@@ -1,0 +1,55 @@
+unnamed_net37	D7-2 
+unnamed_net36	R17-2 Q17-S R18-2 Q18-S Q16-D 
+unnamed_net35	R13-2 D7-1 R16-2 Q16-S R10-2 Q10-S Q13-S 
+battery3	D3-2 
+battery2	R14-2 Q14-S R15-2 Q15-S Q13-D D2-2 
+unnamed_net34	D2-1 D4-2 D3-1 D1-1 
+battery1	R11-2 Q11-S R12-2 Q12-S Q10-D D1-2 
+load2	Q14-D Q17-D Q11-D D6-2 
+load1	Q15-D Q18-D Q12-D D5-2 
+epower	D4-1 D6-1 D5-1 U5-3 C2-1 C1-2 U6-1 
+B1M1	R10-1 Q10-G Q9-C 
+B2M1	R13-1 Q13-G Q8-C 
+B3M1	R16-1 Q16-G Q7-C 
+B1L2	R11-1 Q11-G Q6-C 
+B2L2	R14-1 Q14-G Q5-C 
+B3L2	R17-1 Q17-G Q4-C 
+B1L1	R12-1 Q12-G Q3-C 
+B2L1	R15-1 Q15-G Q2-C 
+unnamed_net33	Q2-B R2-2 
+unnamed_net32	U4-8 R9-1 
+unnamed_net31	Q9-B R9-2 
+unnamed_net30	U4-10 R8-1 
+unnamed_net29	Q8-B R8-2 
+unnamed_net28	U4-12 R7-1 
+unnamed_net27	Q7-B R7-2 
+unnamed_net26	U3-6 R6-1 
+unnamed_net25	Q6-B R6-2 
+unnamed_net24	U3-4 R5-1 
+unnamed_net23	Q5-B R5-2 
+unnamed_net22	U3-2 R4-1 
+unnamed_net21	Q4-B R4-2 
+unnamed_net20	U3-8 R3-1 
+unnamed_net19	Q3-B R3-2 
+unnamed_net18	R2-1 U3-10 
+unnamed_net17	U3-12 R1-1 
+B3L1	R18-1 Q18-G Q1-C 
+unnamed_net16	R1-2 Q1-B 
+9V	U6-3 CONN1-8 
+unnamed_net15	U4-9 U2-6 
+unnamed_net14	U4-11 U2-5 
+unnamed_net13	U4-13 U2-4 
+unnamed_net12	RP1-3 CONN1-7 U2-3 
+unnamed_net11	RP1-4 CONN1-6 U2-2 
+Vcc	U5-2 C3-1 C5-2 C4-2 C7-2 C6-2 RP1-1 U4-14 U3-14 U2-16 U1-16 
+unnamed_net10	U3-5 U1-10 
+unnamed_net9	U3-3 U1-11 
+unnamed_net8	U3-1 U1-12 
+unnamed_net7	RP1-5 CONN1-5 U1-13 
+unnamed_net6	RP1-6 CONN1-4 U1-14 
+unnamed_net5	U3-9 U1-6 
+unnamed_net4	U3-11 U1-5 
+unnamed_net3	U3-13 U1-4 
+unnamed_net2	RP1-8 CONN1-2 U1-3 
+unnamed_net1	RP1-9 CONN1-1 U1-2 
+GND	U5-1 C2-2 C1-1 C3-2 U6-2 C5-1 C4-1 C7-1 C6-1 Q9-E Q8-E Q7-E Q6-E Q5-E Q4-E Q3-E Q2-E U4-7 U3-7 Q1-E CONN1-3 U2-8 U1-8 U2-13 U2-14 U2-15 U2-1 U1-15 U1-1 

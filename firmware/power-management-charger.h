@@ -1,0 +1,52 @@
+/* STM32F1 Power Management for Solar Power
+
+This header file contains defines and prototypes specific to the charging
+task.
+
+Copyright K. Sarkies <ksarkies@internode.on.net> 23 August 2013
+
+Initial 18 October 2013
+
+*/
+
+/*
+ * This file is part of the power-management project.
+ *
+ * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef POWER_MANAGEMENT_CHARGER_H_
+#define POWER_MANAGEMENT_CHARGER_H_
+
+/* This defines the lowest the duty cycle is allowed to go as it may not recover
+when it needs to be raised. Check that the duty cycle reduction doesn't
+cause duty cycle to go to zero at any time. The lower this is, the longer
+it will take the duty cycle to rise in response to changes. */
+#define MIN_DUTYCYCLE   256
+
+#include <stdint.h>
+#include <stdbool.h>
+
+/*--------------------------------------------------------------------------*/
+/* Prototypes */
+/*--------------------------------------------------------------------------*/
+void prvChargerTask(void *pvParameters);
+
+battery_Ch_States getBatteryChargingPhase(int battery);
+int16_t getChargingMeasure(int battery);
+
+#endif
+

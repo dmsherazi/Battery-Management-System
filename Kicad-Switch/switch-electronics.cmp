@@ -1,0 +1,542 @@
+Cmp-Mod V01 Created by CvPcb (2013-12-06 BZR 4528)-product date = Mon 09 Dec 2013 09:40:31 CST
+
+BeginCmp
+TimeStamp = /529FF400/52A2C13F;
+Reference = B1;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2C15B;
+Reference = B2;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2C166;
+Reference = B3;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2DEF3;
+Reference = B11;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2DF23;
+Reference = B12;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2DF0F;
+Reference = B13;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2DF37;
+Reference = B14;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2EDB0;
+Reference = B21;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2EDBC;
+Reference = B22;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2EDB6;
+Reference = B23;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2EDAA;
+Reference = B24;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2EE37;
+Reference = B31;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2EE43;
+Reference = B32;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2EE3D;
+Reference = B33;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2EE49;
+Reference = B34;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCC53;
+Reference = C1;
+ValeurCmp = 0.1uF;
+IdModule  = C2;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCC67;
+Reference = C2;
+ValeurCmp = 0.1uF;
+IdModule  = C2;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCCA3;
+Reference = C3;
+ValeurCmp = 0.1uF;
+IdModule  = C2;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCCB7;
+Reference = C4;
+ValeurCmp = 0.1uF;
+IdModule  = C2;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A02493;
+Reference = C8;
+ValeurCmp = 0.1uF;
+IdModule  = C2;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0249F;
+Reference = C9;
+ValeurCmp = 10uF;
+IdModule  = C1V5;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A02499;
+Reference = C10;
+ValeurCmp = 10uF;
+IdModule  = C1V5;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0245E;
+Reference = D7;
+ValeurCmp = 1N4701;
+IdModule  = D3;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0246A;
+Reference = D8;
+ValeurCmp = 1N4701;
+IdModule  = D3;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A02470;
+Reference = D9;
+ValeurCmp = 1N4701;
+IdModule  = D3;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A005E0;
+Reference = D10;
+ValeurCmp = MBR1645;
+IdModule  = TO220_VERT;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0247C;
+Reference = D11;
+ValeurCmp = 1N4701;
+IdModule  = D3;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A02476;
+Reference = D12;
+ValeurCmp = 1N5819;
+IdModule  = D3;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A02464;
+Reference = D13;
+ValeurCmp = 1N5819;
+IdModule  = D3;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A4F98B;
+Reference = GRND1;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2C171;
+Reference = L1;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2C188;
+Reference = L2;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A2C36A;
+Reference = M1;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_2mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FE219;
+Reference = P1;
+ValeurCmp = CONN_12;
+IdModule  = he10-14c;
+EndCmp
+
+BeginCmp
+TimeStamp = /52A12075;
+Reference = Q1;
+ValeurCmp = 2N3906;
+IdModule  = TO92-CBE;
+EndCmp
+
+BeginCmp
+TimeStamp = /52A120B8;
+Reference = Q2;
+ValeurCmp = 2N3906;
+IdModule  = TO92-CBE;
+EndCmp
+
+BeginCmp
+TimeStamp = /52A120BC;
+Reference = Q3;
+ValeurCmp = 2N3906;
+IdModule  = TO92-CBE;
+EndCmp
+
+BeginCmp
+TimeStamp = /52A120C1;
+Reference = Q4;
+ValeurCmp = 2N3906;
+IdModule  = TO92-CBE;
+EndCmp
+
+BeginCmp
+TimeStamp = /52A120C3;
+Reference = Q5;
+ValeurCmp = 2N3906;
+IdModule  = TO92-CBE;
+EndCmp
+
+BeginCmp
+TimeStamp = /52A120C6;
+Reference = Q6;
+ValeurCmp = 2N3906;
+IdModule  = TO92-CBE;
+EndCmp
+
+BeginCmp
+TimeStamp = /52A120F2;
+Reference = Q7;
+ValeurCmp = 2N3906;
+IdModule  = TO92-CBE;
+EndCmp
+
+BeginCmp
+TimeStamp = /52A120F4;
+Reference = Q8;
+ValeurCmp = 2N3906;
+IdModule  = TO92-CBE;
+EndCmp
+
+BeginCmp
+TimeStamp = /52A120F6;
+Reference = Q9;
+ValeurCmp = 2N3906;
+IdModule  = TO92-CBE;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0037B;
+Reference = Q10;
+ValeurCmp = SQD45P03-12-GE3;
+IdModule  = TO252-HS-S;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/529FFDA0;
+Reference = Q11;
+ValeurCmp = SUD50P04-08-GE3;
+IdModule  = TO252-HS;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A002BA;
+Reference = Q12;
+ValeurCmp = SQD45P03-12-GE3;
+IdModule  = TO252-HS-S;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0038A;
+Reference = Q13;
+ValeurCmp = SQD45P03-12-GE3;
+IdModule  = TO252-HS-S;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0033F;
+Reference = Q14;
+ValeurCmp = SUD50P04-08-GE3;
+IdModule  = TO252-HS;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A00345;
+Reference = Q15;
+ValeurCmp = SQD45P03-12-GE3;
+IdModule  = TO252-HS-S;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A00399;
+Reference = Q16;
+ValeurCmp = SQD45P03-12-GE3;
+IdModule  = TO252-HS-S;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0035D;
+Reference = Q17;
+ValeurCmp = SUD50P04-08-GE3;
+IdModule  = TO252-HS;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A00363;
+Reference = Q18;
+ValeurCmp = SQD45P03-12-GE3;
+IdModule  = TO252-HS-S;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FC76E;
+Reference = R1;
+ValeurCmp = 10K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FC1DC;
+Reference = R2;
+ValeurCmp = 10K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FC7AE;
+Reference = R3;
+ValeurCmp = 10K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FC79B;
+Reference = R4;
+ValeurCmp = 10K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCA65;
+Reference = R5;
+ValeurCmp = 10K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCABF;
+Reference = R6;
+ValeurCmp = 10K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCB9B;
+Reference = R7;
+ValeurCmp = 10K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCB81;
+Reference = R8;
+ValeurCmp = 10K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCBB5;
+Reference = R9;
+ValeurCmp = 10K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A00381;
+Reference = R10;
+ValeurCmp = 1K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A002EC;
+Reference = R11;
+ValeurCmp = 1K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A00319;
+Reference = R12;
+ValeurCmp = 1K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A00390;
+Reference = R13;
+ValeurCmp = 1K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0034B;
+Reference = R14;
+ValeurCmp = 1K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A00351;
+Reference = R15;
+ValeurCmp = 1K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0039F;
+Reference = R16;
+ValeurCmp = 1K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A00369;
+Reference = R17;
+ValeurCmp = 1K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A0036F;
+Reference = R18;
+ValeurCmp = 1K;
+IdModule  = R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCCD6;
+Reference = RR1;
+ValeurCmp = 10K;
+IdModule  = r_pack9;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FBB49;
+Reference = U1;
+ValeurCmp = 74HC04;
+IdModule  = DIP-14__300;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FB8D3;
+Reference = U2;
+ValeurCmp = 74LS139;
+IdModule  = DIP-16__300;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FCB73;
+Reference = U3;
+ValeurCmp = 74HC04;
+IdModule  = DIP-14__300;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FB8BF;
+Reference = U4;
+ValeurCmp = 74LS139;
+IdModule  = DIP-16__300;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A02482;
+Reference = U7;
+ValeurCmp = LM7809CT;
+IdModule  = TO220_VERT;
+EndCmp
+
+BeginCmp
+TimeStamp = /529FF400/52A02488;
+Reference = U8;
+ValeurCmp = LM1084IT-3.3/NOPB;
+IdModule  = TO220_VERT;
+EndCmp
+
+EndListe

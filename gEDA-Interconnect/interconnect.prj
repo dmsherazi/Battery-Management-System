@@ -1,0 +1,4 @@
+elements-dir ~/Development-Electronics/NonProject/gEDA/Footprints
+schematics interconnect-ssi.sch interconnect-connectors.sch
+output-name interconnect
+

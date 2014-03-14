@@ -1,0 +1,39 @@
+# $Id$
+# PcbBOM Version 1.0
+# Date: Wed 26 Feb 2014 06:05:46 GMT UTC
+# Author: Ken Sarkies
+# Title: (unknown) - PCB BOM
+# Quantity, Description, Value, RefDes
+# --------------------------------------------
+12,"R025","10K",R12 R24 R27 R23 R25 R26 R28 R7 R6 R4 R8 R18 
+1,"R025","18K",R20 
+2,"R025","100K",R22 R15 
+5,"TO92","unknown",Q5 Q4 Q3 Q2 Q1 
+2,"LED5","unknown",LED2 LED1 
+2,"R025","470",R29 R30 
+1,"R025","56K",R14 
+4,"R025","1K",R19 R16 R21 R13 
+1,"DIP8","unknown",X2 
+1,"RCY100","1uF",C8 
+1,"RCY100","2.2uF",C9 
+5,"R025","20K",R9 R10 R1 R2 R200 
+4,"JUMPER2","unknown",TP2 TP4 TP3 TP1 
+1,"TO92","LM336Z-2.5",Z1 
+7,"ACY200","0.1uF",C7 C1 C6 C5 C3 C31 C32 
+1,"R025","470K",R11 
+6,"ALF300","1N4148",D4 D1 D6 D5 D2 D3 
+1,"R025","1M",R17 
+1,"DIP14","unknown",X1 
+1,"R025","2.5K",R3 
+1,"R025","2.2K",R5 
+1,"R025","68K",R500 
+5,"Single Large Terminal Pad","(unknown)",(unknown) (unknown) (unknown) (unknown) (unknown) 
+1,"RCY100","47uF",C4 
+1,"RCY100","220uF",C2 
+1,"ACY400","0.005",Rsense 
+1,"JUMPER1","unknown",Neg 
+1,"MSOP8","unknown",X3 
+1,"HEADER10_2","unknown",CONN1 
+2,"Jumper, i.e. single row headers","JUMPER1",(unknown) (unknown) 
+3,"RtrimL","(unknown)",(unknown) (unknown) (unknown) 
+1,"Tactile pushbutton","(unknown)",(unknown) 
