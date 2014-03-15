@@ -1,7 +1,14 @@
+/* Linker script for the Battery Management System
+
+This script is an adaptation of the script used in libopencm3 to define all
+sections independently of libopencm3 and to introduce a section of FLASH
+to store configuration data. */
+
 /*
  * This file is part of the libopencm3 project.
  *
  * Copyright (C) 2009 Uwe Hermann <uwe@hermann-uwe.de>
+ * Copyright (C) 2014 K. Sarkies
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

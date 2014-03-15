@@ -11,15 +11,15 @@ NM 		    = $(PREFIX)-nm
 
 MCU             = cortex-m3
 CHIP            = STM32F10x_128k_20k
-#BOARD           = ET_STM32F103
 BOARD           = ET_STAMP_STM32
 F_XTAL          = 8000000
 SYSCLOCK_CL     = SYSCLK_FREQ_72MHz=72000000
 
-DRIVERS_DIR	    = ../../arm-library/libopencm3-examples/libopencm3
+LIBRARY_DIR     = /home/ksarkies/Development-Software/arm-library
+DRIVERS_DIR	    = $(LIBRARY_DIR)/libopencm3-examples/libopencm3
 DRIVERS_SRC     = $(DRIVERS_DIR)/lib/stm32/f1
 DRIVERS_INC	    = $(DRIVERS_DIR)/include
-FREERTOS_DIR    = ../../arm-library/FreeRTOS
+FREERTOS_DIR    = $(LIBRARY_DIR)/FreeRTOS
 FREERTOS_DEV	= $(FREERTOS_DIR)/Source/portable/GCC/ARM_CM3
 FREERTOS_INC	= $(FREERTOS_DIR)/Source/include
 FREERTOS_SRC	= $(FREERTOS_DIR)/Source
@@ -40,11 +40,7 @@ CFLAGS	   += -DGCC_ARMCM3 -ffunction-sections -fdata-sections
 CFLAGS	   += -mcpu=cortex-m3 -DSTM32F1 -msoft-float
 CFLAGS	   += $(CDEFS)
 
-ifeq ($(BOARD), ET_STAMP_STM32)
-    LDSCRIPT    = stm32-h103RET6.ld
-else
-    LDSCRIPT    = stm32-h103RBT6.ld
-endif
+LDSCRIPT    = stm32-h103RET6.ld
 
 LDFLAGS	   += -I . -lc -T$(LDSCRIPT) -L$(DRIVERS_DIR)/lib -nostartfiles -Wl,--gc-sections
 LDFLAGS	   += -lopencm3_stm32f1
