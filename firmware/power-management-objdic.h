@@ -1,4 +1,4 @@
-/* STM16F1 Power Management for Solar Power
+/* STM32F1 Power Management for Solar Power
 
 This file defines the CANopen object dictionary variables made available to an
 external PC and to other processing modules which may be CANopen devices or
@@ -6,7 +6,7 @@ tasks running on the same microcontroller.
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -83,10 +83,11 @@ struct Config
     bool autoTrack;             /* Allows automatic management of batteries */
     uint8_t monitorStrategy;
 /* Delay Variables */
+    portTickType watchdogDelay;
+    portTickType chargerDelay;
     portTickType measurementDelay;
     portTickType monitorDelay;
     portTickType calibrationDelay;
-    portTickType chargerDelay;
 /* System Parameters */
     union InterfaceGroup currentOffsets;
 };
@@ -119,6 +120,7 @@ int16_t getAlphaC(void);
 int16_t getAlphaR(void);
 int16_t getCurrentOffset(uint8_t interface);
 void setCurrentOffset(uint8_t interface, int16_t offset);
+portTickType getWatchdogDelay(void);
 portTickType getChargerDelay(void);
 portTickType getMeasurementDelay(void);
 portTickType getMonitorDelay(void);

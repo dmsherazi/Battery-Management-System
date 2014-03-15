@@ -6,7 +6,7 @@ Initial 25 November 2013
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *

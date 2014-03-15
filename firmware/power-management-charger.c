@@ -27,7 +27,7 @@ Initial 18 October 2013
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -54,8 +54,9 @@ Initial 18 October 2013
 #include "queue.h"
 #include "semphr.h"
 
+#include "power-management.h"
 #include "power-management-comms.h"
-
+#include "power-management-file.h"
 #include "power-management-hardware.h"
 #include "power-management-measurement.h"
 #include "power-management-monitor.h"
@@ -66,11 +67,10 @@ static void initGlobals(void);
 static int16_t voltageLimit(uint16_t limitV);
 static void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle);
 
-/* Global Variables */
+/* Local Persistent Variables */
 static battery_Ch_States batteryChargingPhase[NUM_BATS];
 static int16_t chargingMeasure[NUM_BATS];       /* ad-hoc state measure */
-
-/* Local Variables */
+static uint8_t chargerWatchdogCount;
 
 /*--------------------------------------------------------------------------*/
 /* @brief Charging Task
@@ -105,10 +105,10 @@ void prvChargerTask(void *pvParameters)
 
 	while (1)
 	{
-        sendStringLowPriority("DD","Charger");
-
 /* Wait until the next tick cycle */
 	    vTaskDelay(getChargerDelay());
+/* Reset watchdog counter */
+        chargerWatchdogCount = 0;
 
 /* Get the battery being charged, if any, from the switch settings.
 These monitor task will set these to select the battery to charge. */
@@ -314,5 +314,23 @@ static void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle)
         newDutyCycle = (newDutyCycle*140)>>7;
     }
     *dutyCycle = newDutyCycle;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Check the watchdog state
+
+The watchdog counter is decremented. If it reaches zero then the task is reset.
+*/
+
+void checkChargerWatchdog(void)
+{
+    if (chargerWatchdogCount++ > 10*getChargerDelay()/getWatchdogDelay())
+    {
+        vTaskDelete(prvChargerTask);
+	    xTaskCreate(prvChargerTask, (signed portCHAR * ) "Charger", \
+                    configMINIMAL_STACK_SIZE, NULL, CHARGER_TASK_PRIORITY, NULL);
+        sendStringLowPriority("D","Charger Restarted");
+        recordString("D","Charger Restarted");
+    }
 }
 

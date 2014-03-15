@@ -3,13 +3,11 @@
 This header file contains defines and prototypes specific to the
 measurement task.
 
-Copyright K. Sarkies <ksarkies@internode.on.net> 23 August 2013
-
 Initial 29 September 2013
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -86,6 +84,7 @@ int16_t getPanelVoltage(int panel);
 int16_t getCurrent(int intf);
 int16_t getVoltage(int intf);
 int32_t getTemperature(void);
+void checkMeasurementWatchdog(void);
 
 #endif
 

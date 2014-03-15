@@ -8,7 +8,7 @@ Note these definitions cannot be placed in the header file.
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -36,18 +36,22 @@ Note these definitions cannot be placed in the header file.
 /* Byte pattern that indicates if a valid NVM config data block is present */
 #define VALID_BLOCK                 0xD5
 
+/* The rate at which the watchdog check is updated (1ms ticks) */
+#define WATCHDOG_DELAY               ((portTickType)512/portTICK_RATE_MS)
+
 /* The rate at which the charger algorithm is updated (1ms ticks) */
-#define CHARGER_DELAY               ((portTickType)500/portTICK_RATE_MS)
+#define CHARGER_DELAY               ((portTickType)512/portTICK_RATE_MS)
 
 /* The rate at which the monitoring is updated (1ms ticks) */
-#define MONITOR_DELAY               ((portTickType)1000/portTICK_RATE_MS)
+#define MONITOR_DELAY               ((portTickType)1024/portTICK_RATE_MS)
 
 /* The default rate at which the samples are taken (1ms ticks) */
-#define MEASUREMENT_DELAY           ((portTickType)500/portTICK_RATE_MS)
+#define MEASUREMENT_DELAY           ((portTickType)512/portTICK_RATE_MS)
 
 /* Delay to allow measurements to settle during the calibration sequence (1ms ticks) */
-#define CALIBRATION_DELAY           ((portTickType)5000/portTICK_RATE_MS)
+#define CALIBRATION_DELAY           ((portTickType)4096/portTICK_RATE_MS)
 
+/* Preset the config data block in FLASH to a given pattern to indicate unused. */
 union ConfigGroup configDataBlock __attribute__ ((section (".configBlock"))) = {{0xA5}};
 union ConfigGroup configData;
 
@@ -65,10 +69,11 @@ void setGlobalDefaults(void)
     flashReadData((uint32_t*)configDataBlock.data,
                    configData.data,sizeof(configData.config));
     if (configData.config.validBlock == VALID_BLOCK) return;
+    configData.config.watchdogDelay = WATCHDOG_DELAY;
+    configData.config.chargerDelay = CHARGER_DELAY;
     configData.config.measurementDelay = MEASUREMENT_DELAY;
     configData.config.monitorDelay = MONITOR_DELAY;
     configData.config.calibrationDelay = CALIBRATION_DELAY;
-    configData.config.chargerDelay = CHARGER_DELAY;
     configData.config.alphaR = 100;           /* about 0.4 */
     configData.config.alphaV = 256;           /* No Filter */
     configData.config.alphaC = 180;           /* about 0.7, only for detecting float state. */
@@ -248,7 +253,18 @@ void setCurrentOffset(uint8_t interface, int16_t offset)
 }
 
 /*--------------------------------------------------------------------------*/
-/** @brief Provide the Charging Time Interval
+/** @brief Provide the Watchdog Task Time Interval
+
+This is the time between decision updates.
+*/
+
+portTickType getWatchdogDelay(void)
+{
+    return configData.config.watchdogDelay;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Provide the Charging Task Time Interval
 
 This is the time between decision updates.
 */
@@ -259,7 +275,7 @@ portTickType getChargerDelay(void)
 }
 
 /*--------------------------------------------------------------------------*/
-/** @brief Provide the Measurement Time Interval
+/** @brief Provide the Measurement Task Time Interval
 
 This is the time between measurement updates.
 */
@@ -270,7 +286,7 @@ portTickType getMeasurementDelay(void)
 }
 
 /*--------------------------------------------------------------------------*/
-/** @brief Provide the Monitor Time Interval
+/** @brief Provide the Monitor Task Time Interval
 
 This is the time between decision updates.
 */

@@ -3,14 +3,12 @@
 This header file contains defines and prototypes specific to the overall
 program.
 
-Copyright K. Sarkies <ksarkies@internode.on.net> 23 August 2013
-
 Initial 13 July 2013
 FreeRTOS 9 August 2013
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -35,6 +33,7 @@ FreeRTOS 9 August 2013
 /* Task Priorities */
 /*--------------------------------------------------------------------------*/
 
+#define WATCHDOG_TASK_PRIORITY      ( tskIDLE_PRIORITY + 0 )
 #define FILE_TASK_PRIORITY          ( tskIDLE_PRIORITY + 0 )
 #define CHARGER_TASK_PRIORITY       ( tskIDLE_PRIORITY + 1 )
 #define MONITOR_TASK_PRIORITY       ( tskIDLE_PRIORITY + 1 )

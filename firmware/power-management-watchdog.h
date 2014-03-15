@@ -1,15 +1,15 @@
 /* STM32F1 Power Management for Solar Power
 
-This header file contains defines and prototypes specific to the
-file management task.
+This header file contains defines and prototypes specific to the charging
+task.
 
-Initial 1 October 2013
+Initial 15 March 2014
 */
 
 /*
  * This file is part of the battery-management-system project.
  *
- * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
+ * Copyright 2014 K. Sarkies <ksarkies@internode.on.net>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -25,22 +25,13 @@ Initial 1 October 2013
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POWER_MANAGEMENT_FILE_H_
-#define POWER_MANAGEMENT_FILE_H_
-
-#define FILE_QUEUE_SIZE             256
-#define FILE_SEND_TIMEOUT          ((portTickType)2000/portTICK_RATE_MS)
-
-#define MAX_OPEN_FILES              2
+#ifndef POWER_MANAGEMENT_WATCHDOG_H_
+#define POWER_MANAGEMENT_WATCHDOG_H_
 
 /*--------------------------------------------------------------------------*/
 /* Prototypes */
 /*--------------------------------------------------------------------------*/
-void prvFileTask(void *pvParameters);
-uint8_t recordString(char* ident, char* string);
-uint8_t recordDual(char* ident, int32_t param1, int32_t param2);
-uint8_t recordSingle(char* ident, int32_t param1);
-void sendFileCommand(char command, uint8_t length, uint8_t *parameters);
+void prvWatchdogTask(void *pvParameters);
 
 #endif
 

@@ -28,15 +28,12 @@ The board used is the ET-STM32F103 (RBT6) or ET-ARM-STAMP (RET6).
 jumpers J13,J14 need to be moved to access the analogue ports. Also PA6-8 are
 used by the SPI1 for the MMIC card interface, so the latter cannot be used.).
 
-Copyright K. Sarkies <ksarkies@internode.on.net> 23 August 2013
-
 Initial 13 July 2013
 FreeRTOS 9 August 2013
-
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -69,9 +66,10 @@ FreeRTOS 9 August 2013
 
 #include "power-management-hardware.h"
 #include "power-management-objdic.h"
+#include "power-management-time.h"
+#include "power-management-watchdog.h"
 #include "power-management-comms.h"
 #include "power-management-file.h"
-#include "power-management-time.h"
 #include "power-management-measurement.h"
 #include "power-management-monitor.h"
 #include "power-management-charger.h"
@@ -88,12 +86,16 @@ int main(void)
     prvSetupHardware();         /* From hardware */
     initComms();                /* From comms */
 
+/* Start the watchdog task. */
+	xTaskCreate(prvWatchdogTask, (signed portCHAR * ) "Watchdog", \
+                configMINIMAL_STACK_SIZE, NULL, WATCHDOG_TASK_PRIORITY, NULL);
+
 /* Start the communications task. */
 	xTaskCreate(prvCommsTask, (signed portCHAR * ) "Communications", \
                 configMINIMAL_STACK_SIZE, NULL, COMMS_TASK_PRIORITY, NULL);
 
 /* Start the file management task. */
-	xTaskCreate(prvFileTask, (signed portCHAR * ) "FileManagement", \
+	xTaskCreate(prvFileTask, (signed portCHAR * ) "File", \
                 configMINIMAL_STACK_SIZE, NULL, FILE_TASK_PRIORITY, NULL);
 
 /* Start the measurement task. */
@@ -119,7 +121,8 @@ idle task. */
 /*-----------------------------------------------------------*/
 /*----       ISR Overrides in libopencm3     ----------------*/
 /*-----------------------------------------------------------*/
-/* These trap serious execution errors and reset the application */
+/* These trap serious execution errors and reset the application by means
+of the CM3 system reset command. */
 
 /*-----------------------------------------------------------*/
 void nmi_handler(void)

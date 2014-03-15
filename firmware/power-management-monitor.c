@@ -24,7 +24,7 @@ Initial 29 September 2013
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -49,10 +49,10 @@ Initial 29 September 2013
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
-#include "queue.h"
 #include "semphr.h"
 
 #include "power-management-board-defs.h"
+#include "power-management.h"
 #include "power-management-hardware.h"
 #include "power-management-objdic.h"
 #include "power-management-lib.h"
@@ -68,6 +68,7 @@ static void initGlobals(void);
 static int16_t computeSoC(uint32_t voltage, uint32_t temperature, battery_Type type);
 
 /* Local Persistent Variables */
+static uint8_t monitorWatchdogCount;
 static bool calibrate;
 /* All current and voltage variables times 256. */
 static uint16_t batteryCurrentSteady[NUM_BATS];
@@ -117,8 +118,6 @@ void prvMonitorTask(void *pvParameters)
 /* Main loop */
 	while (1)
 	{
-        sendStringLowPriority("DD","Monitor");
-
 /* Count the number of batteries present. */
         uint8_t numBats = 0;
         uint8_t i;
@@ -615,6 +614,8 @@ batteries to go isolated. */
 
 /* Wait until the next tick cycle */
 		vTaskDelay(getMonitorDelay());
+/* Reset watchdog counter */
+        monitorWatchdogCount = 0;
     }
 }
 
@@ -703,5 +704,23 @@ int16_t getBatteryCurrentOffset(int battery)
 void startCalibration()
 {
     calibrate = true;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Check the watchdog state
+
+The watchdog counter is decremented. If it reaches zero then the task is reset.
+*/
+
+void checkMonitorWatchdog(void)
+{
+    if (!calibrate && (monitorWatchdogCount++ > 10*getMonitorDelay()/getWatchdogDelay()))
+    {
+        vTaskDelete(prvMonitorTask);
+	    xTaskCreate(prvMonitorTask, (signed portCHAR * ) "Monitor", \
+                    configMINIMAL_STACK_SIZE, NULL, MONITOR_TASK_PRIORITY, NULL);
+        sendStringLowPriority("D","Monitor Restarted");
+        recordString("D","Monitor Restarted");
+    }
 }
 

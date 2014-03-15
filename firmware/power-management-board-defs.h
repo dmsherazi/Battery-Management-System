@@ -4,14 +4,12 @@ Definitions for the Selected Microcontroller Board.
 
 Either the ET-STM32F103 or the ET-STAMP-STM board can be used.
 
-Copyright K. Sarkies <ksarkies@internode.on.net> 23 September 2013
-
 Initial 23 September 2013
 
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *

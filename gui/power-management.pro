@@ -2,7 +2,7 @@ PROJECT =       Power Management GUI
 TEMPLATE =      app
 TARGET          += 
 DEPENDPATH      += .
-include(../../qextserialport/src/qextserialport.pri)
+include(/home/ksarkies/Development-Software/qextserialport/src/qextserialport.pri)
 
 QWT_ROOT        = /usr/local/qwt-6.1.0
 include( $${QWT_ROOT}/features/qwt.prf )

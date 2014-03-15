@@ -18,7 +18,7 @@ Initial 29 September 2013
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -81,6 +81,7 @@ static void pwmSetup(void);
 static uint8_t pwmCount;
 static uint32_t v[NUM_CHANNEL]; /* Buffer used by DMA to dump A/D conversions */
 static uint8_t adceoc;          /* A/D end of conversion flag */
+static uint32_t lostCharacters; /* Number of characters lost due to queue full */
 
 /* FreeRTOS queues and intercommunication variables defined in Comms */
 extern xQueueHandle commsSendQueue, commsReceiveQueue, commsEmptySemaphore;
@@ -721,28 +722,27 @@ Find out what interrupted and get or send data as appropriate.
 
 void usart1_isr(void)
 {
-	char data;
-    portBASE_TYPE ok;
 
 /* Check if we were called because of RXNE. */
 	if (usart_get_flag(USART1,USART_SR_RXNE))
 	{
 /* Pull in received character. If buffer full we'll just drop it */
         char inCharacter = (char) usart_recv(USART1);
-        xQueueSendToBackFromISR(commsReceiveQueue,&inCharacter,NULL);
+        if (xQueueSendToBackFromISR(commsReceiveQueue,&inCharacter,NULL) == errQUEUE_FULL)
+            lostCharacters++;
 	}
 /* Check if we were called because of TXE. */
 	if (usart_get_flag(USART1,USART_SR_TXE))
 	{
 /* If the queue is empty, disable the tx interrupt until something is sent. */
-		ok = xQueueReceiveFromISR(commsSendQueue,&data,NULL);
-		if (ok) usart_send(USART1, data);
+    	char data;
+		if (xQueueReceiveFromISR(commsSendQueue,&data,NULL))
+            usart_send(USART1, data);
 		else
         {
             int wokenTask;
             usart_disable_tx_interrupt(USART1);
             xSemaphoreGiveFromISR(commsEmptySemaphore,&wokenTask);    /* Flag as empty */
-//            if (wokenTask) portYIELD_FROM_ISR(wokenTask);
         }
 	}
 }

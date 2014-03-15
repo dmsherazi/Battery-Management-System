@@ -18,7 +18,7 @@ Refactor 4 January 2014
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -48,9 +48,9 @@ Refactor 4 January 2014
 #include "task.h"
 #include "semphr.h"
 
-#include "power-management-comms.h"
-
 #include "power-management-board-defs.h"
+#include "power-management.h"
+#include "power-management-comms.h"
 #include "power-management-hardware.h"
 #include "power-management-objdic.h"
 #include "power-management-monitor.h"
@@ -61,6 +61,7 @@ static void initGlobals(void);
 
 /* Local Persistent Variables */
 /* All variables times 256 except resistances times 65536. */
+static uint8_t measurementWatchdogCount;
 static int16_t currentStepAv[NUM_BATS];  /* Estimated current average */
 static int16_t voltageStepAv[NUM_BATS];  /* Estimated voltage average */
 static int16_t lastBatteryCurrent[NUM_BATS];
@@ -114,12 +115,12 @@ void prvMeasurementTask(void *pvParameters)
 
 	while (1)
 	{
-        sendStringLowPriority("DD","Measurement");
-
         iwdgReset();
 /* A/D conversions */
 /* Wait until the next tick cycle */
 		vTaskDelay(getMeasurementDelay() );
+/* Reset watchdog counter */
+        measurementWatchdogCount = 0;
 /* Fire off a burst of conversions and average the results.
 This averages out variations due to PWM provided they are not high frequency. */
         uint16_t burst = 0;
@@ -339,5 +340,23 @@ int16_t getVoltage(int intf)
 int32_t getTemperature(void)
 {
     return temperature;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Check the watchdog state
+
+The watchdog counter is decremented. If it reaches zero then the task is reset.
+*/
+
+void checkMeasurementWatchdog(void)
+{
+    if (measurementWatchdogCount++ > 10*getMeasurementDelay()/getWatchdogDelay())
+    {
+        vTaskDelete(prvMeasurementTask);
+    	xTaskCreate(prvMeasurementTask, (signed portCHAR * ) "Measurement", \
+                configMINIMAL_STACK_SIZE, NULL, MEASUREMENT_TASK_PRIORITY, NULL);
+        sendStringLowPriority("D","Measurement Restarted");
+        recordString("D","Measurement Restarted");
+    }
 }
 

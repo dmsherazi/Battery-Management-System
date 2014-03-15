@@ -4,13 +4,11 @@ This header file contains defines and prototypes specific to the
 communications task. A number of convenience functions are
 provided for sending different formats.
 
-Copyright K. Sarkies <ksarkies@internode.on.net> 23 August 2013
-
 Initial 29 September 2013
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *

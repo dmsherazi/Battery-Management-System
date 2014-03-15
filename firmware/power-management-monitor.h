@@ -3,14 +3,11 @@
 This header file contains defines and prototypes specific to the monitoring
 task.
 
-Copyright K. Sarkies <ksarkies@internode.on.net> 23 August 2013
-
 Initial 29 September 2013
-
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -33,6 +30,8 @@ Initial 29 September 2013
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#include "power-management-objdic.h"
 
 /* Delay to allow time for first measurements to come in */
 #define MONITOR_STARTUP_DELAY       (( portTickType )1000/portTICK_RATE_MS )
@@ -65,6 +64,7 @@ the result is maximum negative, around -4000) */
 void prvMonitorTask(void *pvParameters);
 int16_t getBatteryCurrentOffset(int battery);
 void startCalibration();
+void checkMonitorWatchdog(void);
 
 #endif
 

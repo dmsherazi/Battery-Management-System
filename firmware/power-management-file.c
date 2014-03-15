@@ -22,7 +22,7 @@ Initial 1 October 2013
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -203,7 +203,7 @@ static void parseFileCommand(char *line)
                         fileStatus = f_stat(line+2, fileInfo+writeFileHandle);
                 }
             }
-          	xQueueSendToBack(fileReceiveQueue,&fileHandle,portMAX_DELAY);
+          	xQueueSendToBack(fileReceiveQueue,&fileHandle,FILE_SEND_TIMEOUT);
             break;
         }
 /* Open a file read only. No check if the file is already opened. */
@@ -236,7 +236,7 @@ static void parseFileCommand(char *line)
                         fileStatus = f_stat(line+2, fileInfo+readFileHandle);
                 }
             }
-          	xQueueSendToBack(fileReceiveQueue,&fileHandle,portMAX_DELAY);
+          	xQueueSendToBack(fileReceiveQueue,&fileHandle,FILE_SEND_TIMEOUT);
             break;
         }
 /* Close a file */
@@ -303,9 +303,12 @@ differ from the number requested if EOF reached. */
             if (length < 82)
                 fileStatus = f_read(&file[fileHandle],buffer,length,&numRead);
             else fileStatus = FR_INVALID_PARAMETER;
-            xQueueSendToBack(fileReceiveQueue,&numRead,portMAX_DELAY);
-            for (i=0; i<numRead; i++)
-                xQueueSendToBack(fileReceiveQueue,buffer+i,portMAX_DELAY);
+            if (uxQueueSpacesAvailable(fileReceiveQueue) >= numRead+1)
+            {
+                xQueueSendToBack(fileReceiveQueue,&numRead,FILE_SEND_TIMEOUT);
+                for (i=0; i<numRead; i++)
+                    xQueueSendToBack(fileReceiveQueue,buffer+i,FILE_SEND_TIMEOUT);
+            }
             break;
         }
 /* Directory listing. */
@@ -338,9 +341,12 @@ will be sent. */
                 fileInfo.fname[0] = 0;
                 type = 'n';
             }
-            xQueueSendToBack(fileReceiveQueue,&type,portMAX_DELAY);
-            for (i=0; i<numRead+1; i++)
-                xQueueSendToBack(fileReceiveQueue,fileInfo.fname+i,portMAX_DELAY);
+            if (uxQueueSpacesAvailable(fileReceiveQueue) >= numRead+2)
+            {
+                xQueueSendToBack(fileReceiveQueue,&type,FILE_SEND_TIMEOUT);
+                for (i=0; i<numRead+1; i++)
+                    xQueueSendToBack(fileReceiveQueue,fileInfo.fname+i,FILE_SEND_TIMEOUT);
+            }
             break;
         }
 /* Read the free space on the drive. */
@@ -351,22 +357,25 @@ will be sent. */
 	        fileStatus = f_getfree("", (DWORD*)&freeClusters, &fs);
             uint32_t sectorCluster = fs->csize;
             uint8_t i;
-            for (i=0; i<4; i++)
+            if (uxQueueSpacesAvailable(fileReceiveQueue) >= 8)
             {
-                uint8_t wordBuf = (freeClusters >> 8*i) & 0xFF;
-                xQueueSendToBack(fileReceiveQueue,&wordBuf,portMAX_DELAY);
-            }
-            for (i=0; i<4; i++)
-            {
-                uint8_t wordBuf = (sectorCluster >> 8*i) & 0xFF;
-                xQueueSendToBack(fileReceiveQueue,&wordBuf,portMAX_DELAY);
+                for (i=0; i<4; i++)
+                {
+                    uint8_t wordBuf = (freeClusters >> 8*i) & 0xFF;
+                    xQueueSendToBack(fileReceiveQueue,&wordBuf,FILE_SEND_TIMEOUT);
+                }
+                for (i=0; i<4; i++)
+                {
+                    uint8_t wordBuf = (sectorCluster >> 8*i) & 0xFF;
+                    xQueueSendToBack(fileReceiveQueue,&wordBuf,FILE_SEND_TIMEOUT);
+                }
             }
             break;
         }
 /* Return the open status, name and size of open files. */
         case 'S':
         {
-            xQueueSendToBack(fileReceiveQueue,&writeFileHandle,portMAX_DELAY);
+            xQueueSendToBack(fileReceiveQueue,&writeFileHandle,FILE_SEND_TIMEOUT);
             if (writeFileHandle  < 0xFF)
             {
                 TCHAR *writeNameChar;
@@ -374,12 +383,12 @@ will be sent. */
                 do
                 {
                     writeNameChar = fileInfo[writeFileHandle].fname+i;
-                    xQueueSendToBack(fileReceiveQueue,writeNameChar,portMAX_DELAY);
+                    xQueueSendToBack(fileReceiveQueue,writeNameChar,FILE_SEND_TIMEOUT);
                     i++;
                 }
                 while (*writeNameChar > 0);
             }
-            xQueueSendToBack(fileReceiveQueue,&readFileHandle,portMAX_DELAY);
+            xQueueSendToBack(fileReceiveQueue,&readFileHandle,FILE_SEND_TIMEOUT);
             if (readFileHandle  < 0xFF)
             {
                 TCHAR *readNameChar;
@@ -387,7 +396,7 @@ will be sent. */
                 do
                 {
                     readNameChar = fileInfo[readFileHandle].fname+i;
-                    xQueueSendToBack(fileReceiveQueue,readNameChar,portMAX_DELAY);
+                    xQueueSendToBack(fileReceiveQueue,readNameChar,FILE_SEND_TIMEOUT);
                     i++;
                 }
                 while (*readNameChar > 0);
@@ -417,7 +426,7 @@ Checks the filename and handle for the write and read files, if they are open. *
             break;
         }
     }
-    xQueueSendToBack(fileReceiveQueue,&fileStatus,portMAX_DELAY);
+    xQueueSendToBack(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -465,6 +474,10 @@ The data is recorded to the opened write file.
 This is an asynchronous TxPDO in CANopen and therefore is nominally of fixed
 length. The response parameters are converted to ASCII integer for debug.
 
+The command is aborted in its entirety if another task is blocking access to
+the filesystem. It will return an access denied status if a status byte is not
+returned.
+
 @param char* ident: an identifier string.
 @param int32_t param1: first parameter.
 @param int32_t param2: second parameter.
@@ -475,21 +488,23 @@ uint8_t recordSingle(char* ident, int32_t param1)
     uint8_t fileStatus;
     if (isRecording() && (writeFileHandle < 0x7F))
     {
-        if (! xSemaphoreTake(fileSendSemaphore,FILE_SEND_TIMEOUT)) return 0xFF;
-        char record[80];
-        record[0] = '0';            /* dummy in case writeFileHandle is zero */
-        record[1] = 0;
-        stringAppend(record, ident);
-        stringAppend(record, ",");
-        char buffer[20];
-        intToAscii(param1, buffer);
-        stringAppend(record, buffer);
-        stringAppend(record, "\r\n");
-        uint8_t length = stringLength(record);
-        record[0] = writeFileHandle;
-        sendFileCommand('P',length, (uint8_t*)record);
-        xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
-        xSemaphoreGive(fileSendSemaphore);
+        if (xSemaphoreTake(fileSendSemaphore,FILE_SEND_TIMEOUT))
+        {
+            char record[80];
+            record[0] = '0';            /* dummy in case writeFileHandle is zero */
+            record[1] = 0;
+            stringAppend(record, ident);
+            stringAppend(record, ",");
+            char buffer[20];
+            intToAscii(param1, buffer);
+            stringAppend(record, buffer);
+            stringAppend(record, "\r\n");
+            uint8_t length = stringLength(record);
+            record[0] = writeFileHandle;
+            sendFileCommand('P',length, (uint8_t*)record);
+            xQueueReceive(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
+            xSemaphoreGive(fileSendSemaphore);
+        }
     }
     return fileStatus;
 }
@@ -502,6 +517,10 @@ The data is recorded to the opened write file.
 This is an asynchronous TxPDO in CANopen and therefore is nominally of fixed
 length. The response parameters are converted to ASCII integer for debug.
 
+The command is aborted in its entirety if another task is blocking access to
+the filesystem. It will return an access denied status if a status byte is not
+returned.
+
 @param char* ident: an identifier string.
 @param int32_t param1: first parameter.
 @param int32_t param2: second parameter.
@@ -513,24 +532,26 @@ uint8_t recordDual(char* ident, int32_t param1, int32_t param2)
     uint8_t fileStatus;
     if (isRecording() && (writeFileHandle < 0x7F))
     {
-        if (! xSemaphoreTake(fileSendSemaphore,FILE_SEND_TIMEOUT)) return 0xFF;
-        char record[80];
-        record[0] = '0';
-        record[1] = 0;
-        stringAppend(record, ident);
-        stringAppend(record, ",");
-        char buffer[20];
-        intToAscii(param1, buffer);
-        stringAppend(record, buffer);
-        stringAppend(record, ",");
-        intToAscii(param2, buffer);
-        stringAppend(record, buffer);
-        stringAppend(record, "\r\n");
-        uint8_t length = stringLength(record);
-        record[0] = writeFileHandle;
-        sendFileCommand('P',length, (uint8_t*)record);
-        xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
-        xSemaphoreGive(fileSendSemaphore);
+        if (xSemaphoreTake(fileSendSemaphore,FILE_SEND_TIMEOUT))
+        {
+            char record[80];
+            record[0] = '0';
+            record[1] = 0;
+            stringAppend(record, ident);
+            stringAppend(record, ",");
+            char buffer[20];
+            intToAscii(param1, buffer);
+            stringAppend(record, buffer);
+            stringAppend(record, ",");
+            intToAscii(param2, buffer);
+            stringAppend(record, buffer);
+            stringAppend(record, "\r\n");
+            uint8_t length = stringLength(record);
+            record[0] = writeFileHandle;
+            sendFileCommand('P',length, (uint8_t*)record);
+            xQueueReceive(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
+            xSemaphoreGive(fileSendSemaphore);
+        }
     }
     return fileStatus;
 }
@@ -543,6 +564,10 @@ The string is recorded to the opened write file.
 This is an asynchronous TxPDO in CANopen and therefore is nominally of fixed
 length. The response parameters are converted to ASCII integer for debug.
 
+The command is aborted in its entirety if another task is blocking access to
+the filesystem. It will return an access denied status if a status byte is not
+returned.
+
 @param char* ident: an identifier string.
 @param int32_t param1: first parameter.
 @param int32_t param2: second parameter.
@@ -550,22 +575,24 @@ length. The response parameters are converted to ASCII integer for debug.
 
 uint8_t recordString(char* ident, char* string)
 {
-    uint8_t fileStatus;
+    uint8_t fileStatus = FR_DENIED;
     if (isRecording() && (writeFileHandle < 0x7F))
     {
-        if (! xSemaphoreTake(fileSendSemaphore,FILE_SEND_TIMEOUT)) return 0xFF;
-        char record[80];
-        record[0] = '0';
-        record[1] = 0;
-        stringAppend(record, ident);
-        stringAppend(record, ",");
-        stringAppend(record, string);
-        stringAppend(record, "\r\n");
-        uint8_t length = stringLength(record);
-        record[0] = writeFileHandle;
-        sendFileCommand('P',length, (uint8_t*)record);
-        xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
-        xSemaphoreGive(fileSendSemaphore);
+        if (xSemaphoreTake(fileSendSemaphore,FILE_SEND_TIMEOUT))
+        {
+            char record[80];
+            record[0] = '0';
+            record[1] = 0;
+            stringAppend(record, ident);
+            stringAppend(record, ",");
+            stringAppend(record, string);
+            stringAppend(record, "\r\n");
+            uint8_t length = stringLength(record);
+            record[0] = writeFileHandle;
+            sendFileCommand('P',length, (uint8_t*)record);
+            xQueueReceive(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
+            xSemaphoreGive(fileSendSemaphore);
+        }
     }
     return fileStatus;
 }
@@ -576,11 +603,8 @@ uint8_t recordString(char* ident, char* string)
 A convenience API function used to facilitate formation and queueing of commands.
 All commands are a single character followed by the length of the parameters.
 
-If the semaphore is unobtainable, abort the command but block on queue operations
-to ensure that commands are not truncated.
-
-This is the only place the semaphore is taken, and the only place the send queue
-is written.
+The command is aborted in its entirety if there is insufficient space available
+in the queue.
 
 @param[in] char command: Command to be sent
 @param[in] uint8_t length: Length of parameter set only.
@@ -591,9 +615,12 @@ void sendFileCommand(char command, uint8_t length, uint8_t *parameters)
 {
     uint8_t i;
     uint8_t totalLength = length+2;
-    xQueueSendToBack(fileSendQueue,&command,portMAX_DELAY);
-    xQueueSendToBack(fileSendQueue,&totalLength,portMAX_DELAY);
-    for (i=0; i<length; i++)
-        xQueueSendToBack(fileSendQueue,parameters+i,portMAX_DELAY);
+    if (uxQueueSpacesAvailable(fileSendQueue) >= totalLength)
+    {
+        xQueueSendToBack(fileSendQueue,&command,FILE_SEND_TIMEOUT);
+        xQueueSendToBack(fileSendQueue,&totalLength,FILE_SEND_TIMEOUT);
+        for (i=0; i<length; i++)
+            xQueueSendToBack(fileSendQueue,parameters+i,FILE_SEND_TIMEOUT);
+    }
 }
 

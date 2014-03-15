@@ -15,7 +15,7 @@ Initial 29 September 2013
 */
 
 /*
- * This file is part of the power-management project.
+ * This file is part of the battery-management-system project.
  *
  * Copyright 2013 K. Sarkies <ksarkies@internode.on.net>
  *
@@ -687,9 +687,9 @@ void dataMessageSendLowPriority(char* ident, int32_t param1, int32_t param2)
 /* If any characters are on the send queue, block on the commsEmptySemaphore
 which is released by the ISR after the last character has been sent. One
 message is then sent. The calling task cannot queue more than one message. */
+/* Hold indefinitely as the message must not be abandoned */
     while (uxQueueMessagesWaiting(commsSendQueue) > 0)
         xSemaphoreTake(commsEmptySemaphore,portMAX_DELAY);
-/* Hold indefinitely as the message must not be abandoned */
     if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_DELAY)) return;
     commsPrintString(ident);
     commsPrintString(",");
@@ -737,12 +737,16 @@ void sendString(char* ident, char* string)
 {
     if (configData.config.measurementSend)
     {
-        if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_DELAY)) return;
-        commsPrintString(ident);
-        commsPrintString(",");
-        commsPrintString(string);
-        commsPrintString("\r\n");
-        xSemaphoreGive(commsSendSemaphore);
+        if (uxQueueSpacesAvailable(commsSendQueue) >=
+            stringLength(ident)+stringLength(string)+3)
+        {
+            if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_DELAY)) return;
+            commsPrintString(ident);
+            commsPrintString(",");
+            commsPrintString(string);
+            commsPrintString("\r\n");
+            xSemaphoreGive(commsSendSemaphore);
+        }
     }
 }
 
@@ -763,15 +767,19 @@ void sendStringLowPriority(char* ident, char* string)
 /* If any characters are on the send queue, block on the commsEmptySemaphore
 which is released by the ISR after the last character has been sent. One
 message is then sent. The calling task cannot queue more than one message. */
-    while (uxQueueMessagesWaiting(commsSendQueue) > 0)
-        xSemaphoreTake(commsEmptySemaphore,portMAX_DELAY);
 /* Hold indefinitely as the message must not be abandoned */
-    xSemaphoreTake(commsSendSemaphore,portMAX_DELAY);
-    commsPrintString(ident);
-    commsPrintString(",");
-    commsPrintString(string);
-    commsPrintString("\r\n");
-    xSemaphoreGive(commsSendSemaphore);
+    if (uxQueueSpacesAvailable(commsSendQueue) >=
+        stringLength(ident)+stringLength(string)+3)
+    {
+        while (uxQueueMessagesWaiting(commsSendQueue) > 0)
+            xSemaphoreTake(commsEmptySemaphore,portMAX_DELAY);
+        xSemaphoreTake(commsSendSemaphore,portMAX_DELAY);
+        commsPrintString(ident);
+        commsPrintString(",");
+        commsPrintString(string);
+        commsPrintString("\r\n");
+        xSemaphoreGive(commsSendSemaphore);
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -781,11 +789,14 @@ message is then sent. The calling task cannot queue more than one message. */
 
 */
 
-void print_register(uint32_t reg)
+void commsPrintRegister(uint32_t reg)
 {
-	commsPrintHex((reg >> 16) & 0xFFFF);
-	commsPrintHex((reg >> 00) & 0xFFFF);
-	commsPrintChar(" ");
+    if (uxQueueSpacesAvailable(commsSendQueue) >= 11)
+    {
+	    commsPrintHex((reg >> 16) & 0xFFFF);
+	    commsPrintHex((reg >> 00) & 0xFFFF);
+	    commsPrintChar(" ");
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -799,11 +810,12 @@ void commsPrintInt(int32_t value)
 	uint8_t i=0;
 	char buffer[25];
     intToAscii(value, buffer);
-	while (buffer[i] > 0)
-	{
-	    commsPrintChar(&buffer[i]);
-        i++;
-	}
+    if (uxQueueSpacesAvailable(commsSendQueue) >= stringLength(buffer))
+	    while (buffer[i] > 0)
+	    {
+	        commsPrintChar(&buffer[i]);
+            i++;
+	    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -822,11 +834,14 @@ void commsPrintHex(uint32_t value)
 		buffer[i] = "0123456789ABCDEF"[value & 0xF];
 		value >>= 4;
 	}
-	for (i = 4; i > 0; i--)
-	{
-	    commsPrintChar(&buffer[i-1]);
-	}
+    if (uxQueueSpacesAvailable(commsSendQueue) >= 5)
+    {
+	    for (i = 4; i > 0; i--)
+	    {
+	        commsPrintChar(&buffer[i-1]);
+	    }
     commsPrintChar(" ");
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -837,7 +852,8 @@ void commsPrintHex(uint32_t value)
 
 void commsPrintString(char *ch)
 {
-  	while(*ch) commsPrintChar(ch++);
+    if (uxQueueSpacesAvailable(commsSendQueue) >= stringLength(ch))
+  	    while(*ch) commsPrintChar(ch++);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -849,7 +865,7 @@ The ISR is in the hardware module.
 
 Characters are placed on a queue and picked up by the ISR for transmission.
 The application is responsible for protecting a message with semaphores
-to ensure it is sent in entirety.
+to ensure it is sent in entirety (see convenience functions defined here).
 
 If the queue fails to respond it is reset. A number of messages will be lost but
 hopefully the application will continue to run. A receiving program may see
@@ -860,11 +876,11 @@ a corrupted message.
 
 void commsPrintChar(char *ch)
 {
-//    xSemaphoreTake(commsEmptySemaphore,0);  /* Flag as not empty. */
     commsEnableTxInterrupt(false);
   	while (xQueueSendToBack(commsSendQueue,ch,COMMS_SEND_TIMEOUT) != pdTRUE)
     {
         xQueueReset(commsSendQueue);
+        commsEnableTxInterrupt(true);
         taskYIELD();
     }
     commsEnableTxInterrupt(true);
