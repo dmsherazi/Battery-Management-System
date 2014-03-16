@@ -159,6 +159,8 @@ switches off to allow the panel to be measured. */
 quickly but terminal voltage may take some time, which could slightly affect
 some currents. */
 	                vTaskDelay(getCalibrationDelay());
+/* Reset watchdog counter */
+                    monitorWatchdogCount = 0;
                     for (i=0; i<NUM_IFS; i++) results[test][i] = getCurrent(i);
 /* Send a progress update */
                     dataMessageSend("pQ",0,test);
@@ -714,7 +716,7 @@ The watchdog counter is decremented. If it reaches zero then the task is reset.
 
 void checkMonitorWatchdog(void)
 {
-    if (!calibrate && (monitorWatchdogCount++ > 10*getMonitorDelay()/getWatchdogDelay()))
+    if (monitorWatchdogCount++ > 10*getMonitorDelay()/getWatchdogDelay())
     {
         vTaskDelete(prvMonitorTask);
 	    xTaskCreate(prvMonitorTask, (signed portCHAR * ) "Monitor", \

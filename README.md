@@ -45,3 +45,13 @@ from the recorded performance data.
 
 (c) K. Sarkies 15/03/2014
 
+TODO
+
+1. Improvement of MOSFET switch drivers to reduce EMI at higher rates.
+2. Development of a 433MHz transponder set to convert serial transmissions 3.3V
+   and RS232 levels, to RF signalling.
+3. Development of a 50W linear regulator to add to the solar panel side. This
+   will allow avoidance of switching while limiting the battery charge voltage.
+   Ideally this would be controlled through the processor DAC but that would
+   need major hardware changes.
+
