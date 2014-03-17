@@ -95,7 +95,7 @@ void setGlobalDefaults(void)
         }
         else if (configData.config.batteryType[i] == agmT)
         {
-            configData.config.absorptionVoltage[i] = 3660;        /* 14.3V */
+            configData.config.absorptionVoltage[i] = 3736;        /* 14.6V */
             configData.config.floatVoltage[i] = 3481;             /* 13.6V */
         }
         else if (configData.config.batteryType[i] == gelT)
@@ -111,6 +111,7 @@ void setGlobalDefaults(void)
 /* Don't track unless instructed externally */
     configData.config.autoTrack = false;
     configData.config.debugMessageSend = false;
+    configData.config.switchAvoidance = false;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -330,6 +331,17 @@ bool isAutoTrack(void)
 }
 
 /*--------------------------------------------------------------------------*/
+/** @brief Switch Avoidance
+
+True if the switching avoidance strategy is requested.
+*/
+
+bool isSwitchAvoidance(void)
+{
+    return configData.config.switchAvoidance;
+}
+
+/*--------------------------------------------------------------------------*/
 /** @brief Automatic Tracking switch
 
 True if automatic tracking has been requested, false otherwise.
@@ -345,7 +357,9 @@ uint8_t getMonitorStrategy(void)
 
 bit 0 if autoTrack,
 bit 1 if recording,
-bit 2 if calibrating
+bit 2 if switch avoidance
+bit 3 if measurements are being sent
+bit 4 if debug messages are being sent
 
 @returns uint16_t status of controls
 */
@@ -354,6 +368,7 @@ uint16_t getControls(void)
     uint8_t controls = 0;
     if (configData.config.autoTrack) controls |= 1<<0;
     if (configData.config.recording) controls |= 1<<1;
+    if (configData.config.switchAvoidance) controls |= 1<<2;
     if (configData.config.measurementSend) controls |= 1<<3;
     if (configData.config.debugMessageSend) controls |= 1<<4;
     return controls;

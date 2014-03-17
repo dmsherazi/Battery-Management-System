@@ -245,52 +245,13 @@ released. The command is followed by an interface number 0-5 being batteries
     else if (line[0] == 'p')
     {
         uint8_t battery = line[2]-'1';
-/* M-, M+ Turn on/off data messaging (mainly for debug) */
         switch (line[1])
         {
-        case 'M':
-            {
-                if (line[2] == '-') configData.config.measurementSend = false;
-                if (line[2] == '+') configData.config.measurementSend = true;
-                break;
-            }
 /* a-, a+ Turn autoTracking on or off */
         case 'a':
             {
                 if (line[2] == '-') configData.config.autoTrack = false;
                 else if (line[2] == '+') configData.config.autoTrack = true;
-                break;
-            }
-/* r-, r+ Turn recording on or off */
-        case 'r':
-            {
-                if (line[2] == '-') configData.config.recording = false;
-                else if ((line[2] == '+') && (writeFileHandle < 0x0FF))
-                    configData.config.recording = true;
-                break;
-            }
-/* C Start a calibration sequence */
-        case 'C':
-            {
-                startCalibration();
-                break;
-            }
-/* Tntxx Set battery type and capacity, n is battery, t is type, xx is capacity */
-        case 'T':
-            {
-                if (battery < 3)
-                {
-                    uint8_t type = line[3]-'0';
-                    if (type < 3) configData.config.batteryType[battery] = (battery_Type)type;
-                    configData.config.batteryCapacity[battery] = asciiToInt((char*)line+4);
-                }
-                break;
-            }
-/* Inxx Set bulk current limit, n is battery, xx is limit */
-        case 'I':
-            {
-                if (battery < 3)
-                    configData.config.bulkCurrentLimitScale[battery] = asciiToInt((char*)line+3);
                 break;
             }
 /* Anxx Set battery absorption voltage limit, n is battery, xx is limit */
@@ -300,17 +261,32 @@ released. The command is followed by an interface number 0-5 being batteries
                     configData.config.absorptionVoltage[battery] = asciiToInt((char*)line+3);
                 break;
             }
+/* C Start a calibration sequence */
+        case 'C':
+            {
+                startCalibration();
+                break;
+            }
+/* d Turn on debug messages */
+        case 'd':
+            {
+                if (line[2] == '+') configData.config.debugMessageSend = true;
+                if (line[2] == '-') configData.config.debugMessageSend = false;
+                break;
+            }
+/* Dxx Set charger duty cycle (debug only) */
+        case 'D':
+            {
+                uint8_t dutyCycle = asciiToInt((char*)line+2);
+                if (dutyCycle > 99) dutyCycle = 99;
+                pwmSetDutyCycle(dutyCycle);
+                break;
+            }
 /* fnxx Set battery float current trigger, n is battery, xx is trigger */
         case 'f':
             {
                 if (battery < 3)
                     configData.config.floatStageCurrentScale[battery] = asciiToInt((char*)line+3);
-                break;
-            }
-/* sn Set monitor strategy byte n */
-        case 's':
-            {
-                configData.config.monitorStrategy = asciiToInt((char*)line+3);
                 break;
             }
 /* Fnxx Set battery float voltage limit, n is battery, xx is limit */
@@ -326,19 +302,50 @@ released. The command is followed by an interface number 0-5 being batteries
                 setTimeFromString((char*)line+2);
                 break;
             }
-/* Dxx Set charger duty cycle (debug only) */
-        case 'D':
+/* Inxx Set bulk current limit, n is battery, xx is limit */
+        case 'I':
             {
-                uint8_t dutyCycle = asciiToInt((char*)line+2);
-                if (dutyCycle > 99) dutyCycle = 99;
-                pwmSetDutyCycle(dutyCycle);
+                if (battery < 3)
+                    configData.config.bulkCurrentLimitScale[battery] = asciiToInt((char*)line+3);
                 break;
             }
-/* d Turn on debug messages */
-        case 'd':
+/* M-, M+ Turn on/off data messaging (mainly for debug) */
+        case 'M':
             {
-                if (line[2] == '+') configData.config.debugMessageSend = true;
-                if (line[2] == '-') configData.config.debugMessageSend = false;
+                if (line[2] == '-') configData.config.measurementSend = false;
+                if (line[2] == '+') configData.config.measurementSend = true;
+                break;
+            }
+/* r-, r+ Turn recording on or off */
+        case 'r':
+            {
+                if (line[2] == '-') configData.config.recording = false;
+                else if ((line[2] == '+') && (writeFileHandle < 0x0FF))
+                    configData.config.recording = true;
+                break;
+            }
+/* sn Set monitor strategy byte n */
+        case 's':
+            {
+                configData.config.monitorStrategy = asciiToInt((char*)line+3);
+                break;
+            }
+/* S-, S+ Turn switch avoidance on or off */
+        case 'S':
+            {
+                if (line[2] == '-') configData.config.switchAvoidance = false;
+                if (line[2] == '+') configData.config.switchAvoidance = true;
+                break;
+            }
+/* Tntxx Set battery type and capacity, n is battery, t is type, xx is capacity */
+        case 'T':
+            {
+                if (battery < 3)
+                {
+                    uint8_t type = line[3]-'0';
+                    if (type < 3) configData.config.batteryType[battery] = (battery_Type)type;
+                    configData.config.batteryCapacity[battery] = asciiToInt((char*)line+4);
+                }
                 break;
             }
         }

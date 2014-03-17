@@ -415,6 +415,11 @@ panel. */
 /* Deallocate charger if battery is in float state */
         if (getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
             batteryUnderCharge = 0;
+/* Deallocate charger if battery is in absorption state and switch avoidance
+is on. */
+        if (isSwitchAvoidance() &&
+           (getBatteryChargingPhase(batteryUnderCharge-1) == floatC))
+            batteryUnderCharge = 0;
 
 /* One battery: just allocate load and charger to it */
         if (numBats == 1)
@@ -429,8 +434,8 @@ panel. */
             batteryUnderCharge = batteryFillStateSort[1];
             batteryUnderLoad = batteryFillStateSort[0];
 /* If we allow the load and charger to connect to the same battery, do this in
-the case that the top battery is low or critical. This may boost the
-voltage to the load. */
+the case that the top battery is low or critical. This may boost the voltage
+to the load. */
             if (!(getMonitorStrategy() & SEPARATE_LOAD) &&
                (batteryFillState[batteryUnderLoad-1] != normalF))
                 batteryUnderLoad = batteryUnderCharge;

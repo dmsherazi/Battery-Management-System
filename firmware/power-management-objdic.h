@@ -81,6 +81,7 @@ struct Config
     bool debugMessageSend;      /* Controls if debug messages are transmitted */
     bool recording;             /* Controls recording of performance data */
     bool autoTrack;             /* Allows automatic management of batteries */
+    bool switchAvoidance;       /* Avoid switching to reduce EMI */
     uint8_t monitorStrategy;
 /* Delay Variables */
     portTickType watchdogDelay;
@@ -127,6 +128,7 @@ portTickType getMonitorDelay(void);
 portTickType getCalibrationDelay(void);
 bool isRecording(void);
 bool isAutoTrack(void);
+bool isSwitchAvoidance(void);
 uint8_t getMonitorStrategy(void);
 uint16_t getControls(void);
 
