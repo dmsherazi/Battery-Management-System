@@ -934,7 +934,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../../../../../data/home/ksarkies/Development-Software/Power-Management/gui/power-management-gui.qrc">:/main/battery2.png</pixmap>
+    <pixmap resource="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc">:/main/battery2.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="battery2Image">
@@ -950,7 +950,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../../../../../data/home/ksarkies/Development-Software/Power-Management/gui/power-management-gui.qrc">:/main/battery2.png</pixmap>
+    <pixmap resource="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc">:/main/battery2.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="battery3Image">
@@ -966,7 +966,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../../../../../data/home/ksarkies/Development-Software/Power-Management/gui/power-management-gui.qrc">:/main/battery2.png</pixmap>
+    <pixmap resource="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc">:/main/battery2.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="load1Image">
@@ -982,7 +982,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../../../../../data/home/ksarkies/Development-Software/Power-Management/gui/power-management-gui.qrc">:/main/light2.png</pixmap>
+    <pixmap resource="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc">:/main/light2.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="load2Image">
@@ -998,7 +998,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../../../../../data/home/ksarkies/Development-Software/Power-Management/gui/power-management-gui.qrc">:/main/light2.png</pixmap>
+    <pixmap resource="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc">:/main/light2.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="panelImage">
@@ -1014,7 +1014,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../../../../../data/home/ksarkies/Development-Software/Power-Management/gui/power-management-gui.qrc">:/main/panel4.png</pixmap>
+    <pixmap resource="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc">:/main/panel4.png</pixmap>
    </property>
   </widget>
   <widget class="QWidget" name="layoutWidget">
@@ -1888,8 +1888,8 @@
   </widget>
  </widget>
  <resources>
-  <include location="../../../../../data/home/ksarkies/Development-Software/Power-Management/gui/power-management-gui.qrc"/>
-  <include location="../../../../../data/home/ksarkies/Development-Software/Power-Management/gui/power-management-gui.qrc"/>
+  <include location="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc"/>
+  <include location="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc"/>
  </resources>
  <connections/>
 </ui>
