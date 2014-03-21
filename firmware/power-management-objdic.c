@@ -77,6 +77,7 @@ void setGlobalDefaults(void)
     configData.config.alphaR = 100;           /* about 0.4 */
     configData.config.alphaV = 256;           /* No Filter */
     configData.config.alphaC = 180;           /* about 0.7, only for detecting float state. */
+/* Set default battery parameters */
     configData.config.batteryCapacity[0] = 54;
     configData.config.batteryCapacity[1] = 80;
     configData.config.batteryCapacity[2] = 54;
@@ -84,28 +85,8 @@ void setGlobalDefaults(void)
     configData.config.batteryType[1] = gelT;
     configData.config.batteryType[2] = wetT;
     configData.config.monitorStrategy = 0xFF;
-/* Set default battery parameters */
     uint8_t i=0;
-    for (i=0; i<NUM_BATS; i++)
-    {
-        if (configData.config.batteryType[i] == wetT)
-        {
-            configData.config.absorptionVoltage[i] = 3712;        /* 14.5V */
-            configData.config.floatVoltage[i] = 3379;             /* 13.2V */
-        }
-        else if (configData.config.batteryType[i] == agmT)
-        {
-            configData.config.absorptionVoltage[i] = 3736;        /* 14.6V */
-            configData.config.floatVoltage[i] = 3481;             /* 13.6V */
-        }
-        else if (configData.config.batteryType[i] == gelT)
-        {
-            configData.config.absorptionVoltage[i] = 3610;        /* 14.1V */
-            configData.config.floatVoltage[i] = 3532;             /* 13.8V */
-        }
-        configData.config.floatStageCurrentScale[i] = 33;
-        configData.config.bulkCurrentLimitScale[i] = 5;
-    }
+    for (i=0; i<NUM_BATS; i++) setBatteryChargeParameters(i);
 /* Zero the offsets. */
     for (i=0; i<NUM_IFS; i++) configData.config.currentOffsets.data[i] = 0;
 /* Don't track unless instructed externally */
@@ -131,6 +112,33 @@ uint32_t writeConfigBlock(void)
     configData.config.validBlock = VALID_BLOCK;
     return flashWriteData((uint32_t*)configDataBlock.data,
                           configData.data, sizeof(configData.config));
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Set the Battery Charge Parameters given the Type
+
+@param[in] battery: 0..NUM_BATS-1
+*/
+
+void setBatteryChargeParameters(int battery)
+{
+    if (configData.config.batteryType[battery] == wetT)
+    {
+        configData.config.absorptionVoltage[battery] = 3803;        /* 14.5V */
+        configData.config.floatVoltage[battery] = 2902;             /* 13.2V */
+    }
+    else if (configData.config.batteryType[battery] == agmT)
+    {
+        configData.config.absorptionVoltage[battery] = 3873;        /* 14.6V */
+        configData.config.floatVoltage[battery] = 3179;             /* 13.6V */
+    }
+    else if (configData.config.batteryType[battery] == gelT)
+    {
+        configData.config.absorptionVoltage[battery] = 3526;        /* 14.1V */
+        configData.config.floatVoltage[battery] = 3318;             /* 13.8V */
+    }
+    configData.config.floatStageCurrentScale[battery] = 33;
+    configData.config.bulkCurrentLimitScale[battery] = 5;
 }
 
 /*--------------------------------------------------------------------------*/

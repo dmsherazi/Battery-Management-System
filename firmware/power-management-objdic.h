@@ -110,6 +110,7 @@ union ConfigGroup
 void setGlobalDefaults(void);
 uint32_t writeConfigBlock(void);
 
+void setBatteryChargeParameters(int battery);
 battery_Type getBatteryType(int battery);
 int16_t getBatteryCapacity(int battery);
 int16_t getBulkCurrentLimit(int battery);

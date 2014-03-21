@@ -343,7 +343,11 @@ released. The command is followed by an interface number 0-5 being batteries
                 if (battery < 3)
                 {
                     uint8_t type = line[3]-'0';
-                    if (type < 3) configData.config.batteryType[battery] = (battery_Type)type;
+                    if (type < 3)
+                    {
+                        configData.config.batteryType[battery] = (battery_Type)type;
+                        setBatteryChargeParameters(battery);
+                    }
                     configData.config.batteryCapacity[battery] = asciiToInt((char*)line+4);
                 }
                 break;
