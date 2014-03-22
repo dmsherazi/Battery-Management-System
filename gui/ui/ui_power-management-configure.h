@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'power-management-configure.ui'
 **
-** Created: Thu Feb 27 10:04:18 2014
+** Created: Sun Mar 23 08:40:23 2014
 **      by: Qt User Interface Compiler version 4.8.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -61,8 +61,24 @@ public:
     QComboBox *battery1TypeCombo;
     QComboBox *battery2TypeCombo;
     QComboBox *battery3TypeCombo;
-    QLabel *capacityLabel_2;
+    QLabel *typeLabel;
     QLabel *batteriesLabel;
+    QLabel *battery1AbsorptionVoltage;
+    QLabel *battery2AbsorptionVoltage;
+    QLabel *battery3AbsorptionVoltage;
+    QLabel *battery1FloatVoltage;
+    QLabel *battery2FloatVoltage;
+    QLabel *battery3FloatVoltage;
+    QLabel *battery3FloatCurrent;
+    QLabel *battery2FloatCurrent;
+    QLabel *battery1FloatCurrent;
+    QLabel *absorptionVoltageLabel;
+    QLabel *floatVoltageLabel;
+    QLabel *floatCurrentLabel;
+    QLabel *battery2AbsorptionCurrent;
+    QLabel *battery3AbsorptionCurrent;
+    QLabel *battery1AbsorptionCurrent;
+    QLabel *absorptionCurrentLabel;
     QWidget *calibrationTab;
     QPushButton *calibrateButton;
     QLabel *socLabel;
@@ -216,15 +232,75 @@ public:
         battery3TypeCombo = new QComboBox(batteriesTab);
         battery3TypeCombo->setObjectName(QString::fromUtf8("battery3TypeCombo"));
         battery3TypeCombo->setGeometry(QRect(370, 152, 87, 29));
-        capacityLabel_2 = new QLabel(batteriesTab);
-        capacityLabel_2->setObjectName(QString::fromUtf8("capacityLabel_2"));
-        capacityLabel_2->setGeometry(QRect(470, 157, 71, 17));
+        typeLabel = new QLabel(batteriesTab);
+        typeLabel->setObjectName(QString::fromUtf8("typeLabel"));
+        typeLabel->setGeometry(QRect(470, 157, 71, 17));
         batteriesLabel = new QLabel(batteriesTab);
         batteriesLabel->setObjectName(QString::fromUtf8("batteriesLabel"));
         batteriesLabel->setGeometry(QRect(88, 5, 431, 41));
         batteriesLabel->setFont(font1);
         batteriesLabel->setAlignment(Qt::AlignCenter);
         batteriesLabel->setWordWrap(true);
+        battery1AbsorptionVoltage = new QLabel(batteriesTab);
+        battery1AbsorptionVoltage->setObjectName(QString::fromUtf8("battery1AbsorptionVoltage"));
+        battery1AbsorptionVoltage->setGeometry(QRect(154, 195, 79, 31));
+        battery1AbsorptionVoltage->setFrameShape(QFrame::Box);
+        battery2AbsorptionVoltage = new QLabel(batteriesTab);
+        battery2AbsorptionVoltage->setObjectName(QString::fromUtf8("battery2AbsorptionVoltage"));
+        battery2AbsorptionVoltage->setGeometry(QRect(262, 195, 79, 31));
+        battery2AbsorptionVoltage->setFrameShape(QFrame::Box);
+        battery3AbsorptionVoltage = new QLabel(batteriesTab);
+        battery3AbsorptionVoltage->setObjectName(QString::fromUtf8("battery3AbsorptionVoltage"));
+        battery3AbsorptionVoltage->setGeometry(QRect(376, 195, 79, 31));
+        battery3AbsorptionVoltage->setFrameShape(QFrame::Box);
+        battery1FloatVoltage = new QLabel(batteriesTab);
+        battery1FloatVoltage->setObjectName(QString::fromUtf8("battery1FloatVoltage"));
+        battery1FloatVoltage->setGeometry(QRect(154, 275, 79, 31));
+        battery1FloatVoltage->setFrameShape(QFrame::Box);
+        battery2FloatVoltage = new QLabel(batteriesTab);
+        battery2FloatVoltage->setObjectName(QString::fromUtf8("battery2FloatVoltage"));
+        battery2FloatVoltage->setGeometry(QRect(262, 275, 79, 31));
+        battery2FloatVoltage->setFrameShape(QFrame::Box);
+        battery3FloatVoltage = new QLabel(batteriesTab);
+        battery3FloatVoltage->setObjectName(QString::fromUtf8("battery3FloatVoltage"));
+        battery3FloatVoltage->setGeometry(QRect(376, 275, 79, 31));
+        battery3FloatVoltage->setFrameShape(QFrame::Box);
+        battery3FloatCurrent = new QLabel(batteriesTab);
+        battery3FloatCurrent->setObjectName(QString::fromUtf8("battery3FloatCurrent"));
+        battery3FloatCurrent->setGeometry(QRect(376, 315, 79, 31));
+        battery3FloatCurrent->setFrameShape(QFrame::Box);
+        battery2FloatCurrent = new QLabel(batteriesTab);
+        battery2FloatCurrent->setObjectName(QString::fromUtf8("battery2FloatCurrent"));
+        battery2FloatCurrent->setGeometry(QRect(262, 315, 79, 31));
+        battery2FloatCurrent->setFrameShape(QFrame::Box);
+        battery1FloatCurrent = new QLabel(batteriesTab);
+        battery1FloatCurrent->setObjectName(QString::fromUtf8("battery1FloatCurrent"));
+        battery1FloatCurrent->setGeometry(QRect(154, 315, 79, 31));
+        battery1FloatCurrent->setFrameShape(QFrame::Box);
+        absorptionVoltageLabel = new QLabel(batteriesTab);
+        absorptionVoltageLabel->setObjectName(QString::fromUtf8("absorptionVoltageLabel"));
+        absorptionVoltageLabel->setGeometry(QRect(472, 200, 135, 17));
+        floatVoltageLabel = new QLabel(batteriesTab);
+        floatVoltageLabel->setObjectName(QString::fromUtf8("floatVoltageLabel"));
+        floatVoltageLabel->setGeometry(QRect(476, 280, 95, 17));
+        floatCurrentLabel = new QLabel(batteriesTab);
+        floatCurrentLabel->setObjectName(QString::fromUtf8("floatCurrentLabel"));
+        floatCurrentLabel->setGeometry(QRect(476, 320, 97, 17));
+        battery2AbsorptionCurrent = new QLabel(batteriesTab);
+        battery2AbsorptionCurrent->setObjectName(QString::fromUtf8("battery2AbsorptionCurrent"));
+        battery2AbsorptionCurrent->setGeometry(QRect(262, 235, 79, 31));
+        battery2AbsorptionCurrent->setFrameShape(QFrame::Box);
+        battery3AbsorptionCurrent = new QLabel(batteriesTab);
+        battery3AbsorptionCurrent->setObjectName(QString::fromUtf8("battery3AbsorptionCurrent"));
+        battery3AbsorptionCurrent->setGeometry(QRect(376, 235, 79, 31));
+        battery3AbsorptionCurrent->setFrameShape(QFrame::Box);
+        battery1AbsorptionCurrent = new QLabel(batteriesTab);
+        battery1AbsorptionCurrent->setObjectName(QString::fromUtf8("battery1AbsorptionCurrent"));
+        battery1AbsorptionCurrent->setGeometry(QRect(154, 235, 79, 31));
+        battery1AbsorptionCurrent->setFrameShape(QFrame::Box);
+        absorptionCurrentLabel = new QLabel(batteriesTab);
+        absorptionCurrentLabel->setObjectName(QString::fromUtf8("absorptionCurrentLabel"));
+        absorptionCurrentLabel->setGeometry(QRect(472, 240, 135, 17));
         tabWidget->addTab(batteriesTab, QString());
         calibrationTab = new QWidget();
         calibrationTab->setObjectName(QString::fromUtf8("calibrationTab"));
@@ -311,7 +387,7 @@ public:
 
         retranslateUi(PowerManagementConfigDialog);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(PowerManagementConfigDialog);
@@ -361,8 +437,24 @@ public:
         setBatteryButton->setText(QApplication::translate("PowerManagementConfigDialog", "Set", 0, QApplication::UnicodeUTF8));
         resistanceLabel->setText(QApplication::translate("PowerManagementConfigDialog", "Resistance", 0, QApplication::UnicodeUTF8));
         capacityLabel->setText(QApplication::translate("PowerManagementConfigDialog", "Capacity", 0, QApplication::UnicodeUTF8));
-        capacityLabel_2->setText(QApplication::translate("PowerManagementConfigDialog", "Type", 0, QApplication::UnicodeUTF8));
+        typeLabel->setText(QApplication::translate("PowerManagementConfigDialog", "Type", 0, QApplication::UnicodeUTF8));
         batteriesLabel->setText(QApplication::translate("PowerManagementConfigDialog", "View and set Battery model parameters.", 0, QApplication::UnicodeUTF8));
+        battery1AbsorptionVoltage->setText(QString());
+        battery2AbsorptionVoltage->setText(QString());
+        battery3AbsorptionVoltage->setText(QString());
+        battery1FloatVoltage->setText(QString());
+        battery2FloatVoltage->setText(QString());
+        battery3FloatVoltage->setText(QString());
+        battery3FloatCurrent->setText(QString());
+        battery2FloatCurrent->setText(QString());
+        battery1FloatCurrent->setText(QString());
+        absorptionVoltageLabel->setText(QApplication::translate("PowerManagementConfigDialog", "Absorption Voltage", 0, QApplication::UnicodeUTF8));
+        floatVoltageLabel->setText(QApplication::translate("PowerManagementConfigDialog", "Float Voltage", 0, QApplication::UnicodeUTF8));
+        floatCurrentLabel->setText(QApplication::translate("PowerManagementConfigDialog", "Float Current", 0, QApplication::UnicodeUTF8));
+        battery2AbsorptionCurrent->setText(QString());
+        battery3AbsorptionCurrent->setText(QString());
+        battery1AbsorptionCurrent->setText(QString());
+        absorptionCurrentLabel->setText(QApplication::translate("PowerManagementConfigDialog", "Absorption Current", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(batteriesTab), QApplication::translate("PowerManagementConfigDialog", "Batteries", 0, QApplication::UnicodeUTF8));
         calibrateButton->setText(QApplication::translate("PowerManagementConfigDialog", "Calibrate", 0, QApplication::UnicodeUTF8));
         socLabel->setText(QApplication::translate("PowerManagementConfigDialog", "Calibration must be done with all loads physically disconnected and the solar panel connected, but not linked to a battery, over a period of about an hour. This ensures that only quiescent current is flowing and the panel interface has power. Requires 35 seconds to complete.", 0, QApplication::UnicodeUTF8));

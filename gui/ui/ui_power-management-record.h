@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'power-management-record.ui'
 **
-** Created: Fri Feb 21 12:29:45 2014
+** Created: Sun Mar 23 08:32:34 2014
 **      by: Qt User Interface Compiler version 4.8.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

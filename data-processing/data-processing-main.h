@@ -42,6 +42,8 @@
 
 #include "ui_data-processing-main.h"
 #include <QDialog>
+#include <QFile>
+#include <QFileInfo>
 
 typedef enum {battery1UnderVoltage, battery2UnderVoltage, battery3UnderVoltage, 
               battery1OverCurrent, battery2OverCurrent, battery3OverCurrent,
@@ -65,9 +67,15 @@ public:
     bool success();
 private slots:
     void on_openFileButton_clicked();
+    void on_extractButton_clicked();
 private:
 // User Interface object instance
     Ui::DataProcessingMainWindow DataProcessingMainUi;
+    void scanFile(QFile* file);
+    QStringList recordType;
+    QStringList recordText;
+    QFile file;
+    QFileInfo fileInfo;
 };
 
 #endif

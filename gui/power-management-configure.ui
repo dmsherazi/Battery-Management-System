@@ -42,7 +42,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="generalTab">
     <attribute name="title">
@@ -498,7 +498,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="capacityLabel_2">
+    <widget class="QLabel" name="typeLabel">
      <property name="geometry">
       <rect>
        <x>470</x>
@@ -535,6 +535,250 @@
      </property>
      <property name="wordWrap">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery1AbsorptionVoltage">
+     <property name="geometry">
+      <rect>
+       <x>154</x>
+       <y>195</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery2AbsorptionVoltage">
+     <property name="geometry">
+      <rect>
+       <x>262</x>
+       <y>195</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery3AbsorptionVoltage">
+     <property name="geometry">
+      <rect>
+       <x>376</x>
+       <y>195</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery1FloatVoltage">
+     <property name="geometry">
+      <rect>
+       <x>154</x>
+       <y>275</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery2FloatVoltage">
+     <property name="geometry">
+      <rect>
+       <x>262</x>
+       <y>275</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery3FloatVoltage">
+     <property name="geometry">
+      <rect>
+       <x>376</x>
+       <y>275</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery3FloatCurrent">
+     <property name="geometry">
+      <rect>
+       <x>376</x>
+       <y>315</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery2FloatCurrent">
+     <property name="geometry">
+      <rect>
+       <x>262</x>
+       <y>315</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery1FloatCurrent">
+     <property name="geometry">
+      <rect>
+       <x>154</x>
+       <y>315</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="absorptionVoltageLabel">
+     <property name="geometry">
+      <rect>
+       <x>472</x>
+       <y>200</y>
+       <width>135</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Absorption Voltage</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="floatVoltageLabel">
+     <property name="geometry">
+      <rect>
+       <x>476</x>
+       <y>280</y>
+       <width>95</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Float Voltage</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="floatCurrentLabel">
+     <property name="geometry">
+      <rect>
+       <x>476</x>
+       <y>320</y>
+       <width>97</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Float Current</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery2AbsorptionCurrent">
+     <property name="geometry">
+      <rect>
+       <x>262</x>
+       <y>235</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery3AbsorptionCurrent">
+     <property name="geometry">
+      <rect>
+       <x>376</x>
+       <y>235</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery1AbsorptionCurrent">
+     <property name="geometry">
+      <rect>
+       <x>154</x>
+       <y>235</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="absorptionCurrentLabel">
+     <property name="geometry">
+      <rect>
+       <x>472</x>
+       <y>240</y>
+       <width>135</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Absorption Current</string>
      </property>
     </widget>
    </widget>

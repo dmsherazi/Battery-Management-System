@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'data-processing-main.h'
 **
-** Created: Sat Mar 22 09:48:18 2014
+** Created: Sat Mar 22 20:50:21 2014
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_DataProcessingGui[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   14, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -32,12 +32,14 @@ static const uint qt_meta_data_DataProcessingGui[] = {
 
  // slots: signature, parameters, type, tag, flags
       19,   18,   18,   18, 0x08,
+      47,   18,   18,   18, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_DataProcessingGui[] = {
     "DataProcessingGui\0\0on_openFileButton_clicked()\0"
+    "on_extractButton_clicked()\0"
 };
 
 void DataProcessingGui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -47,6 +49,7 @@ void DataProcessingGui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
         DataProcessingGui *_t = static_cast<DataProcessingGui *>(_o);
         switch (_id) {
         case 0: _t->on_openFileButton_clicked(); break;
+        case 1: _t->on_extractButton_clicked(); break;
         default: ;
         }
     }
@@ -85,9 +88,9 @@ int DataProcessingGui::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
+        if (_id < 2)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
+        _id -= 2;
     }
     return _id;
 }

@@ -272,15 +272,19 @@ independent of formats.
 void PowerManagementConfigGui::onMessageReceived(const QString &response)
 {
     QStringList breakdown = response.split(",");
+    int size = breakdown.size();
+    if (size <= 0) return;
     QChar command = breakdown[0].at(1);
     QChar battery = breakdown[0].at(2);
-    int controlByte = breakdown[1].simplified().toInt();
+    int controlByte = 0;
+    if (size > 1) controlByte = breakdown[1].simplified().toInt();
 // Error Code
     switch (command.toAscii())
     {
 // Show Measured Quiescent Current
         case 'Q':
         {
+            if (size < 2) break;
             quiescentCurrent = breakdown[1].simplified();
             int test = breakdown[2].simplified().toInt();
             if (test < 6)
@@ -299,6 +303,7 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
 // Show measured battery resistance
         case 'R':
         {
+            if (size < 2) break;
             QString batteryResistance = QString("%1 m").arg(breakdown[1]
                                          .simplified().toFloat()/65.536,0,'f',0)
                                          .append(QChar(0x03A9));
@@ -316,6 +321,7 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
 // Show battery type and capacity
         case 'T':
         {
+            if (size < 3) break;
             int batteryType = breakdown[1].simplified().toInt();
             int batteryCapacity = breakdown[2].simplified().toInt();
             if (battery == '1')
@@ -341,9 +347,72 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
             }
             break;
         }
+// Show battery absorption phase voltage and current limits
+        case 'A':
+        {
+            if (size < 3) break;
+            QString absorptionVoltage = QString("%1 V").arg(breakdown[1]
+                                         .simplified().toFloat()/65.536,0,'f',0);
+            QString absorptionCurrent = QString("%1 A").arg(breakdown[2]
+                                         .simplified().toFloat()/65.536,0,'f',0);
+            if (battery == '1')
+            {
+                PowerManagementConfigUi.battery1AbsorptionVoltage
+                    ->setText(absorptionVoltage);
+                PowerManagementConfigUi.battery1AbsorptionCurrent
+                    ->setText(absorptionCurrent);
+            }
+            else if (battery == '2')
+            {
+                PowerManagementConfigUi.battery2AbsorptionVoltage
+                    ->setText(absorptionVoltage);
+                PowerManagementConfigUi.battery2AbsorptionCurrent
+                    ->setText(absorptionCurrent);
+            }
+            else if (battery == '3')
+            {
+                PowerManagementConfigUi.battery3AbsorptionVoltage
+                    ->setText(absorptionVoltage);
+                PowerManagementConfigUi.battery3AbsorptionCurrent
+                    ->setText(absorptionCurrent);
+            }
+            break;
+        }
+// Show battery float phase voltage and current limits
+        case 'F':
+        {
+            if (size < 3) break;
+            QString floatVoltage = QString("%1 V").arg(breakdown[1]
+                                         .simplified().toFloat()/65.536,0,'f',0);
+            QString floatCurrent = QString("%1 A").arg(breakdown[2]
+                                         .simplified().toFloat()/65.536,0,'f',0);
+            if (battery == '1')
+            {
+                PowerManagementConfigUi.battery1FloatVoltage
+                    ->setText(floatVoltage);
+                PowerManagementConfigUi.battery1FloatCurrent
+                    ->setText(floatCurrent);
+            }
+            else if (battery == '2')
+            {
+                PowerManagementConfigUi.battery2FloatVoltage
+                    ->setText(floatVoltage);
+                PowerManagementConfigUi.battery2FloatCurrent
+                    ->setText(floatCurrent);
+            }
+            else if (battery == '3')
+            {
+                PowerManagementConfigUi.battery3FloatVoltage
+                    ->setText(floatVoltage);
+                PowerManagementConfigUi.battery3FloatCurrent
+                    ->setText(floatCurrent);
+            }
+            break;
+        }
 /* Show control settings */
         case 'D':
         {
+            if (size < 2) break;
             if (((controlByte&0x08) > 0) &&
                 ! PowerManagementConfigUi.dataMessageCheckbox->isChecked())
                 PowerManagementConfigUi.dataMessageCheckbox->setChecked(true);
@@ -361,6 +430,7 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
 // Show current time settings from the system
         case 'H':
         {
+            if (size < 2) break;
             QDateTime systemTime =
                 QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
             PowerManagementConfigUi.date->setText(systemTime.date().toString("dd.MM.yyyy"));
