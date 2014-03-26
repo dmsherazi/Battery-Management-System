@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'power-management-configure.ui'
 **
-** Created: Sun Mar 23 08:40:23 2014
+** Created: Wed Mar 26 18:49:46 2014
 **      by: Qt User Interface Compiler version 4.8.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -247,11 +247,11 @@ public:
         battery1AbsorptionVoltage->setFrameShape(QFrame::Box);
         battery2AbsorptionVoltage = new QLabel(batteriesTab);
         battery2AbsorptionVoltage->setObjectName(QString::fromUtf8("battery2AbsorptionVoltage"));
-        battery2AbsorptionVoltage->setGeometry(QRect(262, 195, 79, 31));
+        battery2AbsorptionVoltage->setGeometry(QRect(264, 195, 79, 31));
         battery2AbsorptionVoltage->setFrameShape(QFrame::Box);
         battery3AbsorptionVoltage = new QLabel(batteriesTab);
         battery3AbsorptionVoltage->setObjectName(QString::fromUtf8("battery3AbsorptionVoltage"));
-        battery3AbsorptionVoltage->setGeometry(QRect(376, 195, 79, 31));
+        battery3AbsorptionVoltage->setGeometry(QRect(374, 195, 79, 31));
         battery3AbsorptionVoltage->setFrameShape(QFrame::Box);
         battery1FloatVoltage = new QLabel(batteriesTab);
         battery1FloatVoltage->setObjectName(QString::fromUtf8("battery1FloatVoltage"));
@@ -259,19 +259,19 @@ public:
         battery1FloatVoltage->setFrameShape(QFrame::Box);
         battery2FloatVoltage = new QLabel(batteriesTab);
         battery2FloatVoltage->setObjectName(QString::fromUtf8("battery2FloatVoltage"));
-        battery2FloatVoltage->setGeometry(QRect(262, 275, 79, 31));
+        battery2FloatVoltage->setGeometry(QRect(264, 275, 79, 31));
         battery2FloatVoltage->setFrameShape(QFrame::Box);
         battery3FloatVoltage = new QLabel(batteriesTab);
         battery3FloatVoltage->setObjectName(QString::fromUtf8("battery3FloatVoltage"));
-        battery3FloatVoltage->setGeometry(QRect(376, 275, 79, 31));
+        battery3FloatVoltage->setGeometry(QRect(374, 275, 79, 31));
         battery3FloatVoltage->setFrameShape(QFrame::Box);
         battery3FloatCurrent = new QLabel(batteriesTab);
         battery3FloatCurrent->setObjectName(QString::fromUtf8("battery3FloatCurrent"));
-        battery3FloatCurrent->setGeometry(QRect(376, 315, 79, 31));
+        battery3FloatCurrent->setGeometry(QRect(374, 315, 79, 31));
         battery3FloatCurrent->setFrameShape(QFrame::Box);
         battery2FloatCurrent = new QLabel(batteriesTab);
         battery2FloatCurrent->setObjectName(QString::fromUtf8("battery2FloatCurrent"));
-        battery2FloatCurrent->setGeometry(QRect(262, 315, 79, 31));
+        battery2FloatCurrent->setGeometry(QRect(264, 315, 79, 31));
         battery2FloatCurrent->setFrameShape(QFrame::Box);
         battery1FloatCurrent = new QLabel(batteriesTab);
         battery1FloatCurrent->setObjectName(QString::fromUtf8("battery1FloatCurrent"));
@@ -288,11 +288,11 @@ public:
         floatCurrentLabel->setGeometry(QRect(476, 320, 97, 17));
         battery2AbsorptionCurrent = new QLabel(batteriesTab);
         battery2AbsorptionCurrent->setObjectName(QString::fromUtf8("battery2AbsorptionCurrent"));
-        battery2AbsorptionCurrent->setGeometry(QRect(262, 235, 79, 31));
+        battery2AbsorptionCurrent->setGeometry(QRect(264, 235, 79, 31));
         battery2AbsorptionCurrent->setFrameShape(QFrame::Box);
         battery3AbsorptionCurrent = new QLabel(batteriesTab);
         battery3AbsorptionCurrent->setObjectName(QString::fromUtf8("battery3AbsorptionCurrent"));
-        battery3AbsorptionCurrent->setGeometry(QRect(376, 235, 79, 31));
+        battery3AbsorptionCurrent->setGeometry(QRect(374, 235, 79, 31));
         battery3AbsorptionCurrent->setFrameShape(QFrame::Box);
         battery1AbsorptionCurrent = new QLabel(batteriesTab);
         battery1AbsorptionCurrent->setObjectName(QString::fromUtf8("battery1AbsorptionCurrent"));
@@ -387,7 +387,7 @@ public:
 
         retranslateUi(PowerManagementConfigDialog);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(PowerManagementConfigDialog);

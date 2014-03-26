@@ -53,7 +53,7 @@ current. Thus the results here are 256 times the current in amperes. */
 /* Voltage offset: 5 (2 times local ref 2.5V) times the gain 1.803
 times 256 times 4096 */
 
-#define VOLTAGE_OFFSET 9453072
+#define VOLTAGE_OFFSET 9453913
 
 /* Voltage scale: amplifier gain 1.803 times ref voltage 3.276 times 256 */
 

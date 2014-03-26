@@ -94,18 +94,136 @@ bool DataProcessingGui::success()
 }
 
 //-----------------------------------------------------------------------------
+/** @brief Extract Data.
+
+Up to three data sets specified are extracted and written to a file for plotting.
+An interval is specified over which data may be taken as the first sample, the
+maximum or the average. The time over which the extraction occurs can be
+specified.
+*/
+
+void DataProcessingGui::on_extractButton_clicked()
+{
+    if (! inFile->isOpen()) return;
+    inFile->seek(0);      // rewind file
+    if (! saveFile.isEmpty())
+    {
+        displayErrorMessage("A save file is already open - close first");
+        return;
+    }
+    QString filename = QFileDialog::getSaveFileName(this,
+                        "Save csv Data",
+                        QString(),
+                        "Comma Separated Variables (*.csv)",0,0);
+    if (filename.isEmpty()) return;
+    if (! filename.endsWith(".csv")) filename.append(".csv");
+    QFileInfo fileInfo(filename);
+    saveDirectory = fileInfo.absolutePath();
+    saveFile = saveDirectory.filePath(filename);
+    outFile = new QFile(saveFile);             // Open file for output
+    if (! outFile->open(QIODevice::WriteOnly))
+    {
+        displayErrorMessage("Could not open the output file");
+        return;
+    }
+    int interval = DataProcessingMainUi.intervalSpinBox->value();
+    int intervaltype = DataProcessingMainUi.intervalType->currentIndex();
+    QTextStream stream(inFile);
+    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
+    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
+    QDateTime time;
+    while (! stream.atEnd())
+    {
+      	QString lineIn = stream.readLine();
+        QStringList breakdown = lineIn.split(",");
+        int size = breakdown.size();
+        if (size <= 0) break;
+        QString firstField = breakdown[0].simplified();
+        int secondField = 0;
+        int thirdField = 0;
+// Extract the time record for time range comparison
+        if (size > 1)
+        {
+            if ((firstField == "pH") && (size > 1))
+            {
+                time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
+            }
+            else
+            {
+                secondField = breakdown[1].simplified().toInt();
+            }
+        }
+        if (size > 2) thirdField = breakdown[2].simplified().toInt();
+// Extract records
+        if ((time >= startTime) && (time <= endTime))
+        {
+            int recordType_1 = DataProcessingMainUi.recordType_1->currentIndex();
+            int recordType_2 = DataProcessingMainUi.recordType_2->currentIndex();
+            int recordType_3 = DataProcessingMainUi.recordType_3->currentIndex();
+// Find the relevant records and extract their fields
+            if ((recordType_1 > 0) && (firstField == recordType[recordType_1-1]))
+            {
+                qDebug() << breakdown[0].simplified() << breakdown[1].simplified();
+            }
+            if ((recordType_2 > 0) && (firstField == recordType[recordType_2-1]))
+                qDebug() << breakdown[0].simplified() << breakdown[1].simplified();
+            if ((recordType_3 > 0) && (firstField == recordType[recordType_3-1]))
+                qDebug() << breakdown[0].simplified() << breakdown[1].simplified();
+        }
+    }
+    if (saveFile.isEmpty())
+        displayErrorMessage("File already closed");
+    else
+    {
+        outFile->close();
+        delete outFile;
+//! Clear the name to prevent the same file being used.
+        saveFile = QString();
+    }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Open a data file.
+
+*/
+
+void DataProcessingGui::on_openFileButton_clicked()
+{
+    QString errorMessage;
+    QFileInfo fileInfo;
+    QString filename = QFileDialog::getOpenFileName(this,
+                                "Data File","./","Text Files (*.txt)");
+    if (filename.isEmpty())
+    {
+        displayErrorMessage("No filename specified");
+        return;
+    }
+    inFile = new QFile(filename);
+    fileInfo.setFile(filename);
+    if (inFile->open(QIODevice::ReadOnly))
+    {
+        scanFile(inFile);
+    }
+    else
+    {
+        displayErrorMessage(QString("%1").arg((uint)inFile->error()));
+    }
+}
+
+//-----------------------------------------------------------------------------
 /** @brief Scan the data file for start and end times and record types.
 
 */
 
-void DataProcessingGui::scanFile(QFile* file)
+void DataProcessingGui::scanFile(QFile* inFile)
 {
-    QTextStream stream(file);
+    if (! inFile->isOpen()) return;
+    QTextStream stream(inFile);
     QDateTime startTime, endTime;
     while (! stream.atEnd())
     {
-      	QString line = stream.readLine();
-        QStringList breakdown = line.split(",");
+      	QString lineIn = stream.readLine();
+        QStringList breakdown = lineIn.split(",");
         int length = breakdown.size();
         if (length <= 0) break;
         QString firstField = breakdown[0].simplified();
@@ -121,69 +239,11 @@ void DataProcessingGui::scanFile(QFile* file)
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Extract Data.
+/** @brief Print an error message.
 
 */
 
-void DataProcessingGui::on_extractButton_clicked()
+void DataProcessingGui::displayErrorMessage(QString message)
 {
-    file.seek(0);      // rewind file
-    int interval = DataProcessingMainUi.intervalSpinBox->value();
-    int intervaltype = DataProcessingMainUi.intervalType->currentIndex();
-    QTextStream stream(&file);
-    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
-    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
-    QDateTime time = startTime;
-    while (! stream.atEnd())
-    {
-      	QString line = stream.readLine();
-        QStringList breakdown = line.split(",");
-        int length = breakdown.size();
-        if (length <= 0) break;
-        QString firstField = breakdown[0].simplified();
-        if ((firstField == "pH") && (length > 1))
-        {
-            time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
-        }
-        if ((time >= startTime) && (time <= endTime))
-        {
-            int recordType_1 = DataProcessingMainUi.recordType_1->currentIndex();
-            int recordType_2 = DataProcessingMainUi.recordType_2->currentIndex();
-            int recordType_3 = DataProcessingMainUi.recordType_3->currentIndex();
-            if ((recordType_1 > 0) && (firstField == recordType[recordType_1-1]))
-                qDebug() << breakdown[0].simplified() << breakdown[1].simplified();
-            if ((recordType_2 > 0) && (firstField == recordType[recordType_2-1]))
-                qDebug() << breakdown[0].simplified() << breakdown[1].simplified();
-            if ((recordType_3 > 0) && (firstField == recordType[recordType_3-1]))
-                qDebug() << breakdown[0].simplified() << breakdown[1].simplified();
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Open a data file.
-
-*/
-
-void DataProcessingGui::on_openFileButton_clicked()
-{
-    QString errorMessage;
-    QString filename = QFileDialog::getOpenFileName(this,
-                                "Data File","./","Text Files (*.txt)");
-    if (! filename.isEmpty())
-    {
-        file.setFileName(filename);
-        fileInfo.setFile(file);
-        if (file.open(QIODevice::ReadOnly))
-        {
-            scanFile(&file);
-        }
-        else
-        {
-            errorMessage = QString("%1").arg((uint)file.error());
-        }
-    }
-    else errorMessage = "No filename specified";
-    if (! errorMessage.isEmpty()) QMessageBox::critical(this,"Open Failure",errorMessage);
 }
 

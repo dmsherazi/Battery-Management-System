@@ -155,6 +155,8 @@ void PowerManagementConfigGui::on_setBatteryButton_clicked()
     socket->write(typeSet3.append("\n\r").toAscii().constData());
 /* Write to FLASH */
     socket->write("aW\n\r");
+/* Refresh display of set parameters */
+    on_queryBatteryButton_clicked();
 }
 
 //-----------------------------------------------------------------------------
@@ -351,10 +353,10 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
         case 'A':
         {
             if (size < 3) break;
-            QString absorptionVoltage = QString("%1 V").arg(breakdown[1]
-                                         .simplified().toFloat()/65.536,0,'f',0);
-            QString absorptionCurrent = QString("%1 A").arg(breakdown[2]
-                                         .simplified().toFloat()/65.536,0,'f',0);
+            QString absorptionVoltage = QString("%1 V").arg(breakdown[2]
+                                         .simplified().toFloat()/256,0,'f',2);
+            QString absorptionCurrent = QString("%1 A").arg(breakdown[1]
+                                         .simplified().toFloat()/256,0,'f',2);
             if (battery == '1')
             {
                 PowerManagementConfigUi.battery1AbsorptionVoltage
@@ -382,10 +384,10 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
         case 'F':
         {
             if (size < 3) break;
-            QString floatVoltage = QString("%1 V").arg(breakdown[1]
-                                         .simplified().toFloat()/65.536,0,'f',0);
-            QString floatCurrent = QString("%1 A").arg(breakdown[2]
-                                         .simplified().toFloat()/65.536,0,'f',0);
+            QString floatVoltage = QString("%1 V").arg(breakdown[2]
+                                         .simplified().toFloat()/256,0,'f',2);
+            QString floatCurrent = QString("%1 A").arg(breakdown[1]
+                                         .simplified().toFloat()/256,0,'f',2);
             if (battery == '1')
             {
                 PowerManagementConfigUi.battery1FloatVoltage

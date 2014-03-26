@@ -42,7 +42,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="generalTab">
     <attribute name="title">
@@ -556,7 +556,7 @@
     <widget class="QLabel" name="battery2AbsorptionVoltage">
      <property name="geometry">
       <rect>
-       <x>262</x>
+       <x>264</x>
        <y>195</y>
        <width>79</width>
        <height>31</height>
@@ -572,7 +572,7 @@
     <widget class="QLabel" name="battery3AbsorptionVoltage">
      <property name="geometry">
       <rect>
-       <x>376</x>
+       <x>374</x>
        <y>195</y>
        <width>79</width>
        <height>31</height>
@@ -604,7 +604,7 @@
     <widget class="QLabel" name="battery2FloatVoltage">
      <property name="geometry">
       <rect>
-       <x>262</x>
+       <x>264</x>
        <y>275</y>
        <width>79</width>
        <height>31</height>
@@ -620,7 +620,7 @@
     <widget class="QLabel" name="battery3FloatVoltage">
      <property name="geometry">
       <rect>
-       <x>376</x>
+       <x>374</x>
        <y>275</y>
        <width>79</width>
        <height>31</height>
@@ -636,7 +636,7 @@
     <widget class="QLabel" name="battery3FloatCurrent">
      <property name="geometry">
       <rect>
-       <x>376</x>
+       <x>374</x>
        <y>315</y>
        <width>79</width>
        <height>31</height>
@@ -652,7 +652,7 @@
     <widget class="QLabel" name="battery2FloatCurrent">
      <property name="geometry">
       <rect>
-       <x>262</x>
+       <x>264</x>
        <y>315</y>
        <width>79</width>
        <height>31</height>
@@ -723,7 +723,7 @@
     <widget class="QLabel" name="battery2AbsorptionCurrent">
      <property name="geometry">
       <rect>
-       <x>262</x>
+       <x>264</x>
        <y>235</y>
        <width>79</width>
        <height>31</height>
@@ -739,7 +739,7 @@
     <widget class="QLabel" name="battery3AbsorptionCurrent">
      <property name="geometry">
       <rect>
-       <x>376</x>
+       <x>374</x>
        <y>235</y>
        <width>79</width>
        <height>31</height>

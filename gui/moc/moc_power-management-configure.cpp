@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'power-management-configure.h'
 **
-** Created: Sun Mar 23 08:40:47 2014
+** Created: Wed Mar 26 18:49:51 2014
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!

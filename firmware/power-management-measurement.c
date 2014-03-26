@@ -158,7 +158,7 @@ and reset the averages for the next cycle. */
 /* Compute the batteries' charge state by integration of current flow over time.
 Currents are in amperes (x256). Divide by the measurement interval in seconds so
 that charge is in Coulombs (x256). Limit charge to battery's capacity. Sign is
-determined by the fact that poitive current flows out of the batteries. */
+determined by the fact that positive current flows out of the batteries. */
             int32_t batteryCurrent = currents.dataArray.battery[i]-
                                         getBatteryCurrentOffset(i);
             accumulatedBatteryCharge[i] -= batteryCurrent*

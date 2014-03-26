@@ -1,4 +1,5 @@
 Battery Management System Firmware
+Version: First Prototype
 ----------------------------------
 
 The firmware is written for an STM32F103 ARM Cortex M3 microcontroller and uses
@@ -19,6 +20,9 @@ Several tasks are defined to manage:
 It is designed to use CANopen to manage communications with an external PC, in
 case the project is further developed.
 
+The hardware component values set the various scaling factors for voltages and
+currents, and these may change for different hardware versions.
+
 (c) K. Sarkies 15/03/2014
 
 TODO
@@ -31,6 +35,4 @@ TODO
 6. Time - fix date setting.
 7. Comms - additional commands for more configuration options.
 8. Comms - by default do not send messages until instructed.
-9. Charger - options to avoid switching to reduce EMI (this may result in battery
-   undercharge).
 

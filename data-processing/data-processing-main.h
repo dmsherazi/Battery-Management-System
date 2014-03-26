@@ -42,6 +42,7 @@
 
 #include "ui_data-processing-main.h"
 #include <QDialog>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 
@@ -72,9 +73,13 @@ private:
 // User Interface object instance
     Ui::DataProcessingMainWindow DataProcessingMainUi;
     void scanFile(QFile* file);
+    void displayErrorMessage(QString message);
     QStringList recordType;
     QStringList recordText;
-    QFile file;
+    QFile* inFile;
+    QFile* outFile;
+    QString saveFile;
+    QDir saveDirectory;
     QFileInfo fileInfo;
 };
 

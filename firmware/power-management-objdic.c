@@ -124,21 +124,23 @@ void setBatteryChargeParameters(int battery)
 {
     if (configData.config.batteryType[battery] == wetT)
     {
-        configData.config.absorptionVoltage[battery] = 3803;        /* 14.5V */
-        configData.config.floatVoltage[battery] = 2902;             /* 13.2V */
+        configData.config.absorptionVoltage[battery] = 3712;        /* 14.5V */
+        configData.config.floatVoltage[battery] = 3379;             /* 13.2V */
     }
     else if (configData.config.batteryType[battery] == agmT)
     {
-        configData.config.absorptionVoltage[battery] = 3873;        /* 14.6V */
-        configData.config.floatVoltage[battery] = 3179;             /* 13.6V */
+        configData.config.absorptionVoltage[battery] = 3738;        /* 14.6V */
+        configData.config.floatVoltage[battery] = 3482;             /* 13.6V */
     }
     else if (configData.config.batteryType[battery] == gelT)
     {
-        configData.config.absorptionVoltage[battery] = 3526;        /* 14.1V */
-        configData.config.floatVoltage[battery] = 3318;             /* 13.8V */
+        configData.config.absorptionVoltage[battery] = 3610;        /* 14.1V */
+        configData.config.floatVoltage[battery] = 3532;             /* 13.8V */
     }
-    configData.config.floatStageCurrentScale[battery] = 33;
-    configData.config.bulkCurrentLimitScale[battery] = 5;
+    configData.config.floatStageCurrentScale[battery] =
+                configData.config.batteryCapacity[battery]*256/50;
+    configData.config.bulkCurrentLimitScale[battery] =
+        configData.config.batteryCapacity[battery]*256/5;
 }
 
 /*--------------------------------------------------------------------------*/
