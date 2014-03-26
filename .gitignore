@@ -11,9 +11,12 @@
 \#*
 .\#*
 *~
+*-
 *.map
 *.log
 *.pdf
 *.tag
 auxiliary/
+moc_*
+ui_*
 
