@@ -502,20 +502,23 @@ static void gpioSetup(void)
 			    PC_DIGITAL_OUTPUTS);
     gpio_clear(GPIOC, PC_DIGITAL_OUTPUTS);
 #endif
-/* PA inputs digital */
+/* PA inputs digital. Set pull up/down configuration to pull up. */
 #ifdef PA_DIGITAL_INPUTS
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT,
+    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
 			    PA_DIGITAL_INPUTS);
+    gpio_set(GPIOA,PA_DIGITAL_INPUTS);
 #endif
-/* PB inputs digital */
+/* PB inputs digital. Set pull up/down configuration to pull up. */
 #ifdef PB_DIGITAL_INPUTS
-    gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT,
+    gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
 			    PB_DIGITAL_INPUTS);
+    gpio_set(GPIOB,PB_DIGITAL_INPUTS);
 #endif
-/* PC inputs digital */
+/* PC inputs digital. Set pull up/down configuration to pull up. */
 #ifdef PC_DIGITAL_INPUTS
-    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT,
+    gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
 			    PC_DIGITAL_INPUTS);
+    gpio_set(GPIOC,PC_DIGITAL_INPUTS);
 #endif
 }
 

@@ -50,14 +50,14 @@ current. Thus the results here are 256 times the current in amperes. */
 
 #define CURRENT_SCALE 8373
 
-/* Voltage offset: 5 (2 times local ref 2.5V) times the gain 1.803
+/* Voltage offset: 5 (2 times local ref 2.5V) times the gain 1.833
 times 256 times 4096 */
 
-#define VOLTAGE_OFFSET 9453913
+#define VOLTAGE_OFFSET 9610199
 
-/* Voltage scale: amplifier gain 1.803 times ref voltage 3.276 times 256 */
+/* Voltage scale: amplifier gain 1.833 times ref voltage 3.298 times 256 */
 
-#define VOLTAGE_SCALE 1512
+#define VOLTAGE_SCALE 1548
 
 /* Temperature measurement via LM335 for reference voltage 3.280V.
 Scale is 3.28V over 10mV per degree C times 256.
