@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="openFileButton">
+   <widget class="QPushButton" name="openReadFileButton">
     <property name="geometry">
      <rect>
       <x>26</x>
@@ -151,6 +151,22 @@
     </property>
     <property name="toolTip">
      <string>Select whether to use average, maximum or first sample in the interval</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="dumpAllButton">
+    <property name="geometry">
+     <rect>
+      <x>26</x>
+      <y>115</y>
+      <width>91</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Extracts all data in csv form suitable for spreadsheet</string>
+    </property>
+    <property name="text">
+     <string>Dump All</string>
     </property>
    </widget>
   </widget>

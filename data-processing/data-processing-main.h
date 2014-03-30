@@ -67,13 +67,15 @@ public:
     ~DataProcessingGui();
     bool success();
 private slots:
-    void on_openFileButton_clicked();
+    void on_openReadFileButton_clicked();
     void on_extractButton_clicked();
+    void on_dumpAllButton_clicked();
 private:
 // User Interface object instance
     Ui::DataProcessingMainWindow DataProcessingMainUi;
     void scanFile(QFile* file);
     void displayErrorMessage(QString message);
+    bool openSaveFile(void);
     QStringList recordType;
     QStringList recordText;
     QFile* inFile;
@@ -81,6 +83,8 @@ private:
     QString saveFile;
     QDir saveDirectory;
     QFileInfo fileInfo;
+// Record information
+    QString timeRecord;
 };
 
 #endif
