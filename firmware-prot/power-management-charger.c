@@ -111,7 +111,7 @@ void prvChargerTask(void *pvParameters)
         chargerWatchdogCount = 0;
 
 /* Get the battery being charged, if any, from the switch settings.
-These monitor task will set these to select the battery to charge. */
+The monitor task will set these to select the battery to charge. */
         uint8_t switchSettings = getSwitchControlBits();
         battery = (switchSettings >> 4) & 0x03;
 /* If this is different to the battery currently under charge, change over. */
@@ -124,13 +124,16 @@ These monitor task will set these to select the battery to charge. */
         }
 
 /* If a battery is allocated to a load, reset its charging phase to "bulk".
-Only do this if it is not also under charge, as in such a case the charger may
-be supplying the load current. */
+Only do this if it is NOT also under charge, as in such a case the charger may
+be supplying the load current, and only if the SoC is less than 95% to avoid
+"churning". */
         uint8_t batteryUnderLoad1 = switchSettings & 0x03;
-        if (batteryUnderLoad1 != battery)
+        if ((batteryUnderLoad1 != battery) &&
+            (getBatterySoC(batteryUnderLoad1-1) < FLOAT_BULK_SOC))
             batteryChargingPhase[batteryUnderLoad1-1] = bulkC;
         uint8_t batteryUnderLoad2 = (switchSettings >> 2) & 0x03;
-        if (batteryUnderLoad2 != battery)
+        if ((batteryUnderLoad2 != battery) &&
+            (getBatterySoC(batteryUnderLoad2-1) < FLOAT_BULK_SOC))
             batteryChargingPhase[batteryUnderLoad2-1] = bulkC;
 
 /* Compute the averaged voltages and currents to manage phase switchover.
@@ -149,51 +152,57 @@ Use first order exponential filters, separate coefficients. */
             currentAv[index] = currentAv[index] +
                         ((getAlphaC()*(current - currentAv[index]))>>8);
 
+/* Manage the change from bulk to absorption phase. */
+            if (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index)))
+                batteryChargingPhase[index] = absorptionC;  /* Change. */
+
+/* Check that the battery doesn't remain too long in the absorption phase while
+the current is not falling (within a 5% error). 0.5 hour max. Then go to float.
+NOTE: in the following all measured currents are negative while charging. */
+            if ((batteryChargingPhase[index] == absorptionC) &&
+                ((absorptionPhaseCurrent[index]*240)/256 > currentAv[index]))
+            {
+                absorptionPhaseTime[index]++;
+                if (absorptionPhaseTime[index] > 1800000/getChargerDelay())
+                {
+                    batteryChargingPhase[index] = floatC;
+                    absorptionPhaseTime[index] = 0;
+                    absorptionPhaseCurrent[index] = 0;
+                }
+            }
+            else if (batteryChargingPhase[index] == bulkC)
+            {
+                absorptionPhaseTime[index] = 0;
+                absorptionPhaseCurrent[index] = currentAv[index];
+            }
+
+/* Manage the change to float phase when the current drops below the float
+threshold. This is done on the averaged current as rapid response is not
+essential. (Note: measured currents are negative while charging).
+When the change occurs, force the SoC to 100%. This may not be correct if
+the battery is faulty with a low terminal voltage, but that case is handled
+elsewhere. */
+            if ((batteryChargingPhase[index] == absorptionC) &&
+                (-currentAv[index] < getFloatStageCurrent(index)))
+            {
+                batteryChargingPhase[index] = floatC;
+                resetBatterySoC(battery-1);
+            }
+
+/* Manage the change to bulk phase when the terminal voltage drops below the
+absorption threshold, and the duty cycle reaches 100%. This can happen when the
+charger voltage drops, as in a solar panel application. */
+            if ((batteryChargingPhase[index] == absorptionC) &&
+                (voltageAv[index] < voltageLimit(getAbsorptionVoltage(index))*240/256) &&
+                (dutyCycle == dutyCycleMax))
+                batteryChargingPhase[index] = bulkC;
+
 /* Manage the float phase voltage limit. */
             if (batteryChargingPhase[index] == floatC)
                 adaptDutyCycle(voltageAv[index],getFloatVoltage(index),&dutyCycle);
 
 /* Manage the absorption phase voltage limit. */
             adaptDutyCycle(voltageAv[index],getAbsorptionVoltage(index),&dutyCycle);
-
-/* Manage the change from bulk to absorption phase. */
-            if (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index)))
-                batteryChargingPhase[index] = absorptionC;  /* Change. */
-
-/* Check that battery doesn't remain too long in absorption phase while the
-current is not falling (within a 5% error). 0.5 hour max. Then go to float. */
-            if (batteryChargingPhase[index] == absorptionC)
-            {
-                if (((absorptionPhaseCurrent[index]*240)/256 < currentAv[index]))
-                {
-                    absorptionPhaseTime[index]++;
-                    if (absorptionPhaseTime[index] > 1800000/getChargerDelay())
-                    {
-                        batteryChargingPhase[index] = floatC;
-                        absorptionPhaseTime[index] = 0;
-                        absorptionPhaseCurrent[index] = 0;
-                    }
-                }
-                else
-                {
-                    absorptionPhaseTime[index] = 0;
-                    absorptionPhaseCurrent[index] = currentAv[index];
-                }
-            }
-
-/* Manage the change to float phase when the current drops below the float
-threshold. This is done on the averaged current as rapid response is not
-essential. (Note: measured currents are negative while charging). */
-            if ((batteryChargingPhase[index] == absorptionC) &&
-                (-currentAv[index] < getFloatStageCurrent(index)))
-                batteryChargingPhase[index] = floatC;
-
-/* Manage the change to bulk phase when the terminal voltage drops below the
-absorption threshold, and the duty cycle reaches 100%. */
-            if ((batteryChargingPhase[index] == absorptionC) &&
-                (voltageAv[index] < voltageLimit(getAbsorptionVoltage(index))) &&
-                (dutyCycle == dutyCycleMax))
-                batteryChargingPhase[index] = bulkC;
 
 /* Overcurrent protection:
 Compute the peak current from duty cycle (assumes current goes from 0 to a peak)
@@ -207,31 +216,13 @@ This is done on the directly measured current for rapid response. */
             else dutyCycleMax = 100*256;
 
 /* Set the duty cycle. */
-/* Never let duty cycle go near zero else it will not recover. Set to a value
-that will allow it to grow again if needed (round-off error problem). */
+/* Never let duty cycle go too near zero else it will not recover. Set to a
+value that will allow it to grow again if needed (round-off error problem). */
             if (dutyCycle < MIN_DUTYCYCLE) dutyCycle = MIN_DUTYCYCLE;
             if (dutyCycle > dutyCycleMax) dutyCycle = dutyCycleMax;
+recordDual("D1",dutyCycle,currentAv[index]);
+recordDual("D2",absorptionPhaseCurrent[index],absorptionPhaseTime[index]);
             pwmSetDutyCycle(dutyCycle);
-
-/* Compute an ad-hoc charging phase variable.
-This is used for comparison between batteries' charging needs. */
-
-/* Bulk phase: relate to 70% charged at absorption voltage from 0% at an
-arbitrary low voltage (about 10.5V). */
-/*            if (batteryChargingPhase[index] == bulkC)
-            {
-                uint32_t vLimit = voltageLimit(getAbsorptionVoltage(index));
-                chargingMeasure[index] = (70*(voltageAv[index] - 2700))/
-                                            (vLimit - 2700);
-                bulkCurrent = -currentAv[index];
-            }*/
-/* Absorption phase: relate to 70% at bulk current limit to 100% at float stage.
-The bulk current has been recorded from the time that bulk phase ended. */
-/*            else if (batteryChargingPhase[index] == absorptionC)
-            {
-                chargingMeasure[index] = 70 + (30*(bulkCurrent + currentAv[index]))/
-                                       (bulkCurrent - getFloatStageCurrent(index));
-            }*/
         }
     }
 }

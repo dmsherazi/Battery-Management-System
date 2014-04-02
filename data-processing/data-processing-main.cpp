@@ -130,6 +130,12 @@ void DataProcessingGui::on_dumpAllButton_clicked()
     QString controls = "     ";
     QString switches;
     int decision = -1;
+    int debug1a = -1;
+    int debug2a = -1;
+    int debug3a = -1;
+    int debug1b = -1;
+    int debug2b = -1;
+    int debug3b = -1;
     if (! inFile->isOpen()) return;
     if (! openSaveFile()) return;
     inFile->seek(0);      // rewind file
@@ -141,7 +147,8 @@ void DataProcessingGui::on_dumpAllButton_clicked()
     outStream << "B2 I," << "B2 V," << "B2 Cap," << "B2 Op," << "B2 State," << "B2 Charge,";
     outStream << "B3 I," << "B3 V," << "B3 Cap," << "B3 Op," << "B3 State," << "B3 Charge,";
     outStream << "L1 I," << "L1 V," << "L2 I," << "L2 V," << "M1 I," << "M1 V,";
-    outStream << "Temp," << "Controls," << "Switches," << "Decisions";
+    outStream << "Temp," << "Controls," << "Switches," << "Decisions,";
+    outStream << "Debug 1a," << "Debug 1b," << "Debug 2a," << "Debug 2b," << "Debug 3a," << "Debug 3b";
     outStream << "\n\r";
     while (! inStream.atEnd())
     {
@@ -199,7 +206,13 @@ void DataProcessingGui::on_dumpAllButton_clicked()
                     outStream << (float)temperature/256 << ",";
                     outStream << controls << ",";
                     outStream << switches << ",";
-                    outStream << decision;
+                    outStream << decision << ",";
+                    outStream << debug1a << ",";
+                    outStream << debug1b << ",";
+                    outStream << debug2a << ",";
+                    outStream << debug2b << ",";
+                    outStream << debug3a << ",";
+                    outStream << debug3b;
                     outStream << "\n\r";
                 }
                 timeRecord = breakdown[1].simplified();
@@ -244,6 +257,7 @@ void DataProcessingGui::on_dumpAllButton_clicked()
                 if (battery1Fill == 0) battery1FillText = "Normal";
                 else if (battery1Fill == 1) battery1FillText = "Low";
                 else if (battery1Fill == 2) battery1FillText = "Critical";
+                else if (battery1Fill == 3) battery1FillText = "Faulty";
                 else battery1FillText = "?";
                 uint battery1Charge = (secondField >> 4) & 0x03;
                 if (battery1Charge == 0) battery1ChargeText = "Bulk";
@@ -342,6 +356,21 @@ void DataProcessingGui::on_dumpAllButton_clicked()
             if (firstText == "dd")
             {
                 decision = secondField;
+            }
+            if (firstText == "D1")
+            {
+                debug1a = secondField;
+                if (size > 2) debug1b = thirdField;
+            }
+            if (firstText == "D2")
+            {
+                debug2a = secondField;
+                if (size > 2) debug2b = thirdField;
+            }
+            if (firstText == "D3")
+            {
+                debug3a = secondField;
+                if (size > 2) debug3b = thirdField;
             }
         }
     }    

@@ -683,26 +683,36 @@ void PowerManagementGui::processResponse(const QString response)
                 setText("");
         }
     }
-/* Battery Fill and Operational State Indicators */
+/* Battery 1 Fill and Operational State Indicators */
     if ((size > 0) && (firstField == "dO1"))
     {
         int opState = secondField.toInt() & 0x03;
         int fillState = (secondField.toInt() >> 2) & 0x03;
         int chargingState = (secondField.toInt() >> 4) & 0x03;
-        if (fillState == 0)
+        if (fillState == 0)         // Normal
         {
             PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:lightgreen;");
         }
-        else if (fillState == 1)
+        else if (fillState == 1)    // Low
+        {
+            PowerManagementMainUi.battery1Fill->
+                setStyleSheet("background-color:yellow;");
+        }
+        else if (fillState == 2)    // Critical
         {
             PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:orange;");
         }
-        else
+        else if (fillState == 3)    // Faulty
         {
             PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:red;");
+        }
+        else                        // Invalid
+        {
+            PowerManagementMainUi.battery1Fill->
+                setStyleSheet("background-color:white;");
         }
         if (PowerManagementMainUi.autoTrackCheckBox->isChecked())
         {
@@ -749,25 +759,36 @@ void PowerManagementGui::processResponse(const QString response)
                 setText("F");
         }
     }
+/* Battery 2 Fill and Operational State Indicators */
     if ((size > 0) && (firstField == "dO2"))
     {
         int opState = secondField.toInt() & 0x03;
         int fillState = (secondField.toInt() >> 2) & 0x03;
         int chargingState = (secondField.toInt() >> 4) & 0x03;
-        if (fillState == 0)
+        if (fillState == 0)         // Normal
         {
-            PowerManagementMainUi.battery2Fill->
+            PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:lightgreen;");
         }
-        else if (fillState == 1)
+        else if (fillState == 1)    // Low
         {
-            PowerManagementMainUi.battery2Fill->
+            PowerManagementMainUi.battery1Fill->
+                setStyleSheet("background-color:yellow;");
+        }
+        else if (fillState == 2)    // Critical
+        {
+            PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:orange;");
         }
-        else
+        else if (fillState == 3)    // Faulty
         {
-            PowerManagementMainUi.battery2Fill->
+            PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:red;");
+        }
+        else                        // Invalid
+        {
+            PowerManagementMainUi.battery1Fill->
+                setStyleSheet("background-color:white;");
         }
         if (PowerManagementMainUi.autoTrackCheckBox->isChecked())
         {
@@ -814,25 +835,36 @@ void PowerManagementGui::processResponse(const QString response)
                 setText("F");
         }
     }
+/* Battery 3 Fill and Operational State Indicators */
     if ((size > 0) && (firstField == "dO3"))
     {
         int opState = secondField.toInt() & 0x03;
         int fillState = (secondField.toInt() >> 2) & 0x03;
         int chargingState = (secondField.toInt() >> 4) & 0x03;
-        if (fillState == 0)
+        if (fillState == 0)         // Normal
         {
-            PowerManagementMainUi.battery3Fill->
+            PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:lightgreen;");
         }
-        else if (fillState == 1)
+        else if (fillState == 1)    // Low
         {
-            PowerManagementMainUi.battery3Fill->
+            PowerManagementMainUi.battery1Fill->
+                setStyleSheet("background-color:yellow;");
+        }
+        else if (fillState == 2)    // Critical
+        {
+            PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:orange;");
         }
-        else
+        else if (fillState == 3)    // Faulty
         {
-            PowerManagementMainUi.battery3Fill->
+            PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:red;");
+        }
+        else                        // Invalid
+        {
+            PowerManagementMainUi.battery1Fill->
+                setStyleSheet("background-color:white;");
         }
         if (PowerManagementMainUi.autoTrackCheckBox->isChecked())
         {

@@ -70,7 +70,7 @@ static int16_t computeSoC(uint32_t voltage, uint32_t temperature, battery_Type t
 /* Local Persistent Variables */
 static uint8_t monitorWatchdogCount;
 static bool calibrate;
-/* All current and voltage variables times 256. */
+/* All current, voltage, SoC, charge variables times 256. */
 static uint16_t batteryCurrentSteady[NUM_BATS];
 static battery_Fl_States batteryFillState[NUM_BATS];
 static battery_Op_States batteryOpState[NUM_BATS];
@@ -412,6 +412,7 @@ panel. */
         uint8_t lowestBattery = batteryFillStateSort[numBats-1];
 /* decisionStatus is a variable used to record the reason for any decision */
         decisionStatus = 0;
+
 /* Deallocate charger if battery is in float state */
         if (getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
             batteryUnderCharge = 0;
@@ -701,6 +702,33 @@ static int16_t computeSoC(uint32_t voltage, uint32_t temperature, battery_Type t
 int16_t getBatteryCurrentOffset(int battery)
 {
     return currentOffsets.dataArray.battery[battery];
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Access the Battery State of Charge
+
+@param[in] battery: 0..NUM_BATS-1
+*/
+
+int16_t getBatterySoC(int battery)
+{
+    return batterySoC[battery];
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Reset the Battery State of Charge to 100%
+
+This is done by the charging task when the battery enters float phase.
+If the current SoC is less than 100%, report the battery as faulty.
+
+@param[in] battery: 0..NUM_BATS-1
+*/
+
+void resetBatterySoC(int battery)
+{
+    if (batterySoC[battery] < 25600) batteryFillState[battery] = faultyF;
+/* SoC is computed from the charge so this is the quantity changed. */
+    batteryCharge[battery] = 25600*getBatteryCapacity(battery)*36;
 }
 
 /*--------------------------------------------------------------------------*/

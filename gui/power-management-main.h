@@ -27,9 +27,6 @@
 
 #ifndef POWER_MANAGEMENT_MAIN_H
 #define POWER_MANAGEMENT_MAIN_H
-#define _TTY_POSIX_         // Need to tell qextserialport we are in POSIX
-
-#define SERIAL_PORT "/dev/ttyUSB0"
 
 // Parameters of the voltage and current amplifiers
 #define R9 20

@@ -137,10 +137,8 @@ void setBatteryChargeParameters(int battery)
         configData.config.absorptionVoltage[battery] = 3610;        /* 14.1V */
         configData.config.floatVoltage[battery] = 3532;             /* 13.8V */
     }
-    configData.config.floatStageCurrentScale[battery] =
-                configData.config.batteryCapacity[battery]*256/50;
-    configData.config.bulkCurrentLimitScale[battery] =
-        configData.config.batteryCapacity[battery]*256/5;
+    configData.config.floatStageCurrentScale[battery] = 50;
+    configData.config.bulkCurrentLimitScale[battery] = 5;
 }
 
 /*--------------------------------------------------------------------------*/

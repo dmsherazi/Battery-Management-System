@@ -35,6 +35,8 @@ cause duty cycle to go to zero at any time. The lower this is, the longer
 it will take the duty cycle to rise in response to changes. */
 #define MIN_DUTYCYCLE   256
 
+#define FLOAT_BULK_SOC  95*256
+
 #include <stdint.h>
 #include <stdbool.h>
 

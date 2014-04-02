@@ -38,7 +38,7 @@ tasks running on the same microcontroller.
 #define PANEL       2
 
 typedef enum {wetT=0, gelT=1, agmT=2} battery_Type;
-typedef enum {normalF=0, lowF=1, criticalF=2} battery_Fl_States;
+typedef enum {normalF=0, lowF=1, criticalF=2, faultyF=3} battery_Fl_States;
 typedef enum {loadedO=0, chargingO=1, isolatedO=2, missingO=3} battery_Op_States;
 typedef enum {bulkC=0, absorptionC=1, floatC=2, equalizationC=3} battery_Ch_States;
 
