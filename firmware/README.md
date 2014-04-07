@@ -23,7 +23,11 @@ case the project is further developed.
 The hardware component values set the various scaling factors for voltages and
 currents, and these may change for different hardware versions.
 
-(c) K. Sarkies 15/03/2014
+Two versions are here represented. The second refers to slightly different
+voltage and current scales in the measurement header for the PCB version.
+It is compiled with the Makefile-second.
+
+(c) K. Sarkies 07/04/2014
 
 TODO
 

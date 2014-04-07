@@ -54,7 +54,7 @@ Refactor 4 January 2014
 #include "power-management-hardware.h"
 #include "power-management-objdic.h"
 #include "power-management-monitor.h"
-#include "power-management-measurement.h"
+#include "power-management-measurement-second.h"
 
 /* Local Prototypes */
 static void initGlobals(void);
