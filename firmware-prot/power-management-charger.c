@@ -181,7 +181,7 @@ threshold. This is done on the averaged current as rapid response is not
 essential. (Note: measured currents are negative while charging).
 When the change occurs, force the SoC to 100%. This may not be correct if
 the battery is faulty with a low terminal voltage, but that case is handled
-elsewhere. */
+by the resetBattery function. */
             if ((batteryChargingPhase[index] == absorptionC) &&
                 (-currentAv[index] < getFloatStageCurrent(index)))
             {
@@ -199,7 +199,9 @@ charger voltage drops, as in a solar panel application. */
 
 /* Manage the float phase voltage limit. */
             if (batteryChargingPhase[index] == floatC)
+            {
                 adaptDutyCycle(voltageAv[index],getFloatVoltage(index),&dutyCycle);
+            }
 
 /* Manage the absorption phase voltage limit. */
             adaptDutyCycle(voltageAv[index],getAbsorptionVoltage(index),&dutyCycle);
@@ -220,9 +222,18 @@ This is done on the directly measured current for rapid response. */
 value that will allow it to grow again if needed (round-off error problem). */
             if (dutyCycle < MIN_DUTYCYCLE) dutyCycle = MIN_DUTYCYCLE;
             if (dutyCycle > dutyCycleMax) dutyCycle = dutyCycleMax;
-recordDual("D1",dutyCycle,currentAv[index]);
-recordDual("D2",absorptionPhaseCurrent[index],absorptionPhaseTime[index]);
             pwmSetDutyCycle(dutyCycle);
+/* If the voltage drifts too high in float phase, turn off charging altogether.*/
+            if ((batteryChargingPhase[index] == floatC) &&
+                (voltageAv[index] > voltageLimit(getFloatVoltage(index))*260/256))
+                pwmSetDutyCycle(0);
+/* If the voltage drifts too high in any phase, turn off charging altogether.*/
+            if (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))*260/256)
+                pwmSetDutyCycle(0);
+/* If switch avoidance is set, turn off charging. This will cause the charger to
+operate in bang-bang mode, which may create less EMI. */
+            if (isSwitchAvoidance() && (dutyCycle < 100*256))
+                pwmSetDutyCycle(0);
         }
     }
 }

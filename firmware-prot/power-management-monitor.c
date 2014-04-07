@@ -413,20 +413,17 @@ panel. */
 /* decisionStatus is a variable used to record the reason for any decision */
         decisionStatus = 0;
 
-/* Deallocate charger if battery is in float state */
-        if (getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
-            batteryUnderCharge = 0;
-/* Deallocate charger if battery is in absorption state and switch avoidance
-is on. */
-        if (isSwitchAvoidance() &&
-           (getBatteryChargingPhase(batteryUnderCharge-1) == floatC))
-            batteryUnderCharge = 0;
-
 /* One battery: just allocate load and charger to it */
         if (numBats == 1)
         {
             batteryUnderCharge = batteryFillStateSort[0];
-            batteryUnderLoad = batteryUnderCharge;
+            batteryUnderLoad = batteryFillStateSort[0];
+/* If the battery is in float and higher than 95%, stop charging */
+            if ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC) &&
+                (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC))
+            {
+                batteryUnderCharge = 0;
+            }
             decisionStatus = 0x100;
         }
 /* Two batteries: just allocate load to highest and charger to lowest. */
@@ -440,6 +437,12 @@ to the load. */
             if (!(getMonitorStrategy() & SEPARATE_LOAD) &&
                (batteryFillState[batteryUnderLoad-1] != normalF))
                 batteryUnderLoad = batteryUnderCharge;
+/* If the battery under charge is in float and higher than 95%, stop charging */
+            if ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC) &&
+                (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC))
+            {
+                batteryUnderCharge = 0;
+            }
             decisionStatus = 0x200;
         }
 /* More than two batteries: manage isolation and charge state. */
@@ -449,8 +452,7 @@ to the load. */
             if (batteryFillState[lowestBattery-1] == normalF)
             {
 /* (1) If the charger is unallocated, set to the lowest SoC battery if this
-battery is not in float state (float state would be an unusual case that could
-arise from a weak battery that cannot be charged to full SoC).
+battery is not in float state with SoC > 95%.
 Use the isolated one only if it is not in a float charge state. */
                 decisionStatus = 0x300;
                 if (batteryUnderCharge == 0)
@@ -460,6 +462,8 @@ Use the isolated one only if it is not in a float charge state. */
                     {
                         batteryUnderCharge = batteryFillStateSort[numBats-i-1];
                         if (getBatteryChargingPhase(batteryUnderCharge-1) != floatC)
+                            break;
+                        if (batterySoC[batteryUnderCharge-1] < FLOAT_CHARGE_SOC)
                             break;
                     }
 /* However if this has allocated the charger to the loaded battery, then
@@ -541,6 +545,7 @@ critical we must turn off the low priority loads. */
                 batteryUnderLoad = batteryFillStateSort[0];
                 batteryUnderCharge = batteryFillStateSort[numBats-1];
             }
+
 /*--------------END BATTERY MANAGEMENT DECISIONS ------------------*/
 
 /*------------------------CLEAN UP --------------------------------*/
