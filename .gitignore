@@ -16,6 +16,9 @@
 *.log
 *.pdf
 *.tag
+*.lss
+*.sym
+*.csv
 auxiliary/
 moc_*
 ui_*

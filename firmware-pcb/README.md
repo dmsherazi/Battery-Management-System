@@ -1,5 +1,5 @@
 Battery Management System Firmware
-Version: First Prototype
+Version: Second Prototype
 ----------------------------------
 
 The firmware is written for an STM32F103 ARM Cortex M3 microcontroller and uses
@@ -23,16 +23,8 @@ case the project is further developed.
 The hardware component values set the various scaling factors for voltages and
 currents, and these may change for different hardware versions.
 
-(c) K. Sarkies 15/03/2014
+This prototype uses PCBs with slight differences in the interfaces for
+measurement and switch PWM.
 
-TODO
-
-1. Firmware upload - from within the program. Base on stm32flash
-2. Monitor - move load to another battery after SoC has fallen to 90%.
-3. Comms - test queue space available for each data message to send.
-4. Measurement - Increase switching speed to 25kHz. May need hardware changes.
-5. Charger - add acceleration to pull overvoltage back quickly.
-6. Time - fix date setting.
-7. Comms - additional commands for more configuration options.
-8. Comms - by default do not send messages until instructed.
+(c) K. Sarkies 7/04/2014
 

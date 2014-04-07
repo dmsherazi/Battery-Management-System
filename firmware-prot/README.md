@@ -28,8 +28,7 @@ currents, and these may change for different hardware versions.
 TODO
 
 1. Firmware upload - from within the program. Base on stm32flash
-2. Monitor - move load to another battery after SoC has fallen to 90%.
-3. Comms - test queue space available for each data message to send.
+2. Comms - test queue space available for each data message to send.
 4. Measurement - Increase switching speed to 25kHz. May need hardware changes.
 5. Charger - add acceleration to pull overvoltage back quickly.
 6. Time - fix date setting.
