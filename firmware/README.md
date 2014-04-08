@@ -25,9 +25,9 @@ currents, and these may change for different hardware versions.
 
 Two versions are here represented. The second refers to slightly different
 voltage and current scales in the measurement header for the PCB version.
-It is compiled with the Makefile-second.
+It is compiled with 'make VERSION=2'
 
-(c) K. Sarkies 07/04/2014
+(c) K. Sarkies 08/04/2014
 
 TODO
 

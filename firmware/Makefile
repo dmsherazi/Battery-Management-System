@@ -1,6 +1,7 @@
 # Basic makefile K Sarkies
 
 PROJECT	    = power-management
+VERSION    ?= 1
 PREFIX	    = arm-none-eabi
 CC		    = $(PREFIX)-gcc
 LD		    = $(PREFIX)-gcc
@@ -34,6 +35,7 @@ INCLUDES	= $(patsubst %,-I%,$(FREERTOS_INC) $(DRIVERS_INC) $(FATFSDIR))
 CDEFS      += -DHSE_VALUE=$(F_XTAL)UL
 CDEFS      += -D$(SYSCLOCK_CL)
 CDEFS      += -DUSE_$(BOARD)
+CDEFS      += -DVERSION=$(VERSION)
 
 CFLAGS	   += -Os -g -Wall -Wextra -Wno-unused-variable -I. $(INCLUDES) -fno-common -mthumb -MD
 CFLAGS	   += -DGCC_ARMCM3 -ffunction-sections -fdata-sections
