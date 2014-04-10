@@ -277,6 +277,7 @@ void DataProcessingGui::on_dumpAllButton_clicked()
                 if (battery2Fill == 0) battery2FillText = "Normal";
                 else if (battery2Fill == 1) battery2FillText = "Low";
                 else if (battery2Fill == 2) battery2FillText = "Critical";
+                else if (battery2Fill == 3) battery2FillText = "Faulty";
                 else battery2FillText = "?";
                 uint battery2Charge = (secondField >> 4) & 0x03;
                 if (battery2Charge == 0) battery2ChargeText = "Bulk";
@@ -296,6 +297,7 @@ void DataProcessingGui::on_dumpAllButton_clicked()
                 if (battery3Fill == 0) battery3FillText = "Normal";
                 else if (battery3Fill == 1) battery3FillText = "Low";
                 else if (battery3Fill == 2) battery3FillText = "Critical";
+                else if (battery3Fill == 3) battery3FillText = "Faulty";
                 else battery3FillText = "?";
                 uint battery3Charge = (secondField >> 4) & 0x03;
                 if (battery3Charge == 0) battery3ChargeText = "Bulk";
