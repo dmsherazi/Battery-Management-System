@@ -451,24 +451,33 @@ to the load. */
 /*--- All batteries normal fill state. Isolated battery already allocated. ---*/
             if (batteryFillState[lowestBattery-1] == normalF)
             {
-/* (1) If the charger is unallocated, set to the lowest SoC battery if this
-battery is not in float state with SoC > 95%.
-Use the isolated one only if it is not in a float charge state. */
+/* Deallocate the charger if the battery has reached float stage */
+                if (getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
+                    batteryUnderCharge = 0;
+/* (1) If the charger is unallocated, set to the lowest SoC battery, if this
+battery is not in float state with SoC > 95%. If no suitable battery is found
+leave the charger unallocated. */
                 decisionStatus = 0x300;
                 if (batteryUnderCharge == 0)
                 {
                     decisionStatus |= 0x01;
                     for (i=0; i<numBats; i++)
                     {
-                        batteryUnderCharge = batteryFillStateSort[numBats-i-1];
-                        if (getBatteryChargingPhase(batteryUnderCharge-1) != floatC)
+                        uint8_t battery = batteryFillStateSort[numBats-i-1];
+                        if (getBatteryChargingPhase(battery-1) != floatC)
+                        {
+                            batteryUnderCharge = battery;
                             break;
+                        }
                         if (batterySoC[batteryUnderCharge-1] < FLOAT_CHARGE_SOC)
+                        {
+                            batteryUnderCharge = battery;
                             break;
+                        }
                     }
 /* However if this has allocated the charger to the loaded battery, then
 reallocate the loaded battery. This will allow the charger to swap back and
-forth as the loaded battery droops and the charged battery completes charge. */
+forth as the loaded battery droops and the charging battery completes charge. */
                     if (batteryUnderLoad == batteryUnderCharge)
                         batteryUnderLoad = 0;
                 }

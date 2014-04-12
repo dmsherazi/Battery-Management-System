@@ -53,8 +53,8 @@ the result is maximum negative, around -4000) */
 /* Battery state triggers */
 #define LOW_VOLTAGE         2816    /* 11.0V */
 #define CRITICAL_VOLTAGE    2688    /* 10.5V */
-#define LOW_SOC             15360   /* 60% */
-#define CRITICAL_SOC        11520   /* 45% */
+#define LOW_SOC             60*256   /* 60% */
+#define CRITICAL_SOC        45*256   /* 45% */
 
 /* Battery Monitoring Strategy Fields */
 #define SEPARATE_LOAD       1 << 0
