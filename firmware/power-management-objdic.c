@@ -86,7 +86,11 @@ void setGlobalDefaults(void)
     configData.config.batteryType[2] = wetT;
     configData.config.monitorStrategy = 0xFF;
     uint8_t i=0;
-    for (i=0; i<NUM_BATS; i++) setBatteryChargeParameters(i);
+    for (i=0; i<NUM_BATS; i++)
+    {
+        configData.config.batteryHealth[i] = goodH;
+        setBatteryChargeParameters(i);
+    }
 /* Zero the offsets. */
     for (i=0; i<NUM_IFS; i++) configData.config.currentOffsets.data[i] = 0;
 /* Don't track unless instructed externally */
