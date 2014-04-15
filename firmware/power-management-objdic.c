@@ -78,12 +78,12 @@ void setGlobalDefaults(void)
     configData.config.alphaV = 256;           /* No Filter */
     configData.config.alphaC = 180;           /* about 0.7, only for detecting float state. */
 /* Set default battery parameters */
-    configData.config.batteryCapacity[0] = 54;
-    configData.config.batteryCapacity[1] = 80;
-    configData.config.batteryCapacity[2] = 54;
-    configData.config.batteryType[0] = wetT;
+    configData.config.batteryCapacity[0] = 100;
+    configData.config.batteryCapacity[1] = 100;
+    configData.config.batteryCapacity[2] = 80;
+    configData.config.batteryType[0] = gelT;
     configData.config.batteryType[1] = gelT;
-    configData.config.batteryType[2] = wetT;
+    configData.config.batteryType[2] = gelT;
     configData.config.monitorStrategy = 0xFF;
     uint8_t i=0;
     for (i=0; i<NUM_BATS; i++)

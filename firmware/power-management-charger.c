@@ -110,6 +110,16 @@ void prvChargerTask(void *pvParameters)
 /* Reset watchdog counter */
         chargerWatchdogCount = 0;
 
+/* Change each battery to bulk phase when it is in float phase and the
+terminal voltage drops below a charging restart threshold (95%). */
+        uint8_t i;
+        for (i=0; i<NUM_BATS; i++)
+        {
+            if ((batteryChargingPhase[i] == floatC) &&
+                (getBatterySoC(i) < FLOAT_BULK_SOC))
+                batteryChargingPhase[i] = bulkC;
+        }
+
 /* Get the battery being charged, if any, from the switch settings.
 The monitor task will set these to select the battery to charge. */
         uint8_t switchSettings = getSwitchControlBits();
@@ -122,19 +132,6 @@ The monitor task will set these to select the battery to charge. */
             currentAv[battery-1] = 0;
             dutyCycle = 50*256;
         }
-
-/* If a battery is allocated to a load, reset its charging phase to "bulk".
-Only do this if it is NOT also under charge, as in such a case the charger may
-be supplying the load current, and only if the SoC is less than 95% to avoid
-"churning". */
-        uint8_t batteryUnderLoad1 = switchSettings & 0x03;
-        if ((batteryUnderLoad1 != battery) &&
-            (getBatterySoC(batteryUnderLoad1-1) < FLOAT_BULK_SOC))
-            batteryChargingPhase[batteryUnderLoad1-1] = bulkC;
-        uint8_t batteryUnderLoad2 = (switchSettings >> 2) & 0x03;
-        if ((batteryUnderLoad2 != battery) &&
-            (getBatterySoC(batteryUnderLoad2-1) < FLOAT_BULK_SOC))
-            batteryChargingPhase[batteryUnderLoad2-1] = bulkC;
 
 /* Compute the averaged voltages and currents to manage phase switchover.
 Use first order exponential filters, separate coefficients. */

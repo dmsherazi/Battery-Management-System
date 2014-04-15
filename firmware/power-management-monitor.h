@@ -42,8 +42,6 @@ the result is maximum negative, around -4000) */
 #define CALIBRATION_THRESHOLD       -50
 /* Arbitrary high value to start off the minimum value offset computation */
 #define OFFSET_START_VALUE          100
-/* SoC above which charging is stopped in float phase */
-#define FLOAT_CHARGE_SOC            95*256
 /* Number of tests of switch combinations */
 #define NUM_TESTS                   NUM_IFS+1
 
@@ -55,6 +53,8 @@ the result is maximum negative, around -4000) */
 #define CRITICAL_VOLTAGE    2688    /* 10.5V */
 #define LOW_SOC             60*256   /* 60% */
 #define CRITICAL_SOC        45*256   /* 45% */
+/* SoC above which charging is stopped in float phase */
+#define FLOAT_CHARGE_SOC    95*256
 
 /* Battery Monitoring Strategy Fields */
 #define SEPARATE_LOAD       1 << 0

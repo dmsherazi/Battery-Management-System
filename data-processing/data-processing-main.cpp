@@ -104,19 +104,19 @@ void DataProcessingGui::on_dumpAllButton_clicked()
 {
     int battery1Voltage = -1;
     int battery1Current = 0;
-    int battery1Capacity = -1;
+    int battery1SoC = -1;
     QString battery1StateText;
     QString battery1FillText;
     QString battery1ChargeText;
     int battery2Voltage = -1;
     int battery2Current = 0;
-    int battery2Capacity = -1;
+    int battery2SoC = -1;
     QString battery2StateText;
     QString battery2FillText;
     QString battery2ChargeText;
     int battery3Voltage = -1;
     int battery3Current = 0;
-    int battery3Capacity = -1;
+    int battery3SoC = -1;
     QString battery3StateText;
     QString battery3FillText;
     QString battery3ChargeText;
@@ -129,7 +129,7 @@ void DataProcessingGui::on_dumpAllButton_clicked()
     int temperature = -1;
     QString controls = "     ";
     QString switches;
-    int decision = -1;
+    QString decision;
     int debug1a = -1;
     int debug2a = -1;
     int debug3a = -1;
@@ -181,19 +181,19 @@ void DataProcessingGui::on_dumpAllButton_clicked()
                     outStream << timeRecord << ",";
                     outStream << (float)battery1Voltage/256 << ",";
                     outStream << (float)battery1Current/256 << ",";
-                    outStream << (float)battery1Capacity/256 << ",";
+                    outStream << (float)battery1SoC/256 << ",";
                     outStream << battery1StateText << ",";
                     outStream << battery1FillText << ",";
                     outStream << battery1ChargeText << ",";
                     outStream << (float)battery2Voltage/256 << ",";
                     outStream << (float)battery2Current/256 << ",";
-                    outStream << (float)battery2Capacity/256 << ",";
+                    outStream << (float)battery2SoC/256 << ",";
                     outStream << battery2StateText << ",";
                     outStream << battery2FillText << ",";
                     outStream << battery2ChargeText << ",";
                     outStream << (float)battery3Voltage/256 << ",";
                     outStream << (float)battery3Current/256 << ",";
-                    outStream << (float)battery3Capacity/256 << ",";
+                    outStream << (float)battery3SoC/256 << ",";
                     outStream << battery3StateText << ",";
                     outStream << battery3FillText << ",";
                     outStream << battery3ChargeText << ",";
@@ -235,15 +235,15 @@ void DataProcessingGui::on_dumpAllButton_clicked()
             }
             if (firstText == "dC1")
             {
-                battery1Capacity = secondField;
+                battery1SoC = secondField;
             }
             if (firstText == "dC2")
             {
-                battery2Capacity = secondField;
+                battery2SoC = secondField;
             }
             if (firstText == "dC3")
             {
-                battery3Capacity = secondField;
+                battery3SoC = secondField;
             }
             if (firstText == "dO1")
             {
@@ -357,7 +357,8 @@ void DataProcessingGui::on_dumpAllButton_clicked()
             }
             if (firstText == "dd")
             {
-                decision = secondField;
+                bool ok;
+                decision = QString("%1").arg(secondText.toInt(&ok),0,16);
             }
             if (firstText == "D1")
             {

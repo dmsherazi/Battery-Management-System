@@ -466,11 +466,13 @@ leave the charger unallocated. */
                         uint8_t battery = batteryFillStateSort[numBats-i-1];
                         if (getBatteryChargingPhase(battery-1) != floatC)
                         {
+                            decisionStatus |= 0x02;
                             batteryUnderCharge = battery;
                             break;
                         }
-                        if (batterySoC[batteryUnderCharge-1] < FLOAT_CHARGE_SOC)
+                        if (batterySoC[battery-1] < FLOAT_CHARGE_SOC)
                         {
+                            decisionStatus |= 0x04;
                             batteryUnderCharge = battery;
                             break;
                         }
@@ -490,11 +492,19 @@ under charge if the strategies require it. */
                     for (i=0; i<numBats; i++)
                     {
                         batteryUnderLoad = batteryFillStateSort[i];
-                        if (!(getMonitorStrategy() & PRESERVE_ISOLATION) ||
-                            (batteryUnderLoad != longestBattery))
+                        if (!((getMonitorStrategy() & PRESERVE_ISOLATION) &&
+                            (batteryUnderLoad == longestBattery)))
                         {
-                            if (!(getMonitorStrategy() & SEPARATE_LOAD)) break;
-                            if (batteryUnderLoad != batteryUnderCharge) break;
+                            if (!(getMonitorStrategy() & SEPARATE_LOAD))
+                            {
+                                decisionStatus |= 0x20;
+                                break;
+                            }
+                            if (batteryUnderLoad != batteryUnderCharge)
+                            {
+                                decisionStatus |= 0x40;
+                                break;
+                            }
                         }
                     }
                 }

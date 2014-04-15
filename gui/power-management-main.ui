@@ -1630,7 +1630,7 @@
   <widget class="QLabel" name="battery1Fill">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>136</x>
      <y>160</y>
      <width>16</width>
      <height>17</height>
@@ -1657,7 +1657,7 @@
   <widget class="QLabel" name="battery2Fill">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>310</x>
      <y>160</y>
      <width>16</width>
      <height>17</height>
@@ -1684,7 +1684,7 @@
   <widget class="QLabel" name="battery3Fill">
    <property name="geometry">
     <rect>
-     <x>480</x>
+     <x>488</x>
      <y>160</y>
      <width>16</width>
      <height>17</height>
@@ -1711,7 +1711,7 @@
   <widget class="QLabel" name="battery1Charging">
    <property name="geometry">
     <rect>
-     <x>145</x>
+     <x>151</x>
      <y>160</y>
      <width>16</width>
      <height>17</height>
@@ -1738,7 +1738,7 @@
   <widget class="QLabel" name="battery2Charging">
    <property name="geometry">
     <rect>
-     <x>315</x>
+     <x>325</x>
      <y>160</y>
      <width>16</width>
      <height>17</height>
@@ -1765,7 +1765,7 @@
   <widget class="QLabel" name="battery3Charging">
    <property name="geometry">
     <rect>
-     <x>495</x>
+     <x>503</x>
      <y>160</y>
      <width>16</width>
      <height>17</height>
@@ -1792,7 +1792,7 @@
   <widget class="QLabel" name="battery1Op">
    <property name="geometry">
     <rect>
-     <x>160</x>
+     <x>166</x>
      <y>160</y>
      <width>16</width>
      <height>17</height>
@@ -1819,7 +1819,7 @@
   <widget class="QLabel" name="battery2Op">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>340</x>
      <y>160</y>
      <width>16</width>
      <height>17</height>
@@ -1846,7 +1846,7 @@
   <widget class="QLabel" name="battery3Op">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>518</x>
      <y>160</y>
      <width>16</width>
      <height>17</height>
@@ -1884,6 +1884,87 @@
    </property>
    <property name="text">
     <string>Connect</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="battery1Health">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>160</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>6</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Fill State - Normal, Low, Critical</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="battery2Health">
+   <property name="geometry">
+    <rect>
+     <x>294</x>
+     <y>160</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>6</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Fill State - Normal, Low, Critical</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="battery3Health">
+   <property name="geometry">
+    <rect>
+     <x>472</x>
+     <y>160</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>6</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Fill State - Normal, Low, Critical</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>
