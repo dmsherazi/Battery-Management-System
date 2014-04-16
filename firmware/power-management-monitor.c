@@ -139,12 +139,12 @@ system should have been left in a quiescent state for at least an hour. */
             for (test=0; test<NUM_TESTS ; test++)
             {
 /* First turn off all switches */
-                for (i=0; i<NUM_BATS; i++) setSwitch(0,i);
+                for (i=0; i<NUM_LOADS+NUM_PANELS; i++) setSwitch(0,i);
 /* Connect load 2 to each battery in turn. */
-                if (test < NUM_BATS) setSwitch(test,1);
+                if (test < NUM_BATS) setSwitch(test+1,1);
 /* Then connect load 1 to each battery in turn. Last test is all
 switches off to allow the panel to be measured. */
-                else if (test < NUM_TESTS-1) setSwitch(test-NUM_BATS,0);
+                else if (test < NUM_TESTS-1) setSwitch(test-NUM_BATS+1,0);
 /* Delay a few seconds to let the measurements settle. Current should settle
 quickly but terminal voltage may take some time, which could slightly affect
 some currents. */
