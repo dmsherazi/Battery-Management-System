@@ -689,7 +689,7 @@ void PowerManagementGui::processResponse(const QString response)
         int opState = secondField.toInt() & 0x03;
         int fillState = (secondField.toInt() >> 2) & 0x03;
         int chargingState = (secondField.toInt() >> 4) & 0x03;
-        int healthState = (secondField.toInt() >> 8) & 0x03;
+        int healthState = (secondField.toInt() >> 6) & 0x03;
         if (fillState == 0)         // Normal
         {
             PowerManagementMainUi.battery1Fill->
@@ -779,6 +779,18 @@ void PowerManagementGui::processResponse(const QString response)
                 setStyleSheet("background-color:white;");
             PowerManagementMainUi.battery1Health->
                 setText("X");
+            PowerManagementMainUi.battery1Charging->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery1Op->
+                setText("X");
+            PowerManagementMainUi.battery1Fill->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery1Fill->
+                setText("X");
+            PowerManagementMainUi.battery1Charge->
+                setText(QString(""));
+            PowerManagementMainUi.battery1Current->setText(QString(""));
+            PowerManagementMainUi.battery1Voltage->setText(QString(""));
         }
     }
 /* Battery 2 Fill and Operational State Indicators */
@@ -787,7 +799,7 @@ void PowerManagementGui::processResponse(const QString response)
         int opState = secondField.toInt() & 0x03;
         int fillState = (secondField.toInt() >> 2) & 0x03;
         int chargingState = (secondField.toInt() >> 4) & 0x03;
-        int healthState = (secondField.toInt() >> 8) & 0x03;
+        int healthState = (secondField.toInt() >> 6) & 0x03;
         if (fillState == 0)         // Normal
         {
             PowerManagementMainUi.battery2Fill->
@@ -877,6 +889,18 @@ void PowerManagementGui::processResponse(const QString response)
                 setStyleSheet("background-color:white;");
             PowerManagementMainUi.battery2Health->
                 setText("X");
+            PowerManagementMainUi.battery2Charging->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery2Op->
+                setText("X");
+            PowerManagementMainUi.battery2Fill->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery2Fill->
+                setText("X");
+            PowerManagementMainUi.battery2Charge->
+                setText(QString(""));
+            PowerManagementMainUi.battery2Current->setText(QString(""));
+            PowerManagementMainUi.battery2Voltage->setText(QString(""));
         }
     }
 /* Battery 3 Fill and Operational State Indicators */
@@ -885,7 +909,7 @@ void PowerManagementGui::processResponse(const QString response)
         int opState = secondField.toInt() & 0x03;
         int fillState = (secondField.toInt() >> 2) & 0x03;
         int chargingState = (secondField.toInt() >> 4) & 0x03;
-        int healthState = (secondField.toInt() >> 8) & 0x03;
+        int healthState = (secondField.toInt() >> 6) & 0x03;
         if (fillState == 0)         // Normal
         {
             PowerManagementMainUi.battery3Fill->
@@ -975,6 +999,18 @@ void PowerManagementGui::processResponse(const QString response)
                 setStyleSheet("background-color:white;");
             PowerManagementMainUi.battery3Health->
                 setText("X");
+            PowerManagementMainUi.battery3Charging->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery3Op->
+                setText("X");
+            PowerManagementMainUi.battery3Fill->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery3Fill->
+                setText("X");
+            PowerManagementMainUi.battery3Charge->
+                setText(QString(""));
+            PowerManagementMainUi.battery3Current->setText(QString(""));
+            PowerManagementMainUi.battery3Voltage->setText(QString(""));
         }
     }
 /* SoC estimates */
@@ -1029,7 +1065,7 @@ void PowerManagementGui::processResponse(const QString response)
         emit this->recordMessageReceived(response);
     }
 /* Messages for the Configure Task start with p or dS */
-    if ((size > 0) && (firstField.left(1) == "p"))
+    if ((size > 0) && ((firstField.left(1) == "p") || (firstField.left(2) == "dO")))
     {
         emit this->configureMessageReceived(response);
     }

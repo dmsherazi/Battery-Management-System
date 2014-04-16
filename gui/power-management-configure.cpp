@@ -252,6 +252,36 @@ void PowerManagementConfigGui::on_echoTestButton_clicked()
 }
 
 //-----------------------------------------------------------------------------
+/** @brief Reset the Battery 1 Missing Status
+
+*/
+
+void PowerManagementConfigGui::on_resetMissing1Button_clicked()
+{
+    socket->write("pm1-\n\r");
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Reset the Battery 2 Missing Status
+
+*/
+
+void PowerManagementConfigGui::on_resetMissing2Button_clicked()
+{
+    socket->write("pm2-\n\r");
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Reset the Battery 3 Missing Status
+
+*/
+
+void PowerManagementConfigGui::on_resetMissing3Button_clicked()
+{
+    socket->write("pm3-\n\r");
+}
+
+//-----------------------------------------------------------------------------
 /** @brief Close Window
 
 */
@@ -454,6 +484,65 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
             PowerManagementConfigUi.date->setText(systemTime.date().toString("dd.MM.yyyy"));
             PowerManagementConfigUi.time->setText(systemTime.time().toString("H.mm.ss"));
             break;
+        }
+// Operational State values for "reset missing" buttons.
+        case 'O':
+        {
+            int healthState = (controlByte >> 6) & 0x03;
+            if (battery == '1')
+            {
+                if (healthState == 0)
+                {
+                    PowerManagementConfigUi.resetMissing1Button->
+                        setStyleSheet("background-color:lightgreen;");
+                }
+                else if (healthState == 1)
+                {
+                    PowerManagementConfigUi.resetMissing1Button->
+                        setStyleSheet("background-color:orange;");
+                }
+                else if (healthState == 2)
+                {
+                    PowerManagementConfigUi.resetMissing1Button->
+                        setStyleSheet("background-color:white;");
+                }
+            }
+            else if (battery == '2')
+            {
+                if (healthState == 0)
+                {
+                    PowerManagementConfigUi.resetMissing2Button->
+                        setStyleSheet("background-color:lightgreen;");
+                }
+                else if (healthState == 1)
+                {
+                    PowerManagementConfigUi.resetMissing2Button->
+                        setStyleSheet("background-color:orange;");
+                }
+                else if (healthState == 2)
+                {
+                    PowerManagementConfigUi.resetMissing2Button->
+                        setStyleSheet("background-color:white;");
+                }
+            }
+            else if (battery == '3')
+            {
+                if (healthState == 0)
+                {
+                    PowerManagementConfigUi.resetMissing3Button->
+                        setStyleSheet("background-color:lightgreen;");
+                }
+                else if (healthState == 1)
+                {
+                    PowerManagementConfigUi.resetMissing3Button->
+                        setStyleSheet("background-color:orange;");
+                }
+                else if (healthState == 2)
+                {
+                    PowerManagementConfigUi.resetMissing3Button->
+                        setStyleSheet("background-color:white;");
+                }
+            }
         }
     }
 }

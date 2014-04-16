@@ -149,7 +149,7 @@ switches off to allow the panel to be measured. */
 quickly but terminal voltage may take some time, which could slightly affect
 some currents. */
                 vTaskDelay(getCalibrationDelay());
-/* Check to see if a battery is missing */
+/* Check to see if a battery is missing as a result of setting loads. */
                 for (i=0; i<NUM_BATS; i++)
                 {
                     if (((getIndicators() >> 2*i) & 0x02) == 0)
@@ -195,14 +195,17 @@ quiescent current */
             int16_t quiescentCurrent = -100;
             for (i=0; i<NUM_BATS; i++)
             {
-                for (test=0; test<NUM_TESTS; test++)
+                if (batteryHealthState[i] != missingH)
                 {
-                    int16_t current = results[test][i];
-/* Get the maximum if within threshold. */
-                    if (current > CALIBRATION_THRESHOLD)
+                    for (test=0; test<NUM_TESTS; test++)
                     {
-                        if (current > quiescentCurrent)
-                            quiescentCurrent = current;
+                        int16_t current = results[test][i];
+/* Get the maximum if within threshold. */
+                        if (current > CALIBRATION_THRESHOLD)
+                        {
+                            if (current > quiescentCurrent)
+                                quiescentCurrent = current;
+                        }
                     }
                 }
             }
@@ -213,18 +216,18 @@ quiescent current */
             dataMessageSend("dS",switchSettings,0);
 /* Compute the SoC from the OCV. Note the conditions for which OCV gives an
 accurate estimate of SoC. */
-            for (i=0; i<NUM_BATS; i++)
-            {
-                batterySoC[i] = computeSoC(getBatteryVoltage(i),
-                                           getTemperature(),getBatteryType(i));
-                batteryCharge[i] = getBatteryCapacity(i)*36*batterySoC[i];
-            }
 /* Zero counters, and reset battery states */
             for (i=0; i<NUM_BATS; i++)
             {
-                batteryCurrentSteady[i] = 0;
-                batteryIsolationTime[i] = 0;
-                batteryOpState[i] = isolatedO;
+                if (batteryHealthState[i] != missingH)
+                {
+                    batterySoC[i] = computeSoC(getBatteryVoltage(i),
+                                               getTemperature(),getBatteryType(i));
+                    batteryCharge[i] = getBatteryCapacity(i)*36*batterySoC[i];
+                    batteryCurrentSteady[i] = 0;
+                    batteryIsolationTime[i] = 0;
+                    batteryOpState[i] = isolatedO;
+                }
             }
             batteryUnderLoad = 0;
             batteryUnderCharge = 0;
@@ -260,11 +263,11 @@ accurate estimate of SoC. */
             id[1] = 'C';
             sendResponse(id,batterySoC[i]);
             recordSingle(id,batterySoC[i]);
-/* Send out battery operational, fill and charging state indication. */
-            uint8_t states = (batteryOpState[i] & 0x03) |
+/* Send out battery operational, fill, charging and health status indication. */
+            uint16_t states = (batteryOpState[i] & 0x03) |
                              ((batteryFillState[i] & 0x03) << 2) |
                              ((getBatteryChargingPhase(i) & 0x03) << 4) |
-                             ((batteryHealthState[i] & 0x03) << 8);
+                             ((batteryHealthState[i] & 0x03) << 6);
             id[1] = 'O';
             sendResponse(id,states);
             recordSingle(id,states);
@@ -425,21 +428,63 @@ panel. */
 /* Two batteries: just allocate load to highest and charger to lowest. */
         else if (numBats == 2)
         {
-            batteryUnderCharge = batteryFillStateSort[1];
-            batteryUnderLoad = batteryFillStateSort[0];
-/* If we allow the load and charger to connect to the same battery, do this in
-the case that the top battery is low or critical. This may boost the voltage
-to the load. */
-            if (!(getMonitorStrategy() & SEPARATE_LOAD) &&
-               (batteryFillState[batteryUnderLoad-1] != normalF))
-                batteryUnderLoad = batteryUnderCharge;
-/* If the battery under charge is in float and higher than 95%, stop charging */
-            if ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC) &&
-                (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC))
-            {
-                batteryUnderCharge = 0;
-            }
             decisionStatus = 0x200;
+/* Deallocate the charger if the battery has reached float stage */
+            if (getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
+                batteryUnderCharge = 0;
+/* (1) If the charger is unallocated, set to the lowest SoC battery, if this
+battery is not in float state with SoC > 95%. If no suitable battery is found
+leave the charger unallocated. */
+            if (batteryUnderCharge == 0)
+            {
+                decisionStatus |= 0x01;
+                for (i=0; i<numBats; i++)
+                {
+                    uint8_t battery = batteryFillStateSort[numBats-i-1];
+                    if (getBatteryChargingPhase(battery-1) != floatC)
+                    {
+                        decisionStatus |= 0x02;
+                        batteryUnderCharge = battery;
+                        break;
+                    }
+                    if (batterySoC[battery-1] < FLOAT_CHARGE_SOC)
+                    {
+                        decisionStatus |= 0x04;
+                        batteryUnderCharge = battery;
+                        break;
+                    }
+                }
+/* However if this has allocated the charger to the loaded battery, then
+reallocate the loaded battery. This will allow the charger to swap back and
+forth as the loaded battery droops and the charging battery completes charge. */
+                if (batteryUnderLoad == batteryUnderCharge)
+                    batteryUnderLoad = 0;
+            }
+/* (2) If the loads are unallocated, set to the highest SoC unallocated battery.
+Avoid the battery that has been idle for the longest time, and also the battery
+under charge if the strategies require it. */
+            if (batteryUnderLoad == 0)
+            {
+                decisionStatus |= 0x10;
+                for (i=0; i<numBats; i++)
+                {
+                    batteryUnderLoad = batteryFillStateSort[i];
+                    if (!(getMonitorStrategy() & SEPARATE_LOAD))
+                    {
+                        decisionStatus |= 0x20;
+                        break;
+                    }
+                    if (batteryUnderLoad != batteryUnderCharge)
+                    {
+                        decisionStatus |= 0x40;
+                        break;
+                    }
+                }
+            }
+/* If the battery under load is on a low or critical battery, allocate to the
+charging battery regardless. */
+            if (batteryFillState[batteryUnderLoad-1] != normalF)
+            batteryUnderLoad = batteryUnderCharge;
         }
 /* More than two batteries: manage isolation and charge state. */
         else if (numBats > 2)
@@ -560,39 +605,39 @@ critical we must turn off the low priority loads. */
                 batteryUnderLoad = batteryFillStateSort[0];
                 batteryUnderCharge = batteryFillStateSort[numBats-1];
             }
+        }
 
 /*--------------END BATTERY MANAGEMENT DECISIONS ------------------*/
 
 /* If charging voltage is lower than the battery voltage, turn off charging
 altogether. This will allow more flexibility in managing isolation during night
 periods. */
-            if (getBatteryVoltage(batteryUnderCharge-1) > getPanelVoltage(0))
-            {
-                batteryUnderCharge = 0;
-            }
+        if (getBatteryVoltage(batteryUnderCharge-1) > getPanelVoltage(0))
+        {
+            batteryUnderCharge = 0;
+        }
 /* Work out changes in battery operational states. */
-            for (i=0; i<NUM_BATS; i++)
+        for (i=0; i<NUM_BATS; i++)
+        {
+            uint8_t lastOpState = batteryOpState[i];
+            if (batteryHealthState[i] != missingH)
             {
-                uint8_t lastOpState = batteryOpState[i];
-                if (batteryHealthState[i] != missingH)
+                batteryOpState[i] = isolatedO; /* reset operational state */
+                if ((batteryUnderLoad > 0) && (i == batteryUnderLoad-1))
                 {
-                    batteryOpState[i] = isolatedO; /* reset operational state */
-                    if ((batteryUnderLoad > 0) && (i == batteryUnderLoad-1))
-                    {
-                        batteryOpState[i] = loadedO;
-                    }
-                    if ((batteryUnderCharge > 0) && (i == batteryUnderCharge-1))
-                    {
-                        batteryOpState[i] = chargingO;
-                    }
+                    batteryOpState[i] = loadedO;
+                }
+                if ((batteryUnderCharge > 0) && (i == batteryUnderCharge-1))
+                {
+                    batteryOpState[i] = chargingO;
+                }
 /* Restart isolation timer if not isolated or if charger and loads on same
 battery (isolation is not possible due to leakage of charging current to other
 batteries). Do not reset to zero so that the current isolated timer can handover
 later. */
-                    if ((batteryOpState[i] != isolatedO) ||
-                        (batteryUnderLoad == batteryUnderCharge))
-                        batteryIsolationTime[i] = 10;
-                }
+                if ((batteryOpState[i] != isolatedO) ||
+                    (batteryUnderLoad == batteryUnderCharge))
+                    batteryIsolationTime[i] = 10;
             }
         }
 /* Set Switches. Turn off low priority loads if batteries are all critical */

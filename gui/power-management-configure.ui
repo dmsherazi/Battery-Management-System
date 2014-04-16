@@ -42,7 +42,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="generalTab">
     <attribute name="title">
@@ -779,6 +779,54 @@
      </property>
      <property name="text">
       <string>Absorption Current</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="resetMissing1Button">
+     <property name="geometry">
+      <rect>
+       <x>178</x>
+       <y>355</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Reset Battery Missing Status to Good.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="resetMissing2Button">
+     <property name="geometry">
+      <rect>
+       <x>286</x>
+       <y>355</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Reset Battery Missing Status to Good.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="resetMissing3Button">
+     <property name="geometry">
+      <rect>
+       <x>398</x>
+       <y>355</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Reset Battery Missing Status to Good.</string>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>

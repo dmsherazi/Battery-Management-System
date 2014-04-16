@@ -64,6 +64,9 @@ private slots:
     void on_debugMessageCheckbox_clicked();
     void on_dataMessageCheckbox_clicked();
     void on_echoTestButton_clicked();
+    void on_resetMissing1Button_clicked();
+    void on_resetMissing2Button_clicked();
+    void on_resetMissing3Button_clicked();
 private:
 // User Interface object instance
     Ui::PowerManagementConfigDialog PowerManagementConfigUi;
