@@ -74,6 +74,7 @@ static bool calibrate;
 static uint16_t batteryCurrentSteady[NUM_BATS];
 static battery_Fl_States batteryFillState[NUM_BATS];
 static battery_Op_States batteryOpState[NUM_BATS];
+static battery_Hl_States batteryHealthState[NUM_BATS];
 static union InterfaceGroup currentOffsets;
 static union InterfaceGroup currents;
 static union InterfaceGroup voltages;
@@ -118,13 +119,6 @@ void prvMonitorTask(void *pvParameters)
 /* Main loop */
 	while (1)
 	{
-/* Count the number of batteries present. */
-        uint8_t numBats = 0;
-        uint8_t i;
-        for (i=0; i<NUM_BATS; i++)
-        {
-            if (batteryOpState[i] != missingO) numBats++;
-        }
 /*------------- CALIBRATION -----------------------*/
 /* Perform a calibration sequence to zero the currents (see docs).
 Also the State of Charge is estimated from the Open Circuit Voltages, so the
@@ -144,27 +138,31 @@ system should have been left in a quiescent state for at least an hour. */
 /* Set switches and collect the results */
             for (test=0; test<NUM_TESTS ; test++)
             {
-/* Run test only if the needed battery is present (last test unconditional). */
-                if ((test < NUM_TESTS-1) &&
-                    (batteryOpState[test % NUM_BATS] != missingO))
-                {
 /* First turn off all switches */
-                    for (i=0; i<NUM_BATS; i++) setSwitch(0,i);
+                for (i=0; i<NUM_BATS; i++) setSwitch(0,i);
 /* Connect load 2 to each battery in turn. */
-                    if (test < NUM_BATS) setSwitch(test,1);
+                if (test < NUM_BATS) setSwitch(test,1);
 /* Then connect load 1 to each battery in turn. Last test is all
 switches off to allow the panel to be measured. */
-                    else if (test < NUM_TESTS-1) setSwitch(test-NUM_BATS,0);
+                else if (test < NUM_TESTS-1) setSwitch(test-NUM_BATS,0);
 /* Delay a few seconds to let the measurements settle. Current should settle
 quickly but terminal voltage may take some time, which could slightly affect
 some currents. */
-	                vTaskDelay(getCalibrationDelay());
-/* Reset watchdog counter */
-                    monitorWatchdogCount = 0;
-                    for (i=0; i<NUM_IFS; i++) results[test][i] = getCurrent(i);
-/* Send a progress update */
-                    dataMessageSend("pQ",0,test);
+                vTaskDelay(getCalibrationDelay());
+/* Check to see if a battery is missing */
+                for (i=0; i<NUM_BATS; i++)
+                {
+                    if (((getIndicators() >> 2*i) & 0x02) == 0)
+                    {
+                        batteryHealthState[i] = missingH;
+                        batterySoC[i] = 0;
+                    }
                 }
+/* Reset watchdog counter */
+                monitorWatchdogCount = 0;
+                for (i=0; i<NUM_IFS; i++) results[test][i] = getCurrent(i);
+/* Send a progress update */
+                dataMessageSend("pQ",0,test);
             }
 
 /* Estimate the offsets only when they are less than a threshold. Find the lowest
@@ -265,7 +263,8 @@ accurate estimate of SoC. */
 /* Send out battery operational, fill and charging state indication. */
             uint8_t states = (batteryOpState[i] & 0x03) |
                              ((batteryFillState[i] & 0x03) << 2) |
-                             ((getBatteryChargingPhase(i) & 0x03) << 4);
+                             ((getBatteryChargingPhase(i) & 0x03) << 4) |
+                             ((batteryHealthState[i] & 0x03) << 8);
             id[1] = 'O';
             sendResponse(id,states);
             recordSingle(id,states);
@@ -312,50 +311,47 @@ accurate estimate of SoC. */
         sendResponse("dI",getIndicators());
 
 /*------------- COMPUTE BATTERY STATE -----------------------*/
+/* Check to see if a battery is missing. This can happen if a battery put under
+load has been removed. Missing batteries not under load will not show as
+missing due to the nature of the circuitry, so existing missing status is not
+removed here; this must be done externally. */
+        for (i=0; i<NUM_BATS; i++)
+        {
+            if (((getIndicators() >> 2*i) & 0x02) == 0)
+            {
+                batteryHealthState[i] = missingH;
+                batterySoC[i] = 0;
+            }
+        }
+/* Find number of batteries present */
+        uint8_t numBats = NUM_BATS;
+        for (i=0; i<NUM_BATS; i++)
+        {
+            if (batteryHealthState[i] == missingH) numBats--;
+        }
 /* Access each battery charge accumulated since the last time, and update the SoC. */
         for (i=0; i<NUM_BATS; i++)
         {
-            batteryCharge[i] += getBatteryAccumulatedCharge(i);
-            uint32_t chargeMax = getBatteryCapacity(i)*36*100*256;
-            if (batteryCharge[i] > chargeMax) batteryCharge[i] = chargeMax;
-            batterySoC[i] = batteryCharge[i]/(getBatteryCapacity(i)*36);
+            if (batteryHealthState[i] != missingH)
+            {
+                batteryCharge[i] += getBatteryAccumulatedCharge(i);
+                uint32_t chargeMax = getBatteryCapacity(i)*36*100*256;
+                if (batteryCharge[i] > chargeMax) batteryCharge[i] = chargeMax;
+                batterySoC[i] = batteryCharge[i]/(getBatteryCapacity(i)*36);
+            }
         }
 /* Collect battery charge fill state estimations. */
         for (i=0; i<NUM_BATS; i++)
         {
-            uint16_t batteryAbsVoltage = abs(getBatteryVoltage(i));
-            batteryFillState[i] = normalF;
-            if ((batteryAbsVoltage < LOW_VOLTAGE) || (batterySoC[i] < LOW_SOC))
-                batteryFillState[i] = lowF;
-            else if ((batteryAbsVoltage < CRITICAL_VOLTAGE) ||
-                     (batterySoC[i] < CRITICAL_SOC))
-                batteryFillState[i] = criticalF;
-        }
-/* Check for the undervoltage indicator set, and if so, mark the battery as
-missing, otherwise if the battery was marked as missing and suddenly appears,
-mark as isolated. Perform a current and SoC recalibration in case it was never
-done. This is simply the measured current as the battery shouldn't be
-sourcing any of the quiescent current.*/
-        uint16_t indicators = getIndicators();
-        for  (i=0; i<NUM_BATS; i++)
-        {
-            uint8_t lastOpState = batteryOpState[i];
-            if (((indicators >> 2*i) & (0x02)) == 0)    /* Undervoltage */
+            if (batteryHealthState[i] != missingH)
             {
-                batteryOpState[i] = missingO;
-                batterySoC[i] = 0;
-            }
-/* Slip in a newly detected battery and calibrate its current. */
-            else if (lastOpState == missingO)
-            {
-                batteryOpState[i] = isolatedO;
-                currentOffsets.data[i] = 0;
-	            vTaskDelay(getCalibrationDelay());
-                currentOffsets.data[i] = getCurrent(i);
-                batterySoC[i] = computeSoC(getBatteryVoltage(i),
-                                           getTemperature(),getBatteryType(i));
-                batteryCharge[i] = getBatteryCapacity(i)*36*batterySoC[i];
-                writeConfigBlock();
+                uint16_t batteryAbsVoltage = abs(getBatteryVoltage(i));
+                batteryFillState[i] = normalF;
+                if ((batteryAbsVoltage < LOW_VOLTAGE) || (batterySoC[i] < LOW_SOC))
+                    batteryFillState[i] = lowF;
+                else if ((batteryAbsVoltage < CRITICAL_VOLTAGE) ||
+                         (batterySoC[i] < CRITICAL_SOC))
+                    batteryFillState[i] = criticalF;
             }
         }
 /* Rank the batteries by charge state. Bubble sort to have highest SoC first
@@ -384,7 +380,7 @@ pushing all missing batteries to the low end (SoC = 0 set above). */
         uint32_t shortestTime = 0xFFFFFFFF;
         for (i=0; i<NUM_BATS; i++)
         {
-            if (batteryOpState[i] != missingO)
+            if (batteryHealthState[i] != missingH)
             {
                 if (batteryIsolationTime[i] > longestTime)
                 {
@@ -484,7 +480,7 @@ forth as the loaded battery droops and the charging battery completes charge. */
                         batteryUnderLoad = 0;
                 }
 /* (2) If the loads are unallocated, set to the highest SoC unallocated battery.
-Avoid the battery that has been idle for the longest time, and also battery
+Avoid the battery that has been idle for the longest time, and also the battery
 under charge if the strategies require it. */
                 if (batteryUnderLoad == 0)
                 {
@@ -567,7 +563,6 @@ critical we must turn off the low priority loads. */
 
 /*--------------END BATTERY MANAGEMENT DECISIONS ------------------*/
 
-/*------------------------CLEAN UP --------------------------------*/
 /* If charging voltage is lower than the battery voltage, turn off charging
 altogether. This will allow more flexibility in managing isolation during night
 periods. */
@@ -579,7 +574,7 @@ periods. */
             for (i=0; i<NUM_BATS; i++)
             {
                 uint8_t lastOpState = batteryOpState[i];
-                if (batteryOpState[i] != missingO)
+                if (batteryHealthState[i] != missingH)
                 {
                     batteryOpState[i] = isolatedO; /* reset operational state */
                     if ((batteryUnderLoad > 0) && (i == batteryUnderLoad-1))
@@ -622,25 +617,28 @@ below a threshold of about 80mA. */
         uint32_t monitorHour = 3600*1000/(portTICK_RATE_MS*getMonitorDelay());
         for (i=0; i<NUM_BATS; i++)
         {
-            if (abs(getBatteryCurrent(i)) < 30)
-                batteryCurrentSteady[i]++;
-            else
-                batteryCurrentSteady[i] = 0;
-            if (batteryCurrentSteady[i] > monitorHour)
+            if (batteryHealthState[i] != missingH)
             {
-                batterySoC[i] = computeSoC(getBatteryVoltage(i),
-                                           getTemperature(),getBatteryType(i));
-                batteryCurrentSteady[i] = 0;
-            }
+                if (abs(getBatteryCurrent(i)) < 30)
+                    batteryCurrentSteady[i]++;
+                else
+                    batteryCurrentSteady[i] = 0;
+                if (batteryCurrentSteady[i] > monitorHour)
+                {
+                    batterySoC[i] = computeSoC(getBatteryVoltage(i),
+                                               getTemperature(),getBatteryType(i));
+                    batteryCurrentSteady[i] = 0;
+                }
 /* Update the isolation time of each battery. If a battery has been isolated for
 over 8 hours, compute SoC and drop isolation time back to zero to allow other
 batteries to go isolated. */
-            batteryIsolationTime[i]++;
-            if (batteryIsolationTime[i] > 8*monitorHour)
-            {
-                batterySoC[i] = computeSoC(getBatteryVoltage(i),
-                                           getTemperature(),getBatteryType(i));
-                batteryIsolationTime[i] = 0;
+                batteryIsolationTime[i]++;
+                if (batteryIsolationTime[i] > 8*monitorHour)
+                {
+                    batterySoC[i] = computeSoC(getBatteryVoltage(i),
+                                               getTemperature(),getBatteryType(i));
+                    batteryIsolationTime[i] = 0;
+                }
             }
         }
 
@@ -670,6 +668,7 @@ static void initGlobals(void)
         batteryIsolationTime[i] = 0;
 /* Start with all batteries isolated */
         batteryOpState[i] = isolatedO;
+        batteryHealthState[i] = goodH;
     }
     batteryUnderLoad = 0;
     batteryUnderCharge = 0;
@@ -763,6 +762,19 @@ void resetBatterySoC(int battery)
 void startCalibration()
 {
     calibrate = true;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Change missing status of batteries
+
+@param[in] battery: 0..NUM_BATS-1
+@param[in] missing: boolean
+*/
+
+void setBatteryMissing(int battery, bool missing)
+{
+    if (missing) batteryHealthState[battery] = missingH;
+    else batteryHealthState[battery] = goodH;
 }
 
 /*--------------------------------------------------------------------------*/

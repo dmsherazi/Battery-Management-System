@@ -39,7 +39,7 @@ tasks running on the same microcontroller.
 
 typedef enum {wetT=0, gelT=1, agmT=2} battery_Type;
 typedef enum {normalF=0, lowF=1, criticalF=2, faultyF=3} battery_Fl_States;
-typedef enum {loadedO=0, chargingO=1, isolatedO=2, missingO=3} battery_Op_States;
+typedef enum {loadedO=0, chargingO=1, isolatedO=2} battery_Op_States;
 typedef enum {bulkC=0, absorptionC=1, floatC=2, equalizationC=3} battery_Ch_States;
 typedef enum {goodH=0, faultyH=1, missingH=2} battery_Hl_States;
 
@@ -70,7 +70,6 @@ struct Config
 /* Battery characteristics and model parameters */
     uint16_t batteryCapacity[NUM_BATS];
     battery_Type batteryType[NUM_BATS];
-    battery_Hl_States batteryHealth[NUM_BATS];
     int16_t absorptionVoltage[NUM_BATS];
     int16_t floatVoltage[NUM_BATS];
     int16_t floatStageCurrentScale[NUM_BATS];

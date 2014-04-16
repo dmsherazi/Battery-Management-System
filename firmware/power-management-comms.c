@@ -227,8 +227,7 @@ released. The command is followed by an interface number 0-5 being batteries
                 char id[] = "pR0";
                 id[2] = line[2];
                 uint8_t battery = line[2] - '1';
-                dataMessageSend(id,getBatteryResistanceAv(battery),
-                                   (int32_t)configData.config.batteryHealth[battery]);
+                dataMessageSend(id,getBatteryResistanceAv(battery),0);
                 id[1] = 'T';
                 dataMessageSend(id,(int32_t)configData.config.batteryType[battery],
                                    (int32_t)configData.config.batteryCapacity[battery]);
@@ -320,8 +319,8 @@ released. The command is followed by an interface number 0-5 being batteries
 /* M-, M+ Turn on/off battery missing */
         case 'm':
             {
-                if (line[3] == '-') configData.config.batteryHealth[battery] = goodH;
-                if (line[3] == '+') configData.config.batteryHealth[battery] = missingH;
+                if (line[3] == '-') setBatteryMissing(battery,false);
+                if (line[3] == '+') setBatteryMissing(battery,true);
                 break;
             }
 /* r-, r+ Turn recording on or off */

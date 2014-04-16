@@ -689,6 +689,7 @@ void PowerManagementGui::processResponse(const QString response)
         int opState = secondField.toInt() & 0x03;
         int fillState = (secondField.toInt() >> 2) & 0x03;
         int chargingState = (secondField.toInt() >> 4) & 0x03;
+        int healthState = (secondField.toInt() >> 8) & 0x03;
         if (fillState == 0)         // Normal
         {
             PowerManagementMainUi.battery1Fill->
@@ -758,6 +759,27 @@ void PowerManagementGui::processResponse(const QString response)
             PowerManagementMainUi.battery1Charging->
                 setText("F");
         }
+        if (healthState == 0)
+        {
+            PowerManagementMainUi.battery1Health->
+                setStyleSheet("background-color:lightgreen;");
+            PowerManagementMainUi.battery1Health->
+                setText("");
+        }
+        else if (healthState == 1)
+        {
+            PowerManagementMainUi.battery1Health->
+                setStyleSheet("background-color:orange;");
+            PowerManagementMainUi.battery1Health->
+                setText("F");
+        }
+        else
+        {
+            PowerManagementMainUi.battery1Health->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery1Health->
+                setText("X");
+        }
     }
 /* Battery 2 Fill and Operational State Indicators */
     if ((size > 0) && (firstField == "dO2"))
@@ -765,6 +787,7 @@ void PowerManagementGui::processResponse(const QString response)
         int opState = secondField.toInt() & 0x03;
         int fillState = (secondField.toInt() >> 2) & 0x03;
         int chargingState = (secondField.toInt() >> 4) & 0x03;
+        int healthState = (secondField.toInt() >> 8) & 0x03;
         if (fillState == 0)         // Normal
         {
             PowerManagementMainUi.battery2Fill->
@@ -834,6 +857,27 @@ void PowerManagementGui::processResponse(const QString response)
             PowerManagementMainUi.battery2Charging->
                 setText("F");
         }
+        if (healthState == 0)
+        {
+            PowerManagementMainUi.battery2Health->
+                setStyleSheet("background-color:lightgreen;");
+            PowerManagementMainUi.battery2Health->
+                setText("");
+        }
+        else if (healthState == 1)
+        {
+            PowerManagementMainUi.battery2Health->
+                setStyleSheet("background-color:orange;");
+            PowerManagementMainUi.battery2Health->
+                setText("F");
+        }
+        else
+        {
+            PowerManagementMainUi.battery2Health->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery2Health->
+                setText("X");
+        }
     }
 /* Battery 3 Fill and Operational State Indicators */
     if ((size > 0) && (firstField == "dO3"))
@@ -841,6 +885,7 @@ void PowerManagementGui::processResponse(const QString response)
         int opState = secondField.toInt() & 0x03;
         int fillState = (secondField.toInt() >> 2) & 0x03;
         int chargingState = (secondField.toInt() >> 4) & 0x03;
+        int healthState = (secondField.toInt() >> 8) & 0x03;
         if (fillState == 0)         // Normal
         {
             PowerManagementMainUi.battery3Fill->
@@ -909,6 +954,27 @@ void PowerManagementGui::processResponse(const QString response)
                 setStyleSheet("background-color:lightgreen;");
             PowerManagementMainUi.battery3Charging->
                 setText("F");
+        }
+        if (healthState == 0)
+        {
+            PowerManagementMainUi.battery3Health->
+                setStyleSheet("background-color:lightgreen;");
+            PowerManagementMainUi.battery3Health->
+                setText("");
+        }
+        else if (healthState == 1)
+        {
+            PowerManagementMainUi.battery3Health->
+                setStyleSheet("background-color:orange;");
+            PowerManagementMainUi.battery3Health->
+                setText("F");
+        }
+        else
+        {
+            PowerManagementMainUi.battery3Health->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery3Health->
+                setText("X");
         }
     }
 /* SoC estimates */

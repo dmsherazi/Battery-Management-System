@@ -69,6 +69,7 @@ int16_t getBatterySoC(int battery);
 void resetBatterySoC(int battery);
 void startCalibration();
 void checkMonitorWatchdog(void);
+void setBatteryMissing(int battery, bool missing);
 
 #endif
 
