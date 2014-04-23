@@ -1,4 +1,4 @@
-elements-dir ~/Development-Electronics/NonProject/gEDA/Footprints
+elements-dir footprints
 schematics circuit-breaker-1.sch circuit-breaker-2.sch
 output-name circuit-breaker
 
