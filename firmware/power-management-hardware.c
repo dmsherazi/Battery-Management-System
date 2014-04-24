@@ -189,8 +189,8 @@ void setSwitch(uint8_t battery, uint8_t setting)
     uint16_t switchControlBits = ((switchControl >> SWITCH_CONTROL_SHIFT) & 0x3F);
 /* Each two-bit field represents load 1 bits 0-1, load2 bits 2-3 panel bits 4-5,
 and the setting is the battery to be connected (no two batteries can be connected
-to a load/panel at the same time). The final bit pattern of settings go into PB8-13.
-Preserve the lower 8 bits. */
+to a load/panel at the same time). The final bit pattern of settings go into the
+switch control port, preserving the lower bits. */
     if ((battery <= 3) && (setting <= 2))
     {
         switchControlBits &= (~(0x03 << (setting<<1)));

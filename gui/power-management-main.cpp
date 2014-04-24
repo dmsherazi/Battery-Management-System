@@ -781,12 +781,8 @@ void PowerManagementGui::processResponse(const QString response)
                 setText("X");
             PowerManagementMainUi.battery1Charging->
                 setStyleSheet("background-color:white;");
-            PowerManagementMainUi.battery1Op->
-                setText("X");
             PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:white;");
-            PowerManagementMainUi.battery1Fill->
-                setText("X");
             PowerManagementMainUi.battery1Charge->
                 setText(QString(""));
             PowerManagementMainUi.battery1Current->setText(QString(""));
@@ -891,12 +887,8 @@ void PowerManagementGui::processResponse(const QString response)
                 setText("X");
             PowerManagementMainUi.battery2Charging->
                 setStyleSheet("background-color:white;");
-            PowerManagementMainUi.battery2Op->
-                setText("X");
             PowerManagementMainUi.battery2Fill->
                 setStyleSheet("background-color:white;");
-            PowerManagementMainUi.battery2Fill->
-                setText("X");
             PowerManagementMainUi.battery2Charge->
                 setText(QString(""));
             PowerManagementMainUi.battery2Current->setText(QString(""));
@@ -1002,11 +994,7 @@ void PowerManagementGui::processResponse(const QString response)
             PowerManagementMainUi.battery3Charging->
                 setStyleSheet("background-color:white;");
             PowerManagementMainUi.battery3Op->
-                setText("X");
-            PowerManagementMainUi.battery3Fill->
                 setStyleSheet("background-color:white;");
-            PowerManagementMainUi.battery3Fill->
-                setText("X");
             PowerManagementMainUi.battery3Charge->
                 setText(QString(""));
             PowerManagementMainUi.battery3Current->setText(QString(""));

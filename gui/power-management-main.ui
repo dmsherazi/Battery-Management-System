@@ -1455,6 +1455,9 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Set battery monitoring algorithm.</string>
+   </property>
    <property name="layoutDirection">
     <enum>Qt::RightToLeft</enum>
    </property>
@@ -1901,7 +1904,7 @@
     </font>
    </property>
    <property name="toolTip">
-    <string>Fill State - Normal, Low, Critical</string>
+    <string>Health State - Good, Faulty, Missing</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>
@@ -1928,7 +1931,7 @@
     </font>
    </property>
    <property name="toolTip">
-    <string>Fill State - Normal, Low, Critical</string>
+    <string>Health State - Good, Faulty, Missing</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>
@@ -1955,7 +1958,7 @@
     </font>
    </property>
    <property name="toolTip">
-    <string>Fill State - Normal, Low, Critical</string>
+    <string>Health State - Good, Faulty, Missing</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>
