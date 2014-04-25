@@ -6,5 +6,5 @@
 #
 Element( 0x00 "Single Large Terminal Pad" "" "" 0 0 150 100 3 100 0x00)
 (
-  Pin(   0     0  200  70   0  94 "a"  "1" 0x000)
+  Pin(   0     0  200  70   205  94 "a"  "1" 0x000)
 )

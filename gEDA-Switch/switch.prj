@@ -1,0 +1,4 @@
+elements-dir footprints
+schematics switch-ssi.sch switch-power.sch switch-mosfet.sch
+output-name switch
+
