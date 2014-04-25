@@ -219,18 +219,25 @@ This is done on the directly measured current for rapid response. */
 value that will allow it to grow again if needed (round-off error problem). */
             if (dutyCycle < MIN_DUTYCYCLE) dutyCycle = MIN_DUTYCYCLE;
             if (dutyCycle > dutyCycleMax) dutyCycle = dutyCycleMax;
-            pwmSetDutyCycle(dutyCycle);
+            uint16_t dutyCycleActual = dutyCycle;
 /* If the voltage drifts too high in float phase, turn off charging altogether.*/
             if ((batteryChargingPhase[index] == floatC) &&
                 (voltageAv[index] > voltageLimit(getFloatVoltage(index))*260/256))
-                pwmSetDutyCycle(0);
-/* If the voltage drifts too high in any phase, turn off charging altogether.*/
+                dutyCycleActual = 0;
+/* If the voltage drifts above absorption voltage in any phase, turn off
+charging altogether..*/
             if (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))*260/256)
-                pwmSetDutyCycle(0);
+                dutyCycleActual = 0;
+/* If the voltage drifts above the maximum in any phase, turn off charging
+altogether as the duty cycle is not handling this case..*/
+            if (voltageAv[index] > VOLTAGE_MAX*253/256)
+                dutyCycleActual = 0;
 /* If switch avoidance is set, turn off charging. This will cause the charger to
 operate in bang-bang mode, which may create less EMI. */
             if (isSwitchAvoidance() && (dutyCycle < 100*256))
-                pwmSetDutyCycle(0);
+                dutyCycleActual = 0;
+            pwmSetDutyCycle(dutyCycleActual);
+dataMessageSendLowPriority("Dduty",dutyCycleActual,voltageAv[index]);
         }
     }
 }

@@ -389,8 +389,8 @@ static void usartSetup(void)
 /*--------------------------------------------------------------------------*/
 /** @brief PWM Timer Setup
 
-Setup GPIO Port A8 for TIM1_CH1 PWM output to generate a signal of a given  duty cycle.
-No interrupt is required.
+Setup GPIO Port A8 for TIM1_CH1 PWM output to generate a signal of a given duty
+cycle. No interrupt is required.
 */
 
 static void pwmSetup(void)
@@ -406,24 +406,24 @@ static void pwmSetup(void)
 
 /* Set Timer global mode:
  - No division
- - Alignment centre mode 1 (up/down counting, interrupt on downcount only)
+ - Alignment centre (up/down counting), mode 1 (interrupt on downcount only).
  - Direction up (when centre mode is set it is read only, changes by hardware)
 */
 	timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_CENTER_1, TIM_CR1_DIR_UP);
 
 /* Set Timer output compare mode:
- - Channel 1, PWM mode 2 (output low when CNT < CCR1, high otherwise)
+ - Channel 1, PWM mode 2 (output low when CNT <= CCR1, high otherwise)
 */
 	timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM2);
 	timer_enable_oc_output(TIM1, TIM_OC1);
 	timer_enable_break_main_output(TIM1);
 
-/* The ARR (auto-preload register) sets the PWM period to 50 microseconds from the
-72 MHz clock.*/
+/* The ARR (auto-preload register) sets the PWM period to 50 microseconds from
+the 72 MHz clock.*/
 	timer_enable_preload(TIM1);
 	timer_set_period(TIM1, PWM_PERIOD);
 
-/* The CCR1 (capture/compare register 1) sets the PWM duty cycle to default 50% */
+/* The CCR1 (capture/compare register) sets the PWM duty cycle to default 50% */
     pwmSetDutyCycle(50);
 
 /* Force an update to load the shadow registers */
