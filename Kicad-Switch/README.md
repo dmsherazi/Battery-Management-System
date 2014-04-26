@@ -1,7 +1,7 @@
 Battery Management System Switch
 --------------------------------
 
-PCB for the MOSFET switch matrix. This replaces the Kicad version.
+PCB for the MOSFET switch matrix.
 
 Digital circuitry ensures that no two batteries are connected together, which
 could cause damage if the state of charge differs significantly.
