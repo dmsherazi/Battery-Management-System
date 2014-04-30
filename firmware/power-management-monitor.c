@@ -315,8 +315,9 @@ accurate estimate of SoC. */
 
 /*------------- COMPUTE BATTERY STATE -----------------------*/
 /* Check to see if a battery is missing. This can happen if a battery put under
-load has been removed. Missing batteries not under load will not show as
-missing due to the nature of the circuitry, so existing missing status is not
+load has been removed.
+NOTE: Missing batteries not under load will not show as missing due to the
+nature of the circuitry, so any existing missing battery status is not
 removed here; this must be done externally. */
         for (i=0; i<NUM_BATS; i++)
         {
@@ -332,7 +333,8 @@ removed here; this must be done externally. */
         {
             if (batteryHealthState[i] == missingH) numBats--;
         }
-/* Access each battery charge accumulated since the last time, and update the SoC. */
+/* Access each battery charge accumulated since the last time, and update
+the SoC. */
         for (i=0; i<NUM_BATS; i++)
         {
             if (batteryHealthState[i] != missingH)
@@ -587,7 +589,7 @@ critical, set to the highest SoC unallocated battery ... */
                     }
 /* ... however if it still ends up on a low battery then there is only one
 normal battery which is also isolated, so this must be overridden (this should
-not the charging battery if our logic is correct so far). */
+not the battery under charge if our logic is correct so far). */
                     if ((batteryUnderLoad == 0) ||
                         (batteryFillState[batteryUnderLoad-1] != normalF))
                     {

@@ -187,10 +187,10 @@ void setSwitch(uint8_t battery, uint8_t setting)
 {
     uint16_t switchControl = gpio_port_read(SWITCH_CONTROL_PORT);
     uint16_t switchControlBits = ((switchControl >> SWITCH_CONTROL_SHIFT) & 0x3F);
-/* Each two-bit field represents load 1 bits 0-1, load2 bits 2-3 panel bits 4-5,
-and the setting is the battery to be connected (no two batteries can be connected
-to a load/panel at the same time). The final bit pattern of settings go into the
-switch control port, preserving the lower bits. */
+/* Each two-bit field represents load 1 bits 0-1, load 2 bits 2-3
+panel bits 4-5, and the setting is the battery to be connected (no two batteries
+can be connected to a load/panel at the same time). The final bit pattern of
+settings go into the switch control port, preserving the lower bits. */
     if ((battery <= 3) && (setting <= 2))
     {
         switchControlBits &= (~(0x03 << (setting<<1)));
@@ -324,7 +324,7 @@ void setSwitchControlBits(uint8_t settings)
 void pwmSetDutyCycle(uint16_t dutyCycle)
 {
     uint32_t threshold = ((PWM_PERIOD*dutyCycle)/100)>>8;
-	timer_set_oc_value(TIM1, TIM_OC1, threshold);    
+	timer_set_oc_value(TIM1, TIM_OC1, threshold);
 	timer_generate_event(TIM1, TIM_EGR_UG);
 }
 
@@ -413,8 +413,17 @@ static void pwmSetup(void)
 
 /* Set Timer output compare mode:
  - Channel 1, PWM mode 2 (output low when CNT <= CCR1, high otherwise)
+There is an inversion difference between the first and second prototypes.
+The first used inverting gates to apply PWM to the address bits.
+The second applies PWM directly to the switch demultiplexer enable.
 */
+#if (VERSION==1)
 	timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM2);
+#elif (VERSION==2)
+	timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
+#else
+#error "Version is not defined"
+#endif
 	timer_enable_oc_output(TIM1, TIM_OC1);
 	timer_enable_break_main_output(TIM1);
 

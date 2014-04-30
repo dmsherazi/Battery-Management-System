@@ -16,5 +16,13 @@ slow switching speeds. There may be a need for faster switching e.g. high speed
 PWM to reduce EMI. In this case the circuit needs to be modified to use better
 drivers.
 
+There were several errors in the circuit, which have been corrected but not
+tested. The board is to be replaced with the gEDA version.
+
+In the board, load 1 is the central row of switches and the upper power
+connector. Load 2 is the lower row of switches and the lower power connector.
+This is the reverse of that used in the interconnect board and has been changed
+in the gEDA board.
+
 (c) K. Sarkies 26/04/2014
 

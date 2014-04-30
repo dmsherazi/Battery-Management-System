@@ -16,5 +16,9 @@ slow switching speeds. There may be a need for faster switching e.g. high speed
 PWM to reduce EMI. In this case the circuit needs to be modified to use better
 drivers.
 
+Special footprints have been created for the MOSFETs to provide an oversized
+two-sided drain pad with plated through holes to assist in heat dissipation. The
+load switches have common drains and the shared heatsink is therefore smaller.
+
 (c) K. Sarkies 26/04/2014
 
