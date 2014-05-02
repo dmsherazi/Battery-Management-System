@@ -403,6 +403,7 @@ void PowerManagementGui::processResponse(const QString response)
         PowerManagementMainUi.load1Battery3->setEnabled(true);
         switch (load1Setting)
         {
+// No battery allocated to load 1
             case 0:
                 PowerManagementMainUi.load1Battery1->setAutoExclusive(false);
                 PowerManagementMainUi.load1Battery1->setChecked(false);
@@ -441,8 +442,8 @@ void PowerManagementGui::processResponse(const QString response)
         PowerManagementMainUi.load2Battery3->setEnabled(true);
         switch (load2Setting)
             {
+// No battery allocated to load 2
             case 0:
-                PowerManagementMainUi.load2CheckBox->setChecked(false);
                 PowerManagementMainUi.load2Battery1->setAutoExclusive(false);
                 PowerManagementMainUi.load2Battery1->setChecked(false);
                 PowerManagementMainUi.load2Battery1->setAutoExclusive(true);
@@ -480,6 +481,7 @@ void PowerManagementGui::processResponse(const QString response)
         PowerManagementMainUi.panelBattery3->setEnabled(true);
         switch (panelSetting)
             {
+// No battery allocated to the panel
             case 0:
                 PowerManagementMainUi.panelBattery1->setAutoExclusive(false);
                 PowerManagementMainUi.panelBattery1->setChecked(false);
@@ -491,6 +493,7 @@ void PowerManagementGui::processResponse(const QString response)
                 PowerManagementMainUi.panelBattery3->setChecked(false);
                 PowerManagementMainUi.panelBattery3->setAutoExclusive(true);
                 break;
+// Battery x allocated to the panel
             case 1:
                 PowerManagementMainUi.panelBattery1->setAutoExclusive(true);
                 PowerManagementMainUi.panelBattery1->setChecked(true);

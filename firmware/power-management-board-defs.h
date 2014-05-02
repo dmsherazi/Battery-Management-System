@@ -140,27 +140,28 @@ Initial 23 September 2013
 
 #if defined USE_ET_STM32F103
 
-#define PA_ANALOGUE_INPUTS              GPIO0 | GPIO1 | GPIO2 | GPIO3 /*| GPIO4 | GPIO5 |
-                                               GPIO6*/
-#define PA_DIGITAL_OUTPUTS              /*GPIO7 | GPIO8 | */ GPIO11
-#define PB_DIGITAL_OUTPUTS              GPIO0 | GPIO3 | GPIO6 | GPIO8 | GPIO9 | GPIO10 |\
-                                        GPIO11 | GPIO12 | GPIO13
-#define PB_DIGITAL_INPUTS               GPIO1 | GPIO2 | GPIO4 | GPIO5 | GPIO14 | GPIO15
+#define PA_ANALOGUE_INPUTS              GPIO0 | GPIO1 | GPIO2 | GPIO3
+#define PA_DIGITAL_OUTPUTS              GPIO11
+#define PB_DIGITAL_OUTPUTS              GPIO0 | GPIO3 | GPIO6 | GPIO8 | GPIO9 |\
+                                                GPIO10 |GPIO11 | GPIO12 | GPIO13
+#define PB_DIGITAL_INPUTS               GPIO1 | GPIO2 | GPIO4 | GPIO5 |\
+                                                GPIO14 | GPIO15
 #define PC_ANALOGUE_INPUTS              GPIO0 | GPIO1 | GPIO2 | GPIO3 | GPIO4
-#define PC_DIGITAL_INPUTS               /*GPIO6 |*/ GPIO7 | GPIO9 | GPIO10 | GPIO12 | GPIO13
+#define PC_DIGITAL_INPUTS               GPIO7 | GPIO9 | GPIO10 | GPIO12 | GPIO13
 
 #elif defined USE_ET_STAMP_STM32
 
-#define PA_ANALOGUE_INPUTS              GPIO0 | GPIO1 | GPIO2 | GPIO3 | GPIO4 | GPIO5 | \
-                                                GPIO6 | GPIO7
+#define PA_ANALOGUE_INPUTS              GPIO0 | GPIO1 | GPIO2 | GPIO3 | GPIO4 |\
+                                                GPIO5 | GPIO6 | GPIO7
 #define PA_DIGITAL_INPUTS               GPIO11 | GPIO12
 #define PA_DIGITAL_OUTPUTS              GPIO8 | GPIO13 | GPIO14 | GPIO15
 #define PC_ANALOGUE_INPUTS              GPIO0 | GPIO1 | GPIO2 | GPIO3 | GPIO4
-#define PC_DIGITAL_OUTPUTS              GPIO5 | GPIO6 | GPIO7 | GPIO8 | GPIO9 | GPIO10 |\
-                                                GPIO11 | GPIO12 | GPIO13
-#define PB_DIGITAL_INPUTS               GPIO0 | GPIO1 | GPIO2 | GPIO3 | GPIO4 | GPIO5 |\
-                                                GPIO6 | GPIO7 | GPIO8 | GPIO9 | GPIO10 | \
-                                                GPIO11
+#define PC_DIGITAL_OUTPUTS              GPIO5 | GPIO6 | GPIO7 | GPIO8 | GPIO9 |\
+                                                GPIO10 | GPIO11 | GPIO12 |\
+                                                GPIO13
+#define PB_DIGITAL_INPUTS               GPIO0 | GPIO1 | GPIO2 | GPIO3 | GPIO4 |\
+                                                GPIO5 | GPIO6 | GPIO7 | GPIO8 |\
+                                                GPIO9 | GPIO10 | GPIO11
 #endif
 
 #endif

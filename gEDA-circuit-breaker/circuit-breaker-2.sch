@@ -1,4 +1,4 @@
-v 20121123 2
+v 20130925 2
 C 40000 40000 0 0 0 title-B.sym
 C 46900 46000 1 90 0 resistor-1.sym
 {
@@ -271,7 +271,7 @@ device=RESISTOR
 T 43500 43400 5 10 1 1 0 0 1
 refdes=R13
 T 43500 42900 5 10 1 1 0 0 1
-value=10K
+value=4.7K
 T 43200 43100 5 10 0 0 0 0 1
 footprint=R025
 }
@@ -296,7 +296,7 @@ device=RESISTOR
 T 50700 42900 5 10 1 1 0 0 1
 refdes=R21
 T 50700 42400 5 10 1 1 0 0 1
-value=10K
+value=4.7K
 T 50400 42600 5 10 0 0 0 0 1
 footprint=R025
 }
