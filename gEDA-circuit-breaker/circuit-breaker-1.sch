@@ -5,9 +5,9 @@ C 56400 50600 1 0 1 terminal-1.sym
 T 56090 51350 5 10 0 0 0 6 1
 device=terminal
 T 56090 51200 5 10 0 0 0 6 1
-footprint=Pad_Fat_1
+footprint=JUMPER1
 T 55750 50350 5 10 1 1 0 0 1
-refdes=Out
+refdes=Out1
 T 56400 50600 5 10 0 0 0 0 1
 netname=out
 T 56400 50600 5 10 0 0 0 0 1
@@ -81,11 +81,11 @@ C 41000 50600 1 0 0 resistor-1.sym
 T 41300 51000 5 10 0 0 0 0 1
 device=RESISTOR
 T 41200 50300 5 10 1 1 0 0 1
-refdes=Rsense
+refdes=Rsense1
 T 41200 50100 5 10 1 1 0 0 1
 value=0.005
 T 41000 50600 5 10 0 0 0 0 1
-footprint=ACY400
+footprint=Rsense
 }
 N 41900 50700 55500 50700 4
 {
@@ -99,9 +99,9 @@ C 40100 50600 1 0 0 terminal-1.sym
 T 40410 51350 5 10 0 0 0 0 1
 device=terminal
 T 40410 51200 5 10 0 0 0 0 1
-footprint=Pad_Fat_1
+footprint=JUMPER1
 T 40750 50350 5 10 1 1 0 6 1
-refdes=Pos
+refdes=Pos1
 T 40100 50600 5 10 0 0 0 0 1
 netname=positive
 T 40100 50600 5 10 0 0 0 0 1
@@ -114,7 +114,7 @@ device=terminal
 T 40410 47800 5 10 0 0 0 0 1
 footprint=JUMPER1
 T 40750 46950 5 10 1 1 0 6 1
-refdes=Neg
+refdes=Neg1
 T 40100 47200 5 10 0 0 0 0 1
 netname=negative
 T 40100 47200 5 10 0 0 0 0 1
