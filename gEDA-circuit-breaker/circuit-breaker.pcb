@@ -6,7 +6,7 @@ FileVersion[20070407]
 PCB["" 390000 390000]
 
 Grid[100.0 0 0 0]
-Cursor[873 1747 0.000000]
+Cursor[65200 217400 0.000000]
 PolyArea[200000000.000000]
 Thermal[0.500000]
 DRC[600 600 600 600 1500 600]
@@ -1739,7 +1739,7 @@ Element["" "RtrimL" "VR2" "10K" 360500 229800 -22500 8500 0 100 ""]
 
 Element["" "JUMPER1" "Neg1" "unknown" 98000 250000 -5000 -5000 3 100 ""]
 (
-	Pin[0 0 11000 3000 11600 3800 "terminal" "1" "square"]
+	Pin[0 0 12000 3000 12600 7800 "terminal" "1" "square"]
 	ElementLine [-5000 -5000 -5000 5000 1000]
 	ElementLine [-5000 5000 5000 5000 1000]
 	ElementLine [5000 5000 5000 -5000 1000]
@@ -1751,7 +1751,7 @@ Element["" "JUMPER1" "Neg1" "unknown" 98000 250000 -5000 -5000 3 100 ""]
 
 Element["" "JUMPER1" "Pos1" "unknown" 100000 270000 -5000 -5000 3 100 ""]
 (
-	Pin[0 0 10500 3000 11100 3800 "terminal" "1" "square"]
+	Pin[0 0 12000 3000 12600 7800 "terminal" "1" "square"]
 	ElementLine [-5000 -5000 -5000 5000 1000]
 	ElementLine [-5000 5000 5000 5000 1000]
 	ElementLine [5000 5000 5000 -5000 1000]
@@ -1763,7 +1763,7 @@ Element["" "JUMPER1" "Pos1" "unknown" 100000 270000 -5000 -5000 3 100 ""]
 
 Element["" "JUMPER1" "Out1" "unknown" 100000 230000 -5000 -5000 3 100 ""]
 (
-	Pin[0 0 11000 3000 11600 3800 "terminal" "1" "square"]
+	Pin[0 0 12000 3000 12600 7800 "terminal" "1" "square"]
 	ElementLine [-5000 -5000 -5000 5000 1000]
 	ElementLine [-5000 5000 5000 5000 1000]
 	ElementLine [5000 5000 5000 -5000 1000]
@@ -1775,8 +1775,8 @@ Element["" "JUMPER1" "Out1" "unknown" 100000 230000 -5000 -5000 3 100 ""]
 
 Element["" "Rsense" "Rsense1" "0.005" 110100 270200 3935 -1740 1 100 ""]
 (
-	Pin[0 0 10500 3000 11100 3000 "1" "1" "square"]
-	Pin[0 -40000 11000 3000 11600 3000 "2" "2" "square"]
+	Pin[0 0 10500 3000 11100 4000 "1" "1" "square"]
+	Pin[0 -40000 11000 3000 11600 4000 "2" "2" "square"]
 	ElementLine [0 -10000 0 0 1000]
 	ElementLine [0 -40000 0 -30000 1000]
 	ElementLine [-3300 -30000 -3300 -10000 1000]
