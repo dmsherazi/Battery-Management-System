@@ -315,7 +315,7 @@ accurate estimate of SoC. */
 
 /*------------- COMPUTE BATTERY STATE -----------------------*/
 /* Check to see if a battery is missing. This can happen if a battery put under
-load has been removed.
+load has been removed. Remove any existing loads from the battery.
 NOTE: Missing batteries not under load will not show as missing due to the
 nature of the circuitry, so any existing missing battery status is not
 removed here; this must be done externally. */
@@ -325,6 +325,8 @@ removed here; this must be done externally. */
             {
                 batteryHealthState[i] = missingH;
                 batterySoC[i] = 0;
+                if (batteryUnderLoad == i)
+                    batteryUnderLoad = 0;
             }
         }
 /* Find number of batteries present */

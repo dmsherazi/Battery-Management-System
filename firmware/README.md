@@ -31,11 +31,20 @@ It is compiled with 'make VERSION=2'
 
 TODO
 
-1. Firmware upload - from within the program. Base on stm32flash
+1. Firmware upload - from within the program. Base on stm32flash.
 2. Comms - test queue space available for each data message to send.
 4. Measurement - Increase switching speed to 25kHz. May need hardware changes.
 5. Charger - add acceleration to pull overvoltage back quickly.
-6. Time - fix date setting.
-7. Comms - additional commands for more configuration options.
-8. Comms - by default do not send messages until instructed.
+6. Comms - additional commands for more configuration options.
+7. Comms - by default do not send messages until instructed.
+8. File - add file info (date, size) to GUI.
+9. GUI - download feature (may cause saturation of the comms interface).
+
+BUGS
+
+1. Time - fix date setting.
+2. Monitor - missing battery, when removed, is not handled and loads are still
+     allocated to it.
+3. Monitor - when battery drops voltage below critical, needs to be removed
+     from loads until recharged.
 

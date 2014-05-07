@@ -252,13 +252,22 @@ void PowerManagementConfigGui::on_echoTestButton_clicked()
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Reset the Battery 1 Missing Status
+/** @brief Reset or Set the Battery 1 Missing Status
 
 */
 
 void PowerManagementConfigGui::on_resetMissing1Button_clicked()
 {
-    socket->write("pm1-\n\r");
+    if (PowerManagementConfigUi.resetMissing1Button->isFlat())
+    {
+        PowerManagementConfigUi.resetMissing1Button->setFlat(false);
+        socket->write("pm1-\n\r");
+    }
+    else
+    {
+        PowerManagementConfigUi.resetMissing1Button->setFlat(true);
+        socket->write("pm1+\n\r");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -268,7 +277,16 @@ void PowerManagementConfigGui::on_resetMissing1Button_clicked()
 
 void PowerManagementConfigGui::on_resetMissing2Button_clicked()
 {
-    socket->write("pm2-\n\r");
+    if (PowerManagementConfigUi.resetMissing2Button->isFlat())
+    {
+        PowerManagementConfigUi.resetMissing2Button->setFlat(false);
+        socket->write("pm2-\n\r");
+    }
+    else
+    {
+        PowerManagementConfigUi.resetMissing2Button->setFlat(true);
+        socket->write("pm2+\n\r");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -278,7 +296,16 @@ void PowerManagementConfigGui::on_resetMissing2Button_clicked()
 
 void PowerManagementConfigGui::on_resetMissing3Button_clicked()
 {
-    socket->write("pm3-\n\r");
+    if (PowerManagementConfigUi.resetMissing3Button->isFlat())
+    {
+        PowerManagementConfigUi.resetMissing3Button->setFlat(false);
+        socket->write("pm3-\n\r");
+    }
+    else
+    {
+        PowerManagementConfigUi.resetMissing3Button->setFlat(true);
+        socket->write("pm3+\n\r");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -495,16 +522,19 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 {
                     PowerManagementConfigUi.resetMissing1Button->
                         setStyleSheet("background-color:lightgreen;");
+                    PowerManagementConfigUi.resetMissing1Button->setFlat(false);
                 }
                 else if (healthState == 1)
                 {
                     PowerManagementConfigUi.resetMissing1Button->
                         setStyleSheet("background-color:orange;");
+                    PowerManagementConfigUi.resetMissing1Button->setFlat(false);
                 }
                 else if (healthState == 2)
                 {
                     PowerManagementConfigUi.resetMissing1Button->
                         setStyleSheet("background-color:white;");
+                    PowerManagementConfigUi.resetMissing1Button->setFlat(true);
                 }
             }
             else if (battery == '2')
@@ -513,16 +543,19 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 {
                     PowerManagementConfigUi.resetMissing2Button->
                         setStyleSheet("background-color:lightgreen;");
+                    PowerManagementConfigUi.resetMissing2Button->setFlat(false);
                 }
                 else if (healthState == 1)
                 {
                     PowerManagementConfigUi.resetMissing2Button->
                         setStyleSheet("background-color:orange;");
+                    PowerManagementConfigUi.resetMissing2Button->setFlat(false);
                 }
                 else if (healthState == 2)
                 {
                     PowerManagementConfigUi.resetMissing2Button->
                         setStyleSheet("background-color:white;");
+                    PowerManagementConfigUi.resetMissing2Button->setFlat(true);
                 }
             }
             else if (battery == '3')
@@ -531,16 +564,19 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 {
                     PowerManagementConfigUi.resetMissing3Button->
                         setStyleSheet("background-color:lightgreen;");
+                    PowerManagementConfigUi.resetMissing3Button->setFlat(false);
                 }
                 else if (healthState == 1)
                 {
                     PowerManagementConfigUi.resetMissing3Button->
                         setStyleSheet("background-color:orange;");
+                    PowerManagementConfigUi.resetMissing3Button->setFlat(false);
                 }
                 else if (healthState == 2)
                 {
                     PowerManagementConfigUi.resetMissing3Button->
                         setStyleSheet("background-color:white;");
+                    PowerManagementConfigUi.resetMissing3Button->setFlat(true);
                 }
             }
         }
