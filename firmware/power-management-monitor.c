@@ -315,18 +315,22 @@ accurate estimate of SoC. */
 
 /*------------- COMPUTE BATTERY STATE -----------------------*/
 /* Check to see if a battery is missing. This can happen if a battery put under
-load has been removed. Remove any existing loads from the battery.
+load has been removed. Remove any existing loads and charger from the battery.
+If it has already been marked as missing then perpetuate the state.
 NOTE: Missing batteries not under load will not show as missing due to the
 nature of the circuitry, so any existing missing battery status is not
 removed here; this must be done externally. */
         for (i=0; i<NUM_BATS; i++)
         {
-            if (((getIndicators() >> 2*i) & 0x02) == 0)
+            if ((batteryHealthState[i] == missingH) || 
+                ((getIndicators() >> 2*i) & 0x02) == 0)
             {
                 batteryHealthState[i] = missingH;
                 batterySoC[i] = 0;
                 if (batteryUnderLoad == i)
                     batteryUnderLoad = 0;
+                if (batteryUnderCharge == i)
+                    batteryUnderCharge = 0;
             }
         }
 /* Find number of batteries present */
@@ -417,7 +421,7 @@ panel. */
         decisionStatus = 0;
 
 /* One battery: just allocate load and charger to it */
-        if (numBats == 1)
+        if ((numBats == 1) && (batteryHealthState[0] != missingH))
         {
             batteryUnderCharge = batteryFillStateSort[0];
             batteryUnderLoad = batteryFillStateSort[0];
