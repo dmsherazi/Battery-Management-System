@@ -327,9 +327,9 @@ removed here; this must be done externally. */
             {
                 batteryHealthState[i] = missingH;
                 batterySoC[i] = 0;
-                if (batteryUnderLoad == i)
+                if (batteryUnderLoad == i+1)
                     batteryUnderLoad = 0;
-                if (batteryUnderCharge == i)
+                if (batteryUnderCharge == i+1)
                     batteryUnderCharge = 0;
             }
         }
@@ -339,23 +339,17 @@ removed here; this must be done externally. */
         {
             if (batteryHealthState[i] == missingH) numBats--;
         }
-/* Access each battery charge accumulated since the last time, and update
-the SoC. */
         for (i=0; i<NUM_BATS; i++)
         {
             if (batteryHealthState[i] != missingH)
             {
+/* Access each battery charge accumulated since the last time, and update
+the SoC. */
                 batteryCharge[i] += getBatteryAccumulatedCharge(i);
                 uint32_t chargeMax = getBatteryCapacity(i)*36*100*256;
                 if (batteryCharge[i] > chargeMax) batteryCharge[i] = chargeMax;
                 batterySoC[i] = batteryCharge[i]/(getBatteryCapacity(i)*36);
-            }
-        }
 /* Collect battery charge fill state estimations. */
-        for (i=0; i<NUM_BATS; i++)
-        {
-            if (batteryHealthState[i] != missingH)
-            {
                 uint16_t batteryAbsVoltage = abs(getBatteryVoltage(i));
                 batteryFillState[i] = normalF;
                 if ((batteryAbsVoltage < LOW_VOLTAGE) || (batterySoC[i] < LOW_SOC))
@@ -421,17 +415,18 @@ panel. */
         decisionStatus = 0;
 
 /* One battery: just allocate load and charger to it */
-        if ((numBats == 1) && (batteryHealthState[0] != missingH))
+        if (numBats == 1)
         {
+            decisionStatus = 0x100;
             batteryUnderCharge = batteryFillStateSort[0];
             batteryUnderLoad = batteryFillStateSort[0];
 /* If the battery is in float and higher than 95%, stop charging */
             if ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC) &&
                 (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC))
             {
+                decisionStatus |= 0x01;
                 batteryUnderCharge = 0;
             }
-            decisionStatus = 0x100;
         }
 /* Two batteries: just allocate load to highest and charger to lowest. */
         else if (numBats == 2)
@@ -492,7 +487,7 @@ under charge if the strategies require it. */
 /* If the battery under load is on a low or critical battery, allocate to the
 charging battery regardless. */
             if (batteryFillState[batteryUnderLoad-1] != normalF)
-            batteryUnderLoad = batteryUnderCharge;
+                batteryUnderLoad = batteryUnderCharge;
         }
 /* More than two batteries: manage isolation and charge state. */
         else if (numBats > 2)
@@ -631,7 +626,7 @@ periods. */
             if (batteryHealthState[i] != missingH)
             {
                 batteryOpState[i] = isolatedO; /* reset operational state */
-                if ((batteryUnderLoad > 0) && (i == batteryUnderLoad-1))
+                if ((batteryUnderLoad > 0) && (batteryUnderLoad == i+1))
                 {
                     batteryOpState[i] = loadedO;
                 }
