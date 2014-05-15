@@ -413,17 +413,8 @@ static void pwmSetup(void)
 
 /* Set Timer output compare mode:
  - Channel 1, PWM mode 2 (output low when CNT <= CCR1, high otherwise)
-There is an inversion difference between the first and second prototypes.
-The first used inverting gates to apply PWM to the address bits.
-The second applies PWM directly to the switch demultiplexer enable.
 */
-#if (VERSION==1)
-	timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM2);
-#elif (VERSION==2)
 	timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
-#else
-#error "Version is not defined"
-#endif
 	timer_enable_oc_output(TIM1, TIM_OC1);
 	timer_enable_break_main_output(TIM1);
 

@@ -56,20 +56,20 @@ current. Thus the results here are 256 times the current in amperes. */
 /* Voltage offset: 5 (2 times local ref 2.5V) times the gain 1.803
 times 256 times 4096 */
 
-#define VOLTAGE_OFFSET 9452913
+#define VOLTAGE_OFFSET 9453071
 
-/* Voltage scale: amplifier gain 1.803 times ref voltage 3.276 times 256 */
+/* Voltage scale: amplifier gain 1.803 times ref voltage 3.3 times 256 */
 
-#define VOLTAGE_SCALE 1512
+#define VOLTAGE_SCALE 1523
 
 #elif (VERSION==2)
 
 /* Voltage offset: 5 (2 times local ref 2.5V) times the gain 1.833
 times 256 times 4096 */
 
-#define VOLTAGE_OFFSET 9610199
+#define VOLTAGE_OFFSET 9611946
 
-/* Voltage scale: amplifier gain 1.833 times ref voltage 3.298 times 256 */
+/* Voltage scale: amplifier gain 1.833 times ref voltage 3.3 times 256 */
 
 #define VOLTAGE_SCALE 1548
 
