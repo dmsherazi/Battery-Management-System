@@ -77,6 +77,13 @@ DataProcessingGui::DataProcessingGui()
     DataProcessingMainUi.intervalType->addItem("Average");
     DataProcessingMainUi.intervalType->addItem("Maximum");
     DataProcessingMainUi.intervalType->addItem("Sample");
+// Build the energy table
+    DataProcessingMainUi.energyView->setRowCount(1);
+    DataProcessingMainUi.energyView->setColumnCount(6);
+    QStringList energyViewHeader;
+    energyViewHeader << "Battery 1" << "Battery 2" << "Battery 3";
+    energyViewHeader << "Load 1" << "Load 1" << "Panel";
+    DataProcessingMainUi.energyView->setHorizontalHeaderLabels(energyViewHeader);
 }
 
 DataProcessingGui::~DataProcessingGui()
@@ -386,6 +393,130 @@ void DataProcessingGui::on_dumpAllButton_clicked()
 //! Clear the name to prevent the same file being used.
         saveFile = QString();
     }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Find Energy Balance.
+
+Add up the ampere hour energy taken from batteries and supplied by the source
+over the specified time interval. Display these in a table form. The battery
+energy includes loads and sources and therefore itself provides sufficient
+information. The loads and sources alone do not account for onboard electronics
+power usage. The total balance is displayed.
+*/
+
+void DataProcessingGui::on_energyButton_clicked()
+{
+    if (! inFile->isOpen()) return;
+    inFile->seek(0);      // rewind file
+    int interval = DataProcessingMainUi.intervalSpinBox->value();
+    int intervaltype = DataProcessingMainUi.intervalType->currentIndex();
+    QTextStream inStream(inFile);
+    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
+    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
+    QDateTime time = startTime;
+    QDateTime previousTime = startTime;
+// Cumulative energy measures
+    long long battery1Energy = 0;
+    long long battery2Energy = 0;
+    long long battery3Energy = 0;
+    long long load1Energy = 0;
+    long long load2Energy = 0;
+    long long panelEnergy = 0;
+    long battery1Seconds = 0;
+    long battery2Seconds = 0;
+    long battery3Seconds = 0;
+    long load1Seconds = 0;
+    long load2Seconds = 0;
+    long panelSeconds = 0;
+    long elapsedSeconds = 0;
+    while (! inStream.atEnd())
+    {
+      	QString lineIn = inStream.readLine();
+        QStringList breakdown = lineIn.split(",");
+        int size = breakdown.size();
+        if (size <= 0) break;
+        QString firstText = breakdown[0].simplified();
+        int secondField = 0;
+        int thirdField = 0;
+// Extract the time record for time range comparison
+        if (size > 1)
+        {
+            if ((firstText == "pH") && (size > 1))
+            {
+                previousTime = time;
+                time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
+                elapsedSeconds = previousTime.secsTo(time);
+            }
+            else
+            {
+                secondField = breakdown[1].simplified().toInt();
+            }
+        }
+        if (size > 2) thirdField = breakdown[2].simplified().toInt();
+// Extract records of measured currents
+        if ((time >= startTime) && (time <= endTime))
+        {
+            if (firstText == "dB1")
+            {
+                battery1Energy += secondField*elapsedSeconds;
+                battery1Seconds += elapsedSeconds;
+            }
+            if (firstText == "dB2")
+            {
+                battery2Energy += secondField*elapsedSeconds;
+                battery2Seconds += elapsedSeconds;
+            }
+            if (firstText == "dB3")
+            {
+                battery3Energy += secondField*elapsedSeconds;
+                battery3Seconds += elapsedSeconds;
+            }
+            if (firstText == "dL1")
+            {
+                if (secondField < 0) secondField = 0;
+                load1Energy += secondField*elapsedSeconds;
+                load1Seconds += elapsedSeconds;
+            }
+            if (firstText == "dL2")
+            {
+                if (secondField < 0) secondField = 0;
+                load2Energy += secondField*elapsedSeconds;
+                load2Seconds += elapsedSeconds;
+            }
+            if (firstText == "dM1")
+            {
+                if (secondField < 0) secondField = 0;
+                panelEnergy += secondField*elapsedSeconds;
+                panelSeconds += elapsedSeconds;
+            }
+// Get record of indicators
+            if (firstText == "dI")
+            {
+            }
+        }
+    }
+    QTableWidgetItem *battery1Item = new QTableWidgetItem(tr("%1").arg(
+         (float)battery1Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 0, battery1Item);
+    QTableWidgetItem *battery2Item = new QTableWidgetItem(tr("%1").arg(
+         (float)battery2Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 1, battery2Item);
+    QTableWidgetItem *battery3Item = new QTableWidgetItem(tr("%1").arg(
+         (float)battery3Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 2, battery3Item);
+    QTableWidgetItem *load1Item = new QTableWidgetItem(tr("%1").arg(
+         (float)load1Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 3, load1Item);
+    QTableWidgetItem *load2Item = new QTableWidgetItem(tr("%1").arg(
+         (float)load2Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 4, load2Item);
+    QTableWidgetItem *panelItem = new QTableWidgetItem(tr("%1").arg(
+         (float)panelEnergy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 5, panelItem);
+// Display total
+    DataProcessingMainUi.energyBalance->setText(tr("%1 AH").arg(
+         (float)(battery1Energy+battery2Energy+battery3Energy)/921600,0,'g',3));
 }
 
 //-----------------------------------------------------------------------------

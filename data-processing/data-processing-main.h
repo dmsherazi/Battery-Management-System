@@ -70,6 +70,7 @@ private slots:
     void on_openReadFileButton_clicked();
     void on_extractButton_clicked();
     void on_dumpAllButton_clicked();
+    void on_energyButton_clicked();
 private:
 // User Interface object instance
     Ui::DataProcessingMainWindow DataProcessingMainUi;
