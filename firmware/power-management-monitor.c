@@ -312,6 +312,7 @@ accurate estimate of SoC. */
         }
 /* Read the interface fault indicators and send out */
         sendResponse("dI",getIndicators());
+        recordSingle("dI",getIndicators());
 
 /*------------- COMPUTE BATTERY STATE -----------------------*/
 /* Check to see if a battery is missing. This can happen if a battery put under

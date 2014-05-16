@@ -61,7 +61,7 @@
    <widget class="QDateTimeEdit" name="endTime">
     <property name="geometry">
      <rect>
-      <x>356</x>
+      <x>412</x>
       <y>75</y>
       <width>194</width>
       <height>25</height>
@@ -71,7 +71,7 @@
    <widget class="QComboBox" name="recordType_1">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>26</x>
       <y>115</y>
       <width>133</width>
       <height>29</height>
@@ -81,7 +81,7 @@
    <widget class="QComboBox" name="recordType_2">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>166</x>
       <y>115</y>
       <width>133</width>
       <height>29</height>
@@ -91,7 +91,7 @@
    <widget class="QComboBox" name="recordType_3">
     <property name="geometry">
      <rect>
-      <x>434</x>
+      <x>306</x>
       <y>115</y>
       <width>133</width>
       <height>29</height>
@@ -117,7 +117,7 @@
    <widget class="QSpinBox" name="intervalSpinBox">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>194</x>
       <y>155</y>
       <width>52</width>
       <height>25</height>
@@ -127,23 +127,10 @@
      <string>Select the sample interval for data extraction</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>214</x>
-      <y>160</y>
-      <width>64</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Interval</string>
-    </property>
-   </widget>
    <widget class="QComboBox" name="intervalType">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>306</x>
       <y>155</y>
       <width>133</width>
       <height>29</height>
@@ -156,8 +143,8 @@
    <widget class="QPushButton" name="dumpAllButton">
     <property name="geometry">
      <rect>
-      <x>26</x>
-      <y>115</y>
+      <x>626</x>
+      <y>75</y>
       <width>91</width>
       <height>27</height>
      </rect>
@@ -173,7 +160,7 @@
     <property name="geometry">
      <rect>
       <x>26</x>
-      <y>200</y>
+      <y>230</y>
       <width>91</width>
       <height>27</height>
      </rect>
@@ -188,7 +175,7 @@
    <widget class="QTableWidget" name="energyView">
     <property name="geometry">
      <rect>
-      <x>138</x>
+      <x>130</x>
       <y>200</y>
       <width>483</width>
       <height>56</height>
@@ -226,7 +213,7 @@
    <widget class="QLabel" name="energyBalance">
     <property name="geometry">
      <rect>
-      <x>26</x>
+      <x>630</x>
       <y>225</y>
       <width>91</width>
       <height>31</height>
@@ -256,6 +243,26 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="recordType_4">
+    <property name="geometry">
+     <rect>
+      <x>446</x>
+      <y>115</y>
+      <width>133</width>
+      <height>29</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="recordType_5">
+    <property name="geometry">
+     <rect>
+      <x>586</x>
+      <y>115</y>
+      <width>133</width>
+      <height>29</height>
+     </rect>
     </property>
    </widget>
   </widget>

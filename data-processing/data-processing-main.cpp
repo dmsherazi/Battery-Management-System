@@ -67,11 +67,15 @@ DataProcessingGui::DataProcessingGui()
     DataProcessingMainUi.recordType_1->addItem("None");
     DataProcessingMainUi.recordType_2->addItem("None");
     DataProcessingMainUi.recordType_3->addItem("None");
+    DataProcessingMainUi.recordType_4->addItem("None");
+    DataProcessingMainUi.recordType_5->addItem("None");
     for (int n=0; n<recordType.size(); n++)
     {
         DataProcessingMainUi.recordType_1->addItem(recordText[n]);
         DataProcessingMainUi.recordType_2->addItem(recordText[n]);
         DataProcessingMainUi.recordType_3->addItem(recordText[n]);
+        DataProcessingMainUi.recordType_4->addItem(recordText[n]);
+        DataProcessingMainUi.recordType_5->addItem(recordText[n]);
     }
     DataProcessingMainUi.intervalSpinBox->setMinimum(1);
     DataProcessingMainUi.intervalType->addItem("Average");
@@ -137,6 +141,7 @@ void DataProcessingGui::on_dumpAllButton_clicked()
     QString controls = "     ";
     QString switches;
     QString decision;
+    QString indicators;
     int debug1a = -1;
     int debug2a = -1;
     int debug3a = -1;
@@ -154,7 +159,7 @@ void DataProcessingGui::on_dumpAllButton_clicked()
     outStream << "B2 I," << "B2 V," << "B2 Cap," << "B2 Op," << "B2 State," << "B2 Charge,";
     outStream << "B3 I," << "B3 V," << "B3 Cap," << "B3 Op," << "B3 State," << "B3 Charge,";
     outStream << "L1 I," << "L1 V," << "L2 I," << "L2 V," << "M1 I," << "M1 V,";
-    outStream << "Temp," << "Controls," << "Switches," << "Decisions,";
+    outStream << "Temp," << "Controls," << "Switches," << "Decisions," << "Indicators,";
     outStream << "Debug 1a," << "Debug 1b," << "Debug 2a," << "Debug 2b," << "Debug 3a," << "Debug 3b";
     outStream << "\n\r";
     while (! inStream.atEnd())
@@ -214,6 +219,7 @@ void DataProcessingGui::on_dumpAllButton_clicked()
                     outStream << controls << ",";
                     outStream << switches << ",";
                     outStream << decision << ",";
+                    outStream << indicators << ",";
                     outStream << debug1a << ",";
                     outStream << debug1b << ",";
                     outStream << debug2a << ",";
@@ -367,6 +373,11 @@ void DataProcessingGui::on_dumpAllButton_clicked()
                 bool ok;
                 decision = QString("%1").arg(secondText.toInt(&ok),0,16);
             }
+            if (firstText == "dI")
+            {
+                bool ok;
+                decision = QString("%1").arg(secondText.toInt(&ok),0,16);
+            }
             if (firstText == "D1")
             {
                 debug1a = secondField;
@@ -403,10 +414,15 @@ over the specified time interval. Display these in a table form. The battery
 energy includes loads and sources and therefore itself provides sufficient
 information. The loads and sources alone do not account for onboard electronics
 power usage. The total balance is displayed.
+
+The load and source currents show large negative swings when the undervoltage
+or overcurrent indicators are triggered. Any negative swing on those currents
+is set to zero. The indicator settings are captured but not used at this stage.
 */
 
 void DataProcessingGui::on_energyButton_clicked()
 {
+    if (inFile == NULL) return;
     if (! inFile->isOpen()) return;
     inFile->seek(0);      // rewind file
     int interval = DataProcessingMainUi.intervalSpinBox->value();
@@ -430,6 +446,7 @@ void DataProcessingGui::on_energyButton_clicked()
     long load2Seconds = 0;
     long panelSeconds = 0;
     long elapsedSeconds = 0;
+    int indicators = 0;
     while (! inStream.atEnd())
     {
       	QString lineIn = inStream.readLine();
@@ -493,6 +510,7 @@ void DataProcessingGui::on_energyButton_clicked()
 // Get record of indicators
             if (firstText == "dI")
             {
+                indicators = secondField;
             }
         }
     }
@@ -522,23 +540,43 @@ void DataProcessingGui::on_energyButton_clicked()
 //-----------------------------------------------------------------------------
 /** @brief Extract Data.
 
-Up to three data sets specified are extracted and written to a file for plotting.
+Up to three data sets specified are extracted and written to a file for
+plotting.
+
 An interval is specified over which data may be taken as the first sample, the
 maximum or the average. The time over which the extraction occurs can be
 specified.
+
+A header is built from the selected record types specified.
+Each record when found is written directly, excluding the ident field.
+This means that some records will have more than one field and so are dealt
+with individually.
 */
 
 void DataProcessingGui::on_extractButton_clicked()
 {
+    if (inFile == NULL) return;
     if (! inFile->isOpen()) return;
     if (! openSaveFile()) return;
-    inFile->seek(0);      // rewind file
+    inFile->seek(0);      // rewind input file
     int interval = DataProcessingMainUi.intervalSpinBox->value();
     int intervaltype = DataProcessingMainUi.intervalType->currentIndex();
     QTextStream inStream(inFile);
+    QTextStream outStream(outFile);
     QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
     QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
     QDateTime time;
+    QString header;
+    QString comboRecord;
+    int recordType_1 = DataProcessingMainUi.recordType_1->currentIndex();
+    int recordType_2 = DataProcessingMainUi.recordType_2->currentIndex();
+    int recordType_3 = DataProcessingMainUi.recordType_3->currentIndex();
+    int recordType_4 = DataProcessingMainUi.recordType_4->currentIndex();
+    int recordType_5 = DataProcessingMainUi.recordType_5->currentIndex();
+// The first time record is a reference. Anything before that must be ignored.
+    bool firstTime = true;
+// The first record only is preceded by the constructed header.
+    bool firstRecord = true;
     while (! inStream.atEnd())
     {
       	QString lineIn = inStream.readLine();
@@ -546,36 +584,54 @@ void DataProcessingGui::on_extractButton_clicked()
         int size = breakdown.size();
         if (size <= 0) break;
         QString firstText = breakdown[0].simplified();
-        int secondField = 0;
-        int thirdField = 0;
-// Extract the time record for time range comparison
+// Extract the time record for time range comparison.
         if (size > 1)
         {
             if ((firstText == "pH") && (size > 1))
             {
                 time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
-            }
-            else
-            {
-                secondField = breakdown[1].simplified().toInt();
+                if (!firstTime)
+                {
+// On the first pass output the accumulated header string.
+                    if (firstRecord)
+                    {
+                        outStream << header << "\r\n";
+                        firstRecord = false;
+                    }
+// Output the combined record and null it for next pass.
+                    outStream << comboRecord << "\r\n";
+                    comboRecord = QString();
+                }
+                firstTime = false;
             }
         }
-        if (size > 2) thirdField = breakdown[2].simplified().toInt();
-// Extract records
-        if ((time >= startTime) && (time <= endTime))
+// Extract records after the reference time record and between specified times.
+        if (!firstTime && (time >= startTime) && (time <= endTime))
         {
-            int recordType_1 = DataProcessingMainUi.recordType_1->currentIndex();
-            int recordType_2 = DataProcessingMainUi.recordType_2->currentIndex();
-            int recordType_3 = DataProcessingMainUi.recordType_3->currentIndex();
-// Find the relevant records and extract their fields
+// Find the relevant records and extract their fields.
+            int rec = 0;
             if ((recordType_1 > 0) && (firstText == recordType[recordType_1-1]))
-            {
-                qDebug() << breakdown[0].simplified() << breakdown[1].simplified();
-            }
+                rec = recordType_1;
             if ((recordType_2 > 0) && (firstText == recordType[recordType_2-1]))
-                qDebug() << breakdown[0].simplified() << breakdown[1].simplified();
+                rec = recordType_2;
             if ((recordType_3 > 0) && (firstText == recordType[recordType_3-1]))
-                qDebug() << breakdown[0].simplified() << breakdown[1].simplified();
+                rec = recordType_3;
+            if ((recordType_4 > 0) && (firstText == recordType[recordType_4-1]))
+                rec = recordType_4;
+            if ((recordType_5 > 0) && (firstText == recordType[recordType_5-1]))
+                rec = recordType_5;
+            if (rec > 0)
+            {
+                if (firstRecord)
+                {
+                    if (! header.isEmpty()) header += ",";
+                    header += recordText[rec-1];
+                    if (size > 2) header += " I," + recordText[rec-1] + " V";
+                }
+                if (! comboRecord.isEmpty()) comboRecord += ",";
+                comboRecord += breakdown[1].simplified();
+                if (size > 2) comboRecord += "," + breakdown[2].simplified();
+            }
         }
     }
     if (saveFile.isEmpty())
@@ -584,7 +640,7 @@ void DataProcessingGui::on_extractButton_clicked()
     {
         outFile->close();
         delete outFile;
-//! Clear the name to prevent the same file being used.
+//! Null the name to prevent the same file being used.
         saveFile = QString();
     }
 }
