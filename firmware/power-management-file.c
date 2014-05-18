@@ -341,9 +341,19 @@ will be sent. */
                 fileInfo.fname[0] = 0;
                 type = 'n';
             }
+/* If space on the queue, send the type (char), four bytes of file size (MSB
+first) and null terminated filename */
             if (uxQueueSpacesAvailable(fileReceiveQueue) >= numRead+2)
             {
                 xQueueSendToBack(fileReceiveQueue,&type,FILE_SEND_TIMEOUT);
+                uint8_t fileSizeByte = (fileInfo.fsize >> 24) & 0xFF;
+                xQueueSendToBack(fileReceiveQueue,&fileSizeByte,FILE_SEND_TIMEOUT);
+                fileSizeByte = (fileInfo.fsize >> 16) & 0xFF;
+                xQueueSendToBack(fileReceiveQueue,&fileSizeByte,FILE_SEND_TIMEOUT);
+                fileSizeByte = (fileInfo.fsize >> 8) & 0xFF;
+                xQueueSendToBack(fileReceiveQueue,&fileSizeByte,FILE_SEND_TIMEOUT);
+                fileSizeByte = fileInfo.fsize & 0xFF;
+                xQueueSendToBack(fileReceiveQueue,&fileSizeByte,FILE_SEND_TIMEOUT);
                 for (i=0; i<numRead+1; i++)
                     xQueueSendToBack(fileReceiveQueue,fileInfo.fname+i,FILE_SEND_TIMEOUT);
             }

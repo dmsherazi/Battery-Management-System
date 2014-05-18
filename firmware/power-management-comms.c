@@ -540,7 +540,7 @@ sent, the rest remains in the buffer until the next request. */
                 break;
             }
 /* Get a directory listing. Gets all items in the directory and sends the
-names separated by commas. */
+type,size and name, each group separated by commas. */
             case 'D':
             {
                 if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_TIMEOUT)) break;
@@ -553,15 +553,27 @@ names separated by commas. */
                     do
                     {
                         type = 0;
+/* Single character entry type */
                         xQueueReceive(fileReceiveQueue,&type,portMAX_DELAY);
+/* Four bytes of file size */
+                        uint32_t fileSize = 0;
+                        uint8_t i;
+                        for (i=0; i<4; i++)
+                        {
+                            character = 0;
+                            xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
+                            fileSize = (fileSize << 8) + character;
+                        }
+/* If the first character of name is zero then the listing is ended */
                         character = 0;
                         xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
                         firstCharacter = character;
-/* If the first character is zero then the listing is ended */
                         if (firstCharacter > 0)
                         {
                             commsPrintString(",");
                             commsPrintChar(&type);
+                            commsPrintHex(fileSize >> 16);
+                            commsPrintHex(fileSize & 0xFFFF);
                             while (character > 0)
                             {
                                 commsPrintChar(&character);
@@ -858,7 +870,7 @@ void commsPrintHex(uint32_t value)
 	    {
 	        commsPrintChar(&buffer[i-1]);
 	    }
-    commsPrintChar(" ");
+/*    commsPrintChar(" "); */
     }
 }
 

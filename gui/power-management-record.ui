@@ -97,7 +97,7 @@
     <string>Stop Record</string>
    </property>
   </widget>
-  <widget class="QListView" name="fileListView">
+  <widget class="QTableView" name="fileTableView">
    <property name="geometry">
     <rect>
      <x>384</x>
@@ -109,6 +109,12 @@
    <property name="toolTip">
     <string>Click on an item to place it in the text boxes left.</string>
    </property>
+   <attribute name="horizontalHeaderVisible">
+    <bool>false</bool>
+   </attribute>
+   <attribute name="verticalHeaderVisible">
+    <bool>false</bool>
+   </attribute>
   </widget>
   <widget class="QLineEdit" name="recordFileName">
    <property name="geometry">
@@ -409,6 +415,32 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="recordFreqencyLabel_2">
+   <property name="geometry">
+    <rect>
+     <x>392</x>
+     <y>45</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>File</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="recordFreqencyLabel_3">
+   <property name="geometry">
+    <rect>
+     <x>528</x>
+     <y>45</y>
+     <width>67</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Size (MB)</string>
+   </property>
   </widget>
  </widget>
  <resources/>

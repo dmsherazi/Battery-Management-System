@@ -73,12 +73,16 @@ PowerManagementRecordGui::PowerManagementRecordGui(QTcpSocket* tcpSocket, QWidge
     requestRecordingStatus();
 // Ask for the microcontroller SD card free space (process response later)
     getFreeSpace();
-    model = new QStandardItemModel(0, 1, this);
-    PowerManagementRecordUi.fileListView->setViewMode(QListView::ListMode);
-    PowerManagementRecordUi.fileListView->setModel(model);
+    model = new QStandardItemModel(0, 2, this);
+    PowerManagementRecordUi.fileTableView->setModel(model);
+    PowerManagementRecordUi.fileTableView->setGridStyle(Qt::NoPen);
+    PowerManagementRecordUi.fileTableView->setShowGrid(false);
+    QHeaderView *verticalHeader = PowerManagementRecordUi.fileTableView->verticalHeader();
+    verticalHeader->setResizeMode(QHeaderView::Fixed);
+    verticalHeader->setDefaultSectionSize(18);
     row = 0;
 // Signal to process a click on a directory item
-    connect(PowerManagementRecordUi.fileListView,
+    connect(PowerManagementRecordUi.fileTableView,
                      SIGNAL(clicked(const QModelIndex)),
                      this,SLOT(onListItemClicked(const QModelIndex)));
 /* Send a command to open the directory */
@@ -216,16 +220,27 @@ The response will be a comma separated list of items preceded by a type
             for (int i=1; i<breakdown.size(); i++)
             {
                 QChar type = breakdown[i][0];
+                bool ok;
+                QString fileSize = QString("%1")
+                    .arg((float)breakdown[i].mid(1,8).toInt(&ok,16)/1000000,8,'f',3);
+                if (type == 'd')
+                    fileSize = "";
                 if ((type == 'f') || (type == 'd'))
                 {
-                    QString rowItem = breakdown[i].mid(1,breakdown[i].length()-1);
+                    QString fileName = breakdown[i].mid(9,breakdown[i].length()-1);
                     QFont font;
                     if (type == 'd') font.setBold(true);
-                    QStandardItem *item = new QStandardItem(rowItem);
-                    item->setData(QVariant(type));
-                    item->setFont(font);
+                    QStandardItem *nameItem = new QStandardItem(fileName);
+                    QStandardItem *sizeItem = new QStandardItem(fileSize);
+                    QList<QStandardItem *> row;
+                    nameItem->setFont(font);
+                    nameItem->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
+                    sizeItem->setData(Qt::AlignRight, Qt::TextAlignmentRole);
+                    row.append(nameItem);
+                    row.append(sizeItem);
+                    nameItem->setData(QVariant(type));
 //                    item->setIcon(...);
-                    model->appendRow(item);
+                    model->appendRow(row);
                 }
             }
             break;
@@ -233,7 +248,6 @@ The response will be a comma separated list of items preceded by a type
 // Status of recording and open files.
         case 's':
         {
-qDebug() << breakdown;
             if (breakdown.size() <= 1) break;
             recordingOn = (breakdown[1].toInt() & 0x02) > 0;
             if (recordingOn)  // recording on
