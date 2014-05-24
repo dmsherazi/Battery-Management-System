@@ -23,7 +23,6 @@ TODO:
 reference for the voltage measurement circuit. However this latter uses the
 battery ground rather than the local ground, and a small bias voltage can
 be present. Ideally the current monitor should have its own reference voltage.
+
 2. The voltage measurement circuit needs to have the opamp gain setting
-resistors much higher than the voltage divider resistors to reduce the effect
-of the bias ground voltage. The values 100K and 200K for these, and 20K, 75K
-for the voltage divider will give an adequate range of measurements.
+resistors recomputed to eliminate the ground bias.

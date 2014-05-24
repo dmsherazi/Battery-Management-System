@@ -40,6 +40,7 @@ static const uint8_t DaysInMonth[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 3
 /*--------------------------------------------------------------------------*/
 /* @brief Return a string containing the time and date
 
+Convert the global time to a string.
 Based on code from Peter Dannegger found in the mikrocontroller.net forum
 but 100 year exceptions not included.
 
@@ -48,6 +49,7 @@ but 100 year exceptions not included.
 
 void putTimeToString(char* timeString)
 {
+/* Find the number of days, hours, minutes, seconds */
     uint32_t timeCounter = getTimeCounter();
     uint8_t second = timeCounter % 60;
     uint8_t minute = (timeCounter/60) % 60;
@@ -69,8 +71,8 @@ void putTimeToString(char* timeString)
 	}
 	year += 2000;
 
-/* Add in Feb 29 if the last year was a leap year (quirk of above loop) */
-	if((dayOfLastYear & 1) && (day > 58)) day++;
+/* Add back Feb 29 if the last year was a leap year (quirk of above loop) */
+	if((dayOfLastYear == 366) && (day > 58)) day++;
 
 	uint8_t month;
 	for(month = 1; day >= DaysInMonth[month-1]; month++)

@@ -50,6 +50,7 @@ Refactor 4 January 2014
 
 #include "power-management-board-defs.h"
 #include "power-management.h"
+#include "power-management-file.h"
 #include "power-management-comms.h"
 #include "power-management-hardware.h"
 #include "power-management-objdic.h"

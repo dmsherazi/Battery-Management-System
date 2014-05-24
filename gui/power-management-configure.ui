@@ -353,7 +353,7 @@
       <number>10</number>
      </property>
      <property name="value">
-      <number>54</number>
+      <number>100</number>
      </property>
     </widget>
     <widget class="QLabel" name="AHLabel_2">
@@ -391,7 +391,7 @@
       <number>10</number>
      </property>
      <property name="value">
-      <number>80</number>
+      <number>100</number>
      </property>
     </widget>
     <widget class="QLabel" name="AHLabel_3">
@@ -429,7 +429,7 @@
       <number>10</number>
      </property>
      <property name="value">
-      <number>54</number>
+      <number>80</number>
      </property>
     </widget>
     <widget class="QPushButton" name="setBatteryButton">
@@ -543,54 +543,6 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="battery1AbsorptionVoltage">
-     <property name="geometry">
-      <rect>
-       <x>154</x>
-       <y>195</y>
-       <width>79</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="battery2AbsorptionVoltage">
-     <property name="geometry">
-      <rect>
-       <x>264</x>
-       <y>195</y>
-       <width>79</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="battery3AbsorptionVoltage">
-     <property name="geometry">
-      <rect>
-       <x>374</x>
-       <y>195</y>
-       <width>79</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
     <widget class="QLabel" name="battery1FloatVoltage">
      <property name="geometry">
       <rect>
@@ -687,30 +639,17 @@
       <string/>
      </property>
     </widget>
-    <widget class="QLabel" name="absorptionVoltageLabel">
-     <property name="geometry">
-      <rect>
-       <x>472</x>
-       <y>200</y>
-       <width>135</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Absorption Voltage</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="floatVoltageLabel">
      <property name="geometry">
       <rect>
        <x>476</x>
        <y>280</y>
-       <width>95</width>
+       <width>133</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Float Voltage</string>
+      <string>Float Voltage Limit</string>
      </property>
     </widget>
     <widget class="QLabel" name="floatCurrentLabel">
@@ -718,19 +657,19 @@
       <rect>
        <x>476</x>
        <y>320</y>
-       <width>97</width>
+       <width>143</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Float Current</string>
+      <string>Float Current Trigger</string>
      </property>
     </widget>
     <widget class="QLabel" name="battery2AbsorptionCurrent">
      <property name="geometry">
       <rect>
        <x>264</x>
-       <y>235</y>
+       <y>195</y>
        <width>79</width>
        <height>31</height>
       </rect>
@@ -746,7 +685,7 @@
      <property name="geometry">
       <rect>
        <x>374</x>
-       <y>235</y>
+       <y>195</y>
        <width>79</width>
        <height>31</height>
       </rect>
@@ -762,7 +701,7 @@
      <property name="geometry">
       <rect>
        <x>154</x>
-       <y>235</y>
+       <y>195</y>
        <width>79</width>
        <height>31</height>
       </rect>
@@ -778,13 +717,13 @@
      <property name="geometry">
       <rect>
        <x>472</x>
-       <y>240</y>
+       <y>200</y>
        <width>135</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Absorption Current</string>
+      <string>Bulk Current Limit</string>
      </property>
     </widget>
     <widget class="QPushButton" name="resetMissing1Button">
@@ -830,6 +769,67 @@
      </property>
      <property name="toolTip">
       <string>Reset Battery 3 Missing Status to Good.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="absorptionVoltageLabel">
+     <property name="geometry">
+      <rect>
+       <x>472</x>
+       <y>240</y>
+       <width>169</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Absorption Voltage Limit</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery1AbsorptionVoltage">
+     <property name="geometry">
+      <rect>
+       <x>154</x>
+       <y>235</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery2AbsorptionVoltage">
+     <property name="geometry">
+      <rect>
+       <x>264</x>
+       <y>235</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="battery3AbsorptionVoltage">
+     <property name="geometry">
+      <rect>
+       <x>374</x>
+       <y>235</y>
+       <width>79</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
      </property>
      <property name="text">
       <string/>
@@ -959,8 +959,8 @@
     <widget class="QCheckBox" name="loadChargeCheckBox">
      <property name="geometry">
       <rect>
-       <x>68</x>
-       <y>30</y>
+       <x>64</x>
+       <y>15</y>
        <width>273</width>
        <height>22</height>
       </rect>
@@ -984,8 +984,8 @@
     <widget class="QLabel" name="loadChargeText">
      <property name="geometry">
       <rect>
-       <x>86</x>
-       <y>55</y>
+       <x>82</x>
+       <y>40</y>
        <width>487</width>
        <height>101</height>
       </rect>
@@ -997,7 +997,7 @@
       <string notr="true">background-color: rgb(255, 255, 255);</string>
      </property>
      <property name="text">
-      <string>Normally a load is not connected to the battery under charge as this option will result in charging current being leaked to the other batteries. This may not be a problem for those batteries, but will mean that the battery under charge receives less current than would be desirable. An advantage is that during charging, the load will receive a higher voltage when batteries are low.</string>
+      <string>Normally a load is not connected to the battery under charge as this option will result in charging current being leaked to the other batteries. This may not be a problem for those batteries, but will mean that the battery under charge receives less current than might be desirable. An advantage is that during charging, the load will receive a higher voltage when batteries are low.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignJustify|Qt::AlignTop</set>
@@ -1009,8 +1009,8 @@
     <widget class="QCheckBox" name="isolationMaintainCheckBox">
      <property name="geometry">
       <rect>
-       <x>64</x>
-       <y>160</y>
+       <x>60</x>
+       <y>145</y>
        <width>295</width>
        <height>22</height>
       </rect>
@@ -1034,8 +1034,8 @@
     <widget class="QLabel" name="isolationMaintainText">
      <property name="geometry">
       <rect>
-       <x>86</x>
-       <y>185</y>
+       <x>82</x>
+       <y>170</y>
        <width>487</width>
        <height>66</height>
       </rect>
@@ -1044,7 +1044,7 @@
       <string notr="true">background-color: rgb(255, 255, 255);</string>
      </property>
      <property name="text">
-      <string>When all batteries are in normal charge state this option will cause the charger and load to be allocated so that at least one battery can be kept in isolation for resetting its charge state measurement. This can result in lower charging efficiency or load voltage.</string>
+      <string>When all batteries are in normal charge state this option will cause the charger and load to be allocated so that at least one battery can be kept in isolation for resetting its state of charge estimate. This can result in lower load voltage or overall charging efficiency of the system.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignJustify|Qt::AlignTop</set>
@@ -1056,8 +1056,8 @@
     <widget class="QCheckBox" name="accelChargeCheckBox">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>260</y>
+       <x>56</x>
+       <y>245</y>
        <width>241</width>
        <height>22</height>
       </rect>
@@ -1081,10 +1081,10 @@
     <widget class="QLabel" name="accelChargeText">
      <property name="geometry">
       <rect>
-       <x>82</x>
-       <y>285</y>
+       <x>78</x>
+       <y>270</y>
        <width>487</width>
-       <height>56</height>
+       <height>51</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -1103,14 +1103,61 @@
     <widget class="QPushButton" name="setOptionButton">
      <property name="geometry">
       <rect>
-       <x>264</x>
-       <y>380</y>
+       <x>266</x>
+       <y>405</y>
        <width>91</width>
        <height>27</height>
       </rect>
      </property>
      <property name="text">
       <string>Set</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="switchAvoidanceCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>56</x>
+       <y>325</y>
+       <width>241</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Accelerate return to voltage limit when charging voltage is excessive.</string>
+     </property>
+     <property name="text">
+      <string>Use Switch Avoidance</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="accelChargeText_2">
+     <property name="geometry">
+      <rect>
+       <x>76</x>
+       <y>350</y>
+       <width>487</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>When the charger enters absorption phase, use a bang-bang control of current switching rather than the noisy PWM.</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignJustify|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>

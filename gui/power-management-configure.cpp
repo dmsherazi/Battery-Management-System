@@ -197,6 +197,16 @@ void PowerManagementConfigGui::on_setOptionButton_clicked()
     QString command = "ps";
     socket->write(command.append(QString("%1").arg(option,2)).append("\n\r")
                          .toAscii().constData());
+    if (PowerManagementConfigUi.switchAvoidanceCheckBox->isChecked())
+    {
+        QString command = "pS+\n\r";
+        socket->write(command.toAscii().constData());
+    }
+    else
+    {
+        QString command = "pS-\n\r";
+        socket->write(command.toAscii().constData());
+    }
 }
 
 //-----------------------------------------------------------------------------
