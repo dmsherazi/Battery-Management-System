@@ -57,6 +57,7 @@ so must be commented out for normal use. */
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/flash.h>
 #include <libopencm3/cm3/nvic.h>
+#include <libopencm3/cm3/scb.h>
 #include <libopencm3/cm3/systick.h>
 
 /* Scheduler includes. */
@@ -88,6 +89,9 @@ extern xQueueHandle commsSendQueue, commsReceiveQueue, commsEmptySemaphore;
 
 /* Time variable needed when systick is the timer */
 static uint32_t timeCounter;
+
+/* This is provided in the FAT filesystem library */
+extern void disk_timerproc();
 
 /*--------------------------------------------------------------------------*/
 /** @brief Initialise the hardware
@@ -764,5 +768,92 @@ void adc1_2_isr(void)
     adceoc = 1;
 /* Clear DMA to restart at beginning of data array */
     dmaAdcSetup();
+}
+
+/*-----------------------------------------------------------*/
+/*----       ISR Overrides in libopencm3     ----------------*/
+/*-----------------------------------------------------------*/
+/* These trap serious execution errors and reset the application by means
+of the CM3 system reset command. */
+
+/*-----------------------------------------------------------*/
+void nmi_handler(void)
+{
+    scb_reset_system();
+}
+
+/*-----------------------------------------------------------*/
+void hard_fault_handler(void)
+{
+    scb_reset_system();
+}
+
+/*-----------------------------------------------------------*/
+void memory_manage_fault_handler(void)
+{
+    scb_reset_system();
+}
+
+/*-----------------------------------------------------------*/
+void bus_fault_handler(void)
+{
+    scb_reset_system();
+}
+
+/*-----------------------------------------------------------*/
+void usage_fault_handler(void)
+{
+    scb_reset_system();
+}
+
+/*-----------------------------------------------------------*/
+/*----    FreeRTOS ISR Overrides in libopencm3     ----------*/
+/*-----------------------------------------------------------*/
+
+extern void xPortPendSVHandler(void);
+extern void xPortSysTickHandler(void);
+extern void vPortSVCHandler( void );
+
+/*-----------------------------------------------------------*/
+void sv_call_handler(void)
+{
+  	vPortSVCHandler();
+}
+
+/*-----------------------------------------------------------*/
+
+void pend_sv_handler(void)
+{
+  	xPortPendSVHandler();
+}
+
+/*-----------------------------------------------------------*/
+/** @Brief Systick Interrupt Handler
+
+This provides a link to the FreeRTOS systick interrupt handler.
+
+Systick is setup in FreeRTOS according to the tick rate specified in
+FreeRTOSConfig.h. That rate is set at 100Hz.
+
+This also updates the status of any inserted SD card.
+
+Can be used to provide a RTC.
+*/
+void sys_tick_handler(void)
+{
+
+	disk_timerproc();
+
+/* updated every 1s if systick is used for real-time clock. */
+/*
+	static uint16_t cnttime=0;
+	cnttime++;
+	if (cnttime >= 100)
+    {
+		cnttime = 0;
+		updateTimeCount();
+	}
+*/
+  	xPortSysTickHandler();
 }
 
