@@ -258,7 +258,8 @@ released. The command is followed by an interface number 0-5 being batteries
         case 'A':
             {
                 if (battery < 3)
-                    configData.config.absorptionVoltage[battery] = asciiToInt((char*)line+3);
+                    configData.config.absorptionVoltage[battery] =
+                        asciiToInt((char*)line+3);
                 break;
             }
 /* C Start a calibration sequence */
@@ -286,14 +287,16 @@ released. The command is followed by an interface number 0-5 being batteries
         case 'f':
             {
                 if (battery < 3)
-                    configData.config.floatStageCurrentScale[battery] = asciiToInt((char*)line+3);
+                    configData.config.floatStageCurrentScale[battery] =
+                        asciiToInt((char*)line+3);
                 break;
             }
 /* Fnxx Set battery float voltage limit, n is battery, xx is limit */
         case 'F':
             {
                 if (battery < 3)
-                    configData.config.floatVoltage[battery] = asciiToInt((char*)line+3);
+                    configData.config.floatVoltage[battery] =
+                        asciiToInt((char*)line+3);
                 break;
             }
 /* Hxx Set time from an ISO formatted string. */
@@ -306,7 +309,8 @@ released. The command is followed by an interface number 0-5 being batteries
         case 'I':
             {
                 if (battery < 3)
-                    configData.config.bulkCurrentLimitScale[battery] = asciiToInt((char*)line+3);
+                    configData.config.bulkCurrentLimitScale[battery] =
+                        asciiToInt((char*)line+3);
                 break;
             }
 /* M-, M+ Turn on/off data messaging (mainly for debug) */
@@ -337,11 +341,11 @@ released. The command is followed by an interface number 0-5 being batteries
                 configData.config.monitorStrategy = asciiToInt((char*)line+3);
                 break;
             }
-/* S-, S+ Turn switch avoidance on or off */
+/* S-, S+ Turn ICC charging algorithm on or off */
         case 'S':
             {
-                if (line[2] == '-') configData.config.switchAvoidance = false;
-                if (line[2] == '+') configData.config.switchAvoidance = true;
+                if (line[2] == '-') configData.config.icc = false;
+                if (line[2] == '+') configData.config.icc = true;
                 break;
             }
 /* Tntxx Set battery type and capacity, n is battery, t is type, xx is capacity */
@@ -352,8 +356,10 @@ released. The command is followed by an interface number 0-5 being batteries
                     uint8_t type = line[3]-'0';
                     if (type < 3)
                     {
-                        configData.config.batteryType[battery] = (battery_Type)type;
-                        configData.config.batteryCapacity[battery] = asciiToInt((char*)line+4);
+                        configData.config.batteryType[battery] =
+                            (battery_Type)type;
+                        configData.config.batteryCapacity[battery] =
+                            asciiToInt((char*)line+4);
                         setBatteryChargeParameters(battery);
                     }
                 }

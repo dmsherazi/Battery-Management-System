@@ -93,7 +93,7 @@ void setGlobalDefaults(void)
 /* Don't track unless instructed externally */
     configData.config.autoTrack = false;
     configData.config.debugMessageSend = false;
-    configData.config.switchAvoidance = false;
+    configData.config.icc = true;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -340,14 +340,14 @@ bool isAutoTrack(void)
 }
 
 /*--------------------------------------------------------------------------*/
-/** @brief Switch Avoidance
+/** @brief ICC Charging Algorithm
 
-True if the switching avoidance strategy is requested.
+True if the ICC strategy is requested.
 */
 
-bool isSwitchAvoidance(void)
+bool isICC(void)
 {
-    return configData.config.switchAvoidance;
+    return configData.config.icc;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -377,7 +377,7 @@ uint16_t getControls(void)
     uint8_t controls = 0;
     if (configData.config.autoTrack) controls |= 1<<0;
     if (configData.config.recording) controls |= 1<<1;
-    if (configData.config.switchAvoidance) controls |= 1<<2;
+    if (configData.config.icc) controls |= 1<<2;
     if (configData.config.measurementSend) controls |= 1<<3;
     if (configData.config.debugMessageSend) controls |= 1<<4;
     return controls;

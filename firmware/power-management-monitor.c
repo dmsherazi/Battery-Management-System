@@ -65,7 +65,6 @@ Initial 29 September 2013
 
 /* Local Prototypes */
 static void initGlobals(void);
-static int16_t computeSoC(uint32_t voltage, uint32_t temperature, battery_Type type);
 
 /* Local Persistent Variables */
 static uint8_t monitorWatchdogCount;
@@ -737,7 +736,7 @@ Refer to documentation for the model formula derived.
 @return int16_t Percentage State of Charge times 256.
 */
 
-static int16_t computeSoC(uint32_t voltage, uint32_t temperature, battery_Type type)
+int16_t computeSoC(uint32_t voltage, uint32_t temperature, battery_Type type)
 {
     int32_t soc;
     uint32_t v100, v50, v25;
