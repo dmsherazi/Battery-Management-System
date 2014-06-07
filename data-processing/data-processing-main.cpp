@@ -141,7 +141,7 @@ void DataProcessingGui::on_dumpAllButton_clicked()
     QString controls = "     ";
     QString switches;
     QString decision;
-    QString indicators;
+    QString indicatorString;
     int debug1a = -1;
     int debug2a = -1;
     int debug3a = -1;
@@ -162,8 +162,12 @@ void DataProcessingGui::on_dumpAllButton_clicked()
     outStream << "Temp," << "Controls," << "Switches," << "Decisions," << "Indicators,";
     outStream << "Debug 1a," << "Debug 1b," << "Debug 2a," << "Debug 2b," << "Debug 3a," << "Debug 3b";
     outStream << "\n\r";
+    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
+    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
+    QDateTime time = startTime;
     while (! inStream.atEnd())
     {
+        if  (time > endTime) break;
       	QString lineIn = inStream.readLine();
         QStringList breakdown = lineIn.split(",");
         int size = breakdown.size();
@@ -188,7 +192,8 @@ void DataProcessingGui::on_dumpAllButton_clicked()
 // Find and extract the time record
             if (firstText == "pH")
             {
-                if (blockStart)
+                time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
+                if ((blockStart) && (time > startTime))
                 {
                     outStream << timeRecord << ",";
                     outStream << (float)battery1Voltage/256 << ",";
@@ -219,7 +224,7 @@ void DataProcessingGui::on_dumpAllButton_clicked()
                     outStream << controls << ",";
                     outStream << switches << ",";
                     outStream << decision << ",";
-                    outStream << indicators << ",";
+                    outStream << indicatorString << ",";
                     outStream << debug1a << ",";
                     outStream << debug1b << ",";
                     outStream << debug2a << ",";
@@ -376,7 +381,15 @@ void DataProcessingGui::on_dumpAllButton_clicked()
             if (firstText == "dI")
             {
                 bool ok;
-                decision = QString("%1").arg(secondText.toInt(&ok),0,16);
+                indicatorString = "";
+                int indicators = secondText.toInt(&ok);
+                for (int i=0; i<12; i+=2)
+                {
+                    if ((indicators & (1 << i)) > 0) indicatorString.append("_");
+                    else indicatorString.append("O");
+                    if ((indicators & (1 << (i+1))) > 0) indicatorString.append("_");
+                    else indicatorString.append("U");
+                }
             }
             if (firstText == "D1")
             {
@@ -459,7 +472,7 @@ void DataProcessingGui::on_energyButton_clicked()
 // Extract the time record for time range comparison
         if (size > 1)
         {
-            if ((firstText == "pH") && (size > 1))
+            if (firstText == "pH")
             {
                 previousTime = time;
                 time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
@@ -471,8 +484,9 @@ void DataProcessingGui::on_energyButton_clicked()
             }
         }
         if (size > 2) thirdField = breakdown[2].simplified().toInt();
+        if  (time > endTime) break;
 // Extract records of measured currents
-        if ((time >= startTime) && (time <= endTime))
+        if (time >= startTime)
         {
             if (firstText == "dB1")
             {

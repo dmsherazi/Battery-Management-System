@@ -8,6 +8,8 @@
 *.elf
 *.stylecheck
 *.swp
+*.csv
+*.ods
 \#*
 .\#*
 *~
