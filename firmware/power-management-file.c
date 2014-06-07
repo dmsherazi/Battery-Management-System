@@ -429,10 +429,16 @@ Checks the filename and handle for the write and read files, if they are open. *
                 fileStatus = FR_DENIED;
             break;
         }
-/* Remount the memory card. */
+/* Reinitialize the memory card. */
         case 'M':
         {
-            fileStatus = f_mount(&Fatfs[0],"",0);
+            FRESULT fileStatus = f_mount(&Fatfs[0],"",0);
+            fileUsable = (fileStatus == FR_OK);
+            writeFileHandle = 0xFF;
+            readFileHandle = 0xFF;
+            uint8_t i=0;
+            for (i=0; i<MAX_OPEN_FILES; i++) fileInfo[i].fname[0] = 0;
+            filemap = 0;
             break;
         }
     }
