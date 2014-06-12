@@ -268,6 +268,7 @@ The response will be a comma separated list of items preceded by a type
             readFileOpen = breakdown[3].toInt() < 255;
             if (readFileOpen)
                 PowerManagementRecordUi.recordFileName->setText(breakdown[3]);
+            break;
         }
 // Open a file for recording.
         case 'W':
