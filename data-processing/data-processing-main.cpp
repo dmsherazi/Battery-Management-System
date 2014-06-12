@@ -588,6 +588,7 @@ void DataProcessingGui::on_extractButton_clicked()
     int recordType_4 = DataProcessingMainUi.recordType_4->currentIndex();
     int recordType_5 = DataProcessingMainUi.recordType_5->currentIndex();
 // The first time record is a reference. Anything before that must be ignored.
+// firstTime allows the program to build a header and the first record.
     bool firstTime = true;
 // The first record only is preceded by the constructed header.
     bool firstRecord = true;
@@ -601,22 +602,25 @@ void DataProcessingGui::on_extractButton_clicked()
 // Extract the time record for time range comparison.
         if (size > 1)
         {
-            if ((firstText == "pH") && (size > 1))
+            if (firstText == "pH")
             {
                 time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
-                if (!firstTime)
+                if ((time >= startTime) && (time <= endTime))
                 {
-// On the first pass output the accumulated header string.
-                    if (firstRecord)
+                    if (!firstTime)
                     {
-                        outStream << header << "\r\n";
-                        firstRecord = false;
-                    }
+// On the first pass output the accumulated header string.
+                        if (firstRecord)
+                        {
+                            outStream << header << "\r\n";
+                            firstRecord = false;
+                        }
 // Output the combined record and null it for next pass.
-                    outStream << comboRecord << "\r\n";
-                    comboRecord = QString();
+                        outStream << comboRecord << "\r\n";
+                        comboRecord = QString();
+                    }
+                    firstTime = false;
                 }
-                firstTime = false;
             }
         }
 // Extract records after the reference time record and between specified times.
