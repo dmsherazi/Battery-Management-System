@@ -2,6 +2,7 @@
 
 PROJECT	    = power-management
 VERSION    ?= 1
+CHARGER    ?= 3PH
 PREFIX	    = arm-none-eabi
 CC		    = $(PREFIX)-gcc
 LD		    = $(PREFIX)-gcc
@@ -48,11 +49,20 @@ LDFLAGS	   += -I . -lc -T$(LDSCRIPT) -L$(DRIVERS_DIR)/lib -nostartfiles -Wl,--gc
 LDFLAGS	   += -lopencm3_stm32f1
 
 CFILES	    = $(PROJECT).c $(PROJECT)-comms.c $(PROJECT)-file.c
-CFILES     += $(PROJECT)-monitor.c $(PROJECT)-charger.c $(PROJECT)-hardware.c
+CFILES     += $(PROJECT)-monitor.c $(PROJECT)-hardware.c
 CFILES     += $(PROJECT)-lib.c $(PROJECT)-time.c $(PROJECT)-objdic.c
 CFILES     += $(PROJECT)-measurement.c $(PROJECT)-watchdog.c
 CFILES     += ff.c sd_spi_loc3_stm32_freertos.c fattime.c rtc.c freertos.c
 CFILES     += tasks.c list.c queue.c timers.c port.c heap_1.c
+ifeq ($(CHARGER),3PH)
+CFILES     +=  $(PROJECT)-charger-3ph.c
+else
+ifeq ($(CHARGER),ICC)
+CFILES     +=  $(PROJECT)-charger-icc.c
+else
+$(error Invalid Charger Type)
+endif
+endif
 
 OBJS		= $(CFILES:.c=.o)
 
