@@ -246,6 +246,7 @@ The response will be a comma separated list of items preceded by a type
             break;
         }
 // Status of recording and open files.
+// The write and read file handles are retrieved from this
         case 's':
         {
             if (breakdown.size() <= 1) break;
@@ -257,7 +258,8 @@ The response will be a comma separated list of items preceded by a type
                 PowerManagementRecordUi.startButton->
                     setStyleSheet("background-color:lightpink;");
             if (breakdown.size() <= 2) break;
-            writeFileOpen = breakdown[2].toInt() < 255;
+            writeFileHandle = breakdown[2].toInt();
+            writeFileOpen = (writeFileHandle < 255);
             if (writeFileOpen)
                 PowerManagementRecordUi.recordFileButton->
                     setStyleSheet("background-color:lightgreen;");
@@ -265,7 +267,8 @@ The response will be a comma separated list of items preceded by a type
                 PowerManagementRecordUi.recordFileButton->
                     setStyleSheet("background-color:lightpink;");
             if (breakdown.size() <= 3) break;
-            readFileOpen = breakdown[3].toInt() < 255;
+            readFileHandle = breakdown[3].toInt();
+            readFileOpen = (readFileHandle < 255);
             if (readFileOpen)
                 PowerManagementRecordUi.recordFileName->setText(breakdown[3]);
             break;

@@ -75,6 +75,7 @@ private:
     void refreshDirectory();
     void getFreeSpace();
     int writeFileHandle;
+    int readFileHandle;
     bool recordingOn;
     bool writeFileOpen;
     bool readFileOpen;
