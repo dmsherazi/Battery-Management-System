@@ -686,7 +686,7 @@ void PowerManagementGui::processResponse(const QString response)
                 setText("");
         }
     }
-/* Battery 1 Fill and Operational State Indicators */
+/* Battery 1 Fill, Health and Operational State Indicators */
     if ((size > 0) && (firstField == "dO1"))
     {
         int opState = secondField.toInt() & 0x03;
@@ -784,15 +784,23 @@ void PowerManagementGui::processResponse(const QString response)
                 setText("X");
             PowerManagementMainUi.battery1Charging->
                 setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery1Charging->
+                setText("");
             PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery1Fill->
+                setText("");
+            PowerManagementMainUi.battery1Op->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery1Op->
+                setText("");
             PowerManagementMainUi.battery1Charge->
                 setText(QString(""));
             PowerManagementMainUi.battery1Current->setText(QString(""));
             PowerManagementMainUi.battery1Voltage->setText(QString(""));
         }
     }
-/* Battery 2 Fill and Operational State Indicators */
+/* Battery 2 Fill, Health and Operational State Indicators */
     if ((size > 0) && (firstField == "dO2"))
     {
         int opState = secondField.toInt() & 0x03;
@@ -890,15 +898,23 @@ void PowerManagementGui::processResponse(const QString response)
                 setText("X");
             PowerManagementMainUi.battery2Charging->
                 setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery2Charging->
+                setText("");
             PowerManagementMainUi.battery2Fill->
                 setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery2Fill->
+                setText("");
+            PowerManagementMainUi.battery2Op->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery2Op->
+                setText("");
             PowerManagementMainUi.battery2Charge->
                 setText(QString(""));
             PowerManagementMainUi.battery2Current->setText(QString(""));
             PowerManagementMainUi.battery2Voltage->setText(QString(""));
         }
     }
-/* Battery 3 Fill and Operational State Indicators */
+/* Battery 3 Fill, Health and Operational State Indicators */
     if ((size > 0) && (firstField == "dO3"))
     {
         int opState = secondField.toInt() & 0x03;
@@ -996,8 +1012,16 @@ void PowerManagementGui::processResponse(const QString response)
                 setText("X");
             PowerManagementMainUi.battery3Charging->
                 setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery3Charging->
+                setText("");
+            PowerManagementMainUi.battery3Fill->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery3Fill->
+                setText("");
             PowerManagementMainUi.battery3Op->
                 setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery3Op->
+                setText("");
             PowerManagementMainUi.battery3Charge->
                 setText(QString(""));
             PowerManagementMainUi.battery3Current->setText(QString(""));

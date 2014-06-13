@@ -85,7 +85,7 @@ PowerManagementRecordGui::PowerManagementRecordGui(QTcpSocket* tcpSocket, QWidge
     connect(PowerManagementRecordUi.fileTableView,
                      SIGNAL(clicked(const QModelIndex)),
                      this,SLOT(onListItemClicked(const QModelIndex)));
-/* Send a command to open the directory */
+// Send a command to refresh the directory
     refreshDirectory();
     writeFileHandle = 0xFF;
 }
@@ -376,7 +376,7 @@ void PowerManagementRecordGui::refreshDirectory()
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Ask for status of recording.
+/** @brief Ask for Status of Recording.
 
 */
 
@@ -386,7 +386,7 @@ void PowerManagementRecordGui::requestRecordingStatus()
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Ask for status of recording.
+/** @brief Ask for Amount of Free Space Remaining on the Medium.
 
 */
 
