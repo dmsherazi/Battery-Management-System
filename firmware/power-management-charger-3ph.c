@@ -98,9 +98,6 @@ static void chargerControl(void)
 /* Compute the average current and voltage */
     calculateAverageMeasures();
 
-/* Get the battery being charged, if any, from the switch settings.
-The monitor task will set these to select the battery to charge. */
-    uint8_t switchSettings = getSwitchControlBits();
     uint8_t batteryUnderCharge = getBatteryUnderCharge();
 
     if (batteryUnderCharge > 0)

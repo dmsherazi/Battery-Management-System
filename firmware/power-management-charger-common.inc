@@ -10,7 +10,7 @@ below the limit.
 This file contains common code for different algorithms. It must be included
 within the source file for each algorithm.
 
-Initial 18 October 2013
+Initial 14 June 2014
 */
 
 /*
@@ -45,6 +45,7 @@ static void initLocals(void);
 static int16_t voltageAv[NUM_BATS];
 static int16_t currentAv[NUM_BATS];
 static battery_Ch_States batteryChargingPhase[NUM_BATS];
+static uint8_t chargerWatchdogCount;
 
 /*--------------------------------------------------------------------------*/
 /* @brief Charging Task

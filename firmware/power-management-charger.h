@@ -47,13 +47,6 @@ it will take the duty cycle to rise in response to changes. */
 #include <stdint.h>
 #include <stdbool.h>
 
-/* Local Persistent Variables */
-static battery_Ch_States batteryChargingPhase[NUM_BATS];
-static uint8_t chargerWatchdogCount;
-static int16_t voltageAv[NUM_BATS];
-static int16_t currentAv[NUM_BATS];
-static uint8_t batteryUnderCharge;      /* zero if no battery charging */
-
 /*--------------------------------------------------------------------------*/
 /* Prototypes */
 /*--------------------------------------------------------------------------*/
