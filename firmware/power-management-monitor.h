@@ -66,6 +66,7 @@ the result is maximum negative, around -4000) */
 void prvMonitorTask(void *pvParameters);
 int16_t getBatteryCurrentOffset(int battery);
 int16_t getBatterySoC(int battery);
+uint8_t getBatteryUnderCharge(void);
 void resetBatterySoC(int battery);
 void startCalibration();
 void checkMonitorWatchdog(void);

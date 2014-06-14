@@ -655,7 +655,6 @@ later. */
             {
                 setSwitch(batteryUnderLoad,LOAD_1);
             }
-            setSwitch(batteryUnderCharge,PANEL);
         }
 
 /*---------------- RESET SoC AFTER IDLE TIME --------------------*/
@@ -810,6 +809,16 @@ void resetBatterySoC(int battery)
 void startCalibration()
 {
     calibrate = true;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Get the Battery Under Charge
+
+*/
+
+uint8_t getBatteryUnderCharge(void)
+{
+    return batteryUnderCharge;
 }
 
 /*--------------------------------------------------------------------------*/
