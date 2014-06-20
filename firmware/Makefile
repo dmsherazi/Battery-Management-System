@@ -55,14 +55,15 @@ CFILES     += $(PROJECT)-measurement.c $(PROJECT)-watchdog.c
 CFILES     += ff.c sd_spi_loc3_stm32_freertos.c fattime.c rtc.c freertos.c
 CFILES     += tasks.c list.c queue.c timers.c port.c heap_1.c
 ifeq ($(CHARGER),3PH)
-CFILES     +=  $(PROJECT)-charger-3ph.c
+#CFILES     +=  $(PROJECT)-charger-3ph.c
 else
 ifeq ($(CHARGER),ICC)
-CFILES     +=  $(PROJECT)-charger-icc.c
+#CFILES     +=  $(PROJECT)-charger-icc.c
 else
 $(error Invalid Charger Type)
 endif
 endif
+CFILES     +=  $(PROJECT)-charger.c
 
 OBJS		= $(CFILES:.c=.o)
 

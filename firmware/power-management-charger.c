@@ -71,6 +71,12 @@ static void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle)
 static battery_Ch_States batteryChargingPhase[NUM_BATS];
 static int16_t chargingMeasure[NUM_BATS];       /* ad-hoc state measure */
 static uint8_t chargerWatchdogCount;
+static uint16_t absorptionPhaseTime[NUM_BATS];   /* time in absorption */
+static int16_t absorptionPhaseCurrent[NUM_BATS];
+static int16_t voltageAv[NUM_BATS];
+static int16_t currentAv[NUM_BATS];
+static uint8_t batteryUnderCharge = 0;  /* zero if no battery charging */
+static uint16_t bulkCurrent = 0;
 
 /*--------------------------------------------------------------------------*/
 /* @brief Charging Task
@@ -84,12 +90,6 @@ void prvChargerTask(void *pvParameters)
     uint16_t dutyCycle = 50*256;                    /* percentage times 256 */
     uint16_t dutyCycleMax = 100*256;
     uint8_t battery = 0;
-    static uint16_t absorptionPhaseTime[NUM_BATS];   /* time in absorption */
-    static int16_t absorptionPhaseCurrent[NUM_BATS];
-    static int16_t voltageAv[NUM_BATS];
-    static int16_t currentAv[NUM_BATS];
-    static uint8_t batteryUnderCharge = 0;  /* zero if no battery charging */
-    static uint16_t bulkCurrent = 0;
 
     initGlobals();
 
@@ -120,35 +120,42 @@ terminal voltage drops below a charging restart threshold (95%). */
                 batteryChargingPhase[i] = bulkC;
         }
 
-/* Get the battery being charged, if any, from the switch settings.
-The monitor task will set these to select the battery to charge. */
-        uint8_t switchSettings = getSwitchControlBits();
-        battery = (switchSettings >> 4) & 0x03;
+/* Compute the averaged voltages and currents to manage phase switchover.
+Use first order exponential filters, separate coefficients. */
+        for (i=0; i<NUM_BATS; i++)
+        {
+            int16_t current = getBatteryCurrent(i)-getBatteryCurrentOffset(i);
+            int16_t voltage = getBatteryVoltage(i);
+/* Seed the filter with the most recent measurement (rather than zero) */
+            if (voltageAv[i] == 0) voltageAv[i] = voltage;
+            if (currentAv[i] == 0) currentAv[i] = current;
+/* IIR filters with fairly short time constant */
+            voltageAv[i] = voltageAv[i] +
+                        ((getAlphaV()*(voltage - voltageAv[i]))>>8);
+            currentAv[i] = currentAv[i] +
+                        ((getAlphaC()*(current - currentAv[i]))>>8);
+        }
+
+/* Get the battery to be charged from the monitor task. */
+        uint8_t battery = getBatteryUnderCharge();
 /* If this is different to the battery currently under charge, change over. */
         if (battery != batteryUnderCharge)  /* Change of battery to charge */
         {
             batteryUnderCharge = battery;   /* Set new battery to charge */
-            voltageAv[battery-1] = 0;
-            currentAv[battery-1] = 0;
+            voltageAv[batteryUnderCharge-1] = 0;
+            currentAv[batteryUnderCharge-1] = 0;
             dutyCycle = 50*256;
         }
 
-/* Compute the averaged voltages and currents to manage phase switchover.
-Use first order exponential filters, separate coefficients. */
-        if (battery > 0)
-        {
-            uint8_t index = battery-1;
-            int16_t current = getBatteryCurrent(index)-getBatteryCurrentOffset(index);
-            int16_t voltage = getBatteryVoltage(index);
-/* Seed the filter with the most recent measurement (rather than zero) */
-            if (voltageAv[index] == 0) voltageAv[index] = voltage;
-            if (currentAv[index] == 0) currentAv[index] = current;
-/* IIR filters with fairly short time constant */
-            voltageAv[index] = voltageAv[index] +
-                        ((getAlphaV()*(voltage - voltageAv[index]))>>8);
-            currentAv[index] = currentAv[index] +
-                        ((getAlphaC()*(current - currentAv[index]))>>8);
+/* Set the panel switch to the selected battery if tracking is automatic
+(otherwise it is set externally and should not be changed here). */
+        if (isAutoTrack()) setSwitch(batteryUnderCharge,PANEL);
 
+/* Start of three phase algorithm */
+        if (batteryUnderCharge > 0)
+        {
+
+            uint8_t index = batteryUnderCharge-1;
 /* Manage the change from bulk to absorption phase. */
             if (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index)))
                 batteryChargingPhase[index] = absorptionC;  /* Change. */
@@ -183,7 +190,7 @@ by the resetBattery function. */
                 (-currentAv[index] < getFloatStageCurrent(index)))
             {
                 batteryChargingPhase[index] = floatC;
-                resetBatterySoC(battery-1);
+                resetBatterySoC(batteryUnderCharge-1);
             }
 
 /* Manage the change to bulk phase when the terminal voltage drops below the
@@ -208,6 +215,7 @@ Compute the peak current from duty cycle (assumes current goes from 0 to a peak)
 then if the peak is greater than the battery's current limit, reduce the
 maximum duty cycle. Limit the duty cycle to this.
 This is done on the directly measured current for rapid response. */
+            int16_t current = getBatteryCurrent(index)-getBatteryCurrentOffset(index);
             if (dutyCycle < MIN_DUTYCYCLE) dutyCycle = MIN_DUTYCYCLE;
             int32_t currentPeak = -((int32_t)current*100)/dutyCycle;
             if (currentPeak > getBulkCurrentLimit(index))
@@ -219,6 +227,7 @@ This is done on the directly measured current for rapid response. */
 value that will allow it to grow again if needed (round-off error problem). */
             if (dutyCycle < MIN_DUTYCYCLE) dutyCycle = MIN_DUTYCYCLE;
             if (dutyCycle > dutyCycleMax) dutyCycle = dutyCycleMax;
+/* dutyCycle is a persistent variable. dutyCycleActual carries local changes */
             uint16_t dutyCycleActual = dutyCycle;
 /* If the voltage drifts too high in float phase, turn off charging altogether.*/
             if ((batteryChargingPhase[index] == floatC) &&
@@ -334,5 +343,4 @@ void checkChargerWatchdog(void)
         recordString("D","Charger Restarted");
     }
 }
-
 
