@@ -177,12 +177,12 @@
      <rect>
       <x>130</x>
       <y>200</y>
-      <width>483</width>
-      <height>56</height>
+      <width>563</width>
+      <height>331</height>
      </rect>
     </property>
     <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
+     <enum>Qt::ScrollBarAsNeeded</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -191,10 +191,10 @@
      <bool>false</bool>
     </property>
     <property name="rowCount">
-     <number>1</number>
+     <number>12</number>
     </property>
     <property name="columnCount">
-     <number>6</number>
+     <number>7</number>
     </property>
     <attribute name="horizontalHeaderDefaultSectionSize">
      <number>80</number>
@@ -203,47 +203,24 @@
      <bool>false</bool>
     </attribute>
     <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
     <column/>
     <column/>
     <column/>
     <column/>
     <column/>
     <column/>
-   </widget>
-   <widget class="QLabel" name="energyBalance">
-    <property name="geometry">
-     <rect>
-      <x>630</x>
-      <y>225</y>
-      <width>91</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Panel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="lineWidth">
-     <number>1</number>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::PlainText</enum>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
+    <column/>
    </widget>
    <widget class="QComboBox" name="recordType_4">
     <property name="geometry">
@@ -263,6 +240,35 @@
       <width>133</width>
       <height>29</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="energySplitCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>26</x>
+      <y>300</y>
+      <width>93</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Day Split</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="energySaveFile">
+    <property name="geometry">
+     <rect>
+      <x>26</x>
+      <y>265</y>
+      <width>91</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Energy balance (AH) for all batteries and sources over the time interval</string>
+    </property>
+    <property name="text">
+     <string>Save File</string>
     </property>
    </widget>
   </widget>

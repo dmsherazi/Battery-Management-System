@@ -82,11 +82,9 @@ DataProcessingGui::DataProcessingGui()
     DataProcessingMainUi.intervalType->addItem("Maximum");
     DataProcessingMainUi.intervalType->addItem("Sample");
 // Build the energy table
-    DataProcessingMainUi.energyView->setRowCount(1);
-    DataProcessingMainUi.energyView->setColumnCount(6);
     QStringList energyViewHeader;
     energyViewHeader << "Battery 1" << "Battery 2" << "Battery 3";
-    energyViewHeader << "Load 1" << "Load 1" << "Panel";
+    energyViewHeader << "Load 1" << "Load 1" << "Panel" << "Total";
     DataProcessingMainUi.energyView->setHorizontalHeaderLabels(energyViewHeader);
 }
 
@@ -546,9 +544,13 @@ void DataProcessingGui::on_energyButton_clicked()
     QTableWidgetItem *panelItem = new QTableWidgetItem(tr("%1").arg(
          (float)panelEnergy/921600,0,'g',3));
     DataProcessingMainUi.energyView->setItem(0, 5, panelItem);
-// Display total
-    DataProcessingMainUi.energyBalance->setText(tr("%1 AH").arg(
+// Display total in last column
+    QTableWidgetItem *energyTotal = new QTableWidgetItem(tr("%1").arg(
          (float)(battery1Energy+battery2Energy+battery3Energy)/921600,0,'g',3));
+    QFont tableFont = QApplication::font();
+    tableFont.setBold(true);
+    energyTotal->setFont(tableFont);
+    DataProcessingMainUi.energyView->setItem(0, 6, energyTotal);
 }
 
 //-----------------------------------------------------------------------------
