@@ -1,4 +1,4 @@
-v 20130925 2
+v 20121123 2
 C 40000 40000 0 0 0 title-B.sym
 C 56400 50600 1 0 1 terminal-1.sym
 {
@@ -70,7 +70,7 @@ device=RESISTOR
 T 52100 47900 5 10 1 1 0 0 1
 refdes=R10
 T 52100 47700 5 10 1 1 0 0 1
-value=20K
+value=15K
 T 51900 48200 5 10 0 0 0 0 1
 footprint=R025
 }
@@ -127,7 +127,7 @@ device=RESISTOR
 T 51000 48400 5 10 1 1 0 0 1
 refdes=R7
 T 51000 48200 5 10 1 1 0 0 1
-value=10K
+value=12K
 T 50800 48700 5 10 0 0 0 0 1
 footprint=R025
 }
@@ -153,7 +153,7 @@ device=RESISTOR
 T 50400 48000 5 10 1 1 180 0 1
 refdes=R5
 T 50100 47600 5 10 1 1 0 0 1
-value=10K
+value=12K
 T 50000 47300 5 10 0 0 0 0 1
 footprint=R025
 }
@@ -337,7 +337,7 @@ device=RESISTOR
 T 51100 49600 5 10 1 1 0 0 1
 refdes=R6
 T 51100 49400 5 10 1 1 0 0 1
-value=10K
+value=7.5K
 T 50800 49100 5 10 0 0 0 0 1
 footprint=R025
 }
@@ -461,7 +461,7 @@ device=RESISTOR
 T 52300 49600 5 10 1 1 0 0 1
 refdes=R9
 T 52300 49400 5 10 1 1 0 0 1
-value=20K
+value=15K
 T 52000 49800 5 10 0 0 0 0 1
 footprint=R025
 }
