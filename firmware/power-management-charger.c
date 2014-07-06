@@ -118,6 +118,10 @@ terminal voltage drops below a charging restart threshold (95%). */
             if ((batteryChargingPhase[i] == floatC) &&
                 (getBatterySoC(i) < FLOAT_BULK_SOC))
                 batteryChargingPhase[i] = bulkC;
+/* Also if battery is in absorption phase and is not being charged. */
+            if ((batteryChargingPhase[i] == absorptionC) &&
+                (i != batteryUnderCharge))
+                batteryChargingPhase[i] = bulkC;
         }
 
 /* Compute the averaged voltages and currents to manage phase switchover.
@@ -196,10 +200,12 @@ by the resetBattery function. */
 /* Manage the change to bulk phase when the terminal voltage drops below the
 absorption threshold, and the duty cycle reaches 100%. This can happen when the
 charger voltage drops, as in a solar panel application. */
-            if ((batteryChargingPhase[index] == absorptionC) &&
-                (voltageAv[index] < voltageLimit(getAbsorptionVoltage(index))*240/256) &&
-                (dutyCycle == dutyCycleMax))
-                batteryChargingPhase[index] = bulkC;
+            if (batteryChargingPhase[index] == absorptionC)
+            {
+                if ((voltageAv[index] < voltageLimit(getAbsorptionVoltage(index))*240/256) &&
+                    (dutyCycle == dutyCycleMax))
+                    batteryChargingPhase[index] = bulkC;
+            }
 
 /* Manage the float phase voltage limit. */
             if (batteryChargingPhase[index] == floatC)
@@ -216,7 +222,6 @@ then if the peak is greater than the battery's current limit, reduce the
 maximum duty cycle. Limit the duty cycle to this.
 This is done on the directly measured current for rapid response. */
             int16_t current = getBatteryCurrent(index)-getBatteryCurrentOffset(index);
-            if (dutyCycle < MIN_DUTYCYCLE) dutyCycle = MIN_DUTYCYCLE;
             int32_t currentPeak = -((int32_t)current*100)/dutyCycle;
             if (currentPeak > getBulkCurrentLimit(index))
                 dutyCycleMax = getBulkCurrentLimit(index)*256/currentPeak;

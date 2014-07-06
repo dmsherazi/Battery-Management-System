@@ -1,7 +1,7 @@
 # Basic makefile K Sarkies
 
 PROJECT	    = power-management
-VERSION    ?= 1
+VERSION    ?= 3
 CHARGER    ?= 3PH
 PREFIX	    = arm-none-eabi
 CC		    = $(PREFIX)-gcc
