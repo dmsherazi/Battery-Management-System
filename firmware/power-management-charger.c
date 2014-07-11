@@ -120,7 +120,7 @@ terminal voltage drops below a charging restart threshold (95%). */
                 batteryChargingPhase[i] = bulkC;
 /* Also if battery is in absorption phase and is not being charged. */
             if ((batteryChargingPhase[i] == absorptionC) &&
-                (i != batteryUnderCharge))
+                (i+1 != batteryUnderCharge))
                 batteryChargingPhase[i] = bulkC;
         }
 
@@ -202,7 +202,7 @@ absorption threshold, and the duty cycle reaches 100%. This can happen when the
 charger voltage drops, as in a solar panel application. */
             if (batteryChargingPhase[index] == absorptionC)
             {
-                if ((voltageAv[index] < voltageLimit(getAbsorptionVoltage(index))*240/256) &&
+                if ((voltageAv[index] < voltageLimit(getAbsorptionVoltage(index))*230/256) &&
                     (dutyCycle == dutyCycleMax))
                     batteryChargingPhase[index] = bulkC;
             }
