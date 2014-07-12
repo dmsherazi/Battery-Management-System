@@ -117,11 +117,15 @@ terminal voltage drops below a charging restart threshold (95%). */
         {
             if ((batteryChargingPhase[i] == floatC) &&
                 (getBatterySoC(i) < FLOAT_BULK_SOC))
+            {
                 batteryChargingPhase[i] = bulkC;
+            }
 /* Also if battery is in absorption phase and is not being charged. */
             if ((batteryChargingPhase[i] == absorptionC) &&
                 (i+1 != batteryUnderCharge))
+            {
                 batteryChargingPhase[i] = bulkC;
+            }
         }
 
 /* Compute the averaged voltages and currents to manage phase switchover.
@@ -142,13 +146,18 @@ Use first order exponential filters, separate coefficients. */
 
 /* Get the battery to be charged from the monitor task. */
         uint8_t battery = getBatteryUnderCharge();
-/* If this is different to the battery currently under charge, change over. */
-        if (battery != batteryUnderCharge)  /* Change of battery to charge */
+/* If this is different to the battery currently under charge, change over
+and reset the measurements and duty cycle. Nothing should happen if no
+charger is allocated. */
+        if (battery != batteryUnderCharge)
         {
             batteryUnderCharge = battery;   /* Set new battery to charge */
-            voltageAv[batteryUnderCharge-1] = 0;
-            currentAv[batteryUnderCharge-1] = 0;
-            dutyCycle = 50*256;
+            if (batteryUnderCharge > 0)
+            {
+                voltageAv[batteryUnderCharge-1] = 0;
+                currentAv[batteryUnderCharge-1] = 0;
+                dutyCycle = 50*256;
+            }
         }
 
 /* Set the panel switch to the selected battery if tracking is automatic
@@ -204,7 +213,9 @@ charger voltage drops, as in a solar panel application. */
             {
                 if ((voltageAv[index] < voltageLimit(getAbsorptionVoltage(index))*230/256) &&
                     (dutyCycle == dutyCycleMax))
+                {
                     batteryChargingPhase[index] = bulkC;
+                }
             }
 
 /* Manage the float phase voltage limit. */

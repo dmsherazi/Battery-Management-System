@@ -615,7 +615,8 @@ critical we must turn off the low priority loads. */
 /* If charging voltage is lower than the battery voltage, turn off charging
 altogether. This will allow more flexibility in managing isolation during night
 periods. */
-        if (getBatteryVoltage(batteryUnderCharge-1) > getPanelVoltage(0))
+        if ((batteryUnderCharge > 0) &&
+            (getBatteryVoltage(batteryUnderCharge-1) > getPanelVoltage(0)))
         {
             batteryUnderCharge = 0;
         }
