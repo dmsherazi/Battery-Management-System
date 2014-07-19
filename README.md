@@ -43,6 +43,10 @@ switches directly.
 A data processing program is also provided to generate reports of various types
 from the recorded performance data.
 
+More information is availale on:
+
+http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-overview.html
+
 (c) K. Sarkies 15/03/2014
 
 TODO

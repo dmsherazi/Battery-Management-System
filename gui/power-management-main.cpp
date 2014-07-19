@@ -1490,6 +1490,8 @@ void PowerManagementGui::on_battery3CheckBox_clicked()
 //-----------------------------------------------------------------------------
 /** @brief Obtain a save file name and path and attempt to open it.
 
+The files are csv but the ending can be arbitrary to allow compatibility
+with the data processing application.
 */
 
 void PowerManagementGui::on_saveFileButton_clicked()
@@ -1504,9 +1506,9 @@ void PowerManagementGui::on_saveFileButton_clicked()
     QString filename = QFileDialog::getSaveFileName(this,
                         "Acquisition Save Acquired Data",
                         QString(),
-                        "Comma Separated Variables (*.csv)",0,0);
+                        "Comma Separated Variables (*.csv *.txt)");
     if (filename.isEmpty()) return;
-    if (! filename.endsWith(".csv")) filename.append(".csv");
+//    if (! filename.endsWith(".csv")) filename.append(".csv");
     QFileInfo fileInfo(filename);
     saveDirectory = fileInfo.absolutePath();
     saveFile = saveDirectory.filePath(filename);
