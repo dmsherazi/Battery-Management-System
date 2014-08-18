@@ -108,7 +108,7 @@
      </rect>
     </property>
     <property name="toolTip">
-     <string>Extract selected data from the file to a csv</string>
+     <string>Extract selected data between given times from the file to a csv</string>
     </property>
     <property name="text">
      <string>Extract</string>
@@ -150,7 +150,7 @@
      </rect>
     </property>
     <property name="toolTip">
-     <string>Extracts all data in csv form suitable for spreadsheet</string>
+     <string>Extracts all data between given times in csv form suitable for spreadsheet</string>
     </property>
     <property name="text">
      <string>Dump All</string>
@@ -166,7 +166,7 @@
      </rect>
     </property>
     <property name="toolTip">
-     <string>Energy balance (AH) for all batteries and sources over the time interval</string>
+     <string>Energy balance (AH) for all batteries and sources over the given time interval</string>
     </property>
     <property name="text">
      <string>Energy</string>
@@ -269,6 +269,22 @@
     </property>
     <property name="text">
      <string>Save File</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="splitButton">
+    <property name="geometry">
+     <rect>
+      <x>624</x>
+      <y>155</y>
+      <width>91</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Split a CSV file into day records, or a combine  TXT file records to day files.</string>
+    </property>
+    <property name="text">
+     <string>Split</string>
     </property>
    </widget>
   </widget>

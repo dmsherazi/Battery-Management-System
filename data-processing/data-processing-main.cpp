@@ -1,6 +1,10 @@
-/*       Power Management Data Processing Main Window
-
+/**
+@mainpage Power Management Data Processing Main Window
+@version 1.0
+@author Ken Sarkies (www.jiggerjuice.net)
 @date 22 March 2014
+
+Utility program to aid in analysis if BMS data files.
 */
 
 /****************************************************************************
@@ -103,6 +107,34 @@ bool DataProcessingGui::success()
 }
 
 //-----------------------------------------------------------------------------
+/** @brief Open a data file for Reading.
+
+*/
+
+void DataProcessingGui::on_openReadFileButton_clicked()
+{
+    QString errorMessage;
+    QFileInfo fileInfo;
+    QString filename = QFileDialog::getOpenFileName(this,
+                                "Data File","./","Text Files (*.txt)");
+    if (filename.isEmpty())
+    {
+        displayErrorMessage("No filename specified");
+        return;
+    }
+    inFile = new QFile(filename);
+    fileInfo.setFile(filename);
+    if (inFile->open(QIODevice::ReadOnly))
+    {
+        scanFile(inFile);
+    }
+    else
+    {
+        displayErrorMessage(QString("%1").arg((uint)inFile->error()));
+    }
+}
+
+//-----------------------------------------------------------------------------
 /** @brief Extract All to CSV.
 
 All data is extracted to a csv file with one record per time interval. Format
@@ -110,6 +142,373 @@ suitable for spreadsheet analysis.
 */
 
 void DataProcessingGui::on_dumpAllButton_clicked()
+{
+    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
+    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
+    if (! inFile->isOpen()) return;
+    if (! openSaveFile()) return;
+    inFile->seek(0);      // rewind input file
+    combineRecords(startTime, endTime, inFile, outFile, true);
+    if (saveFile.isEmpty())
+        displayErrorMessage("File already closed");
+    else
+    {
+        outFile->close();
+        delete outFile;
+//! Clear the name to prevent the same file being used.
+        saveFile = QString();
+    }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Split raw or record files to day record files.
+
+All data is extracted to a csv file with one record per time interval with
+time starting at midnight and ending at midnight on the same day.
+
+An input file must already be opened using the Open button.
+Start time is taken from the first record of the input file and the
+end time is midnight.
+The save file is created from the input file name and the date on the first
+record of the input file. This is updated each time the record date changes.
+If the save file exists, abort, create a parallel save file or append data.
+*/
+
+void DataProcessingGui::on_splitButton_clicked()
+{
+    if (! inFile->isOpen())
+    {
+        displayErrorMessage("Open the input file first");
+        return;
+    }
+    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
+    bool eof = false;
+    bool header = true;
+    while (! eof)
+    {
+        if (! startTime.isValid()) return;
+// Set the end time to the record before midnight
+        QDateTime endTime(startTime.date(),QTime(23,59,59));
+// Create a save filename constructed from start date
+        QString filename = QString("bms-data-")
+                            .append(startTime.date().toString("yyyy.MM.dd"))
+                            .append(".csv");
+        QFileInfo fileInfo(filename);
+        QDir saveDirectory = fileInfo.absolutePath();
+        QString saveFile = saveDirectory.filePath(filename);
+// If it exists, decide what action to take
+        bool skip = false;
+        if (QFile::exists(saveFile))
+        {
+            QMessageBox msgBox;
+            msgBox.setText(QString("A previous save file ").append(filename).append(" exists."));
+            QPushButton *overwriteButton = msgBox.addButton(tr("Overwrite"), QMessageBox::AcceptRole);
+            QPushButton *appendButton = msgBox.addButton(tr("Append"), QMessageBox::AcceptRole);
+            QPushButton *parallelButton = msgBox.addButton(tr("New File"), QMessageBox::AcceptRole);
+            QPushButton *skipButton = msgBox.addButton(tr("Skip"), QMessageBox::AcceptRole);
+            QPushButton *abortButton = msgBox.addButton(tr("Abort"), QMessageBox::AcceptRole);
+            msgBox.exec();
+            if (msgBox.clickedButton() == overwriteButton)
+            {
+                QFile::remove(saveFile);
+            }
+            else if (msgBox.clickedButton() == parallelButton)
+            {
+                filename = filename.left(filename.length()-4).append("-a.csv");
+                QFileInfo fileInfo(filename);
+                QDir saveDirectory = fileInfo.absolutePath();
+                saveFile = saveDirectory.filePath(filename);
+            }
+            else if (msgBox.clickedButton() == skipButton)
+            {
+                skip = true;
+            }
+            else if (msgBox.clickedButton() == abortButton)
+            {
+                return;
+            }
+        }
+        if (! skip)
+        {
+            QFile* outFile = new QFile(saveFile);   // Open file for output
+            if (! outFile->open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+            {
+                displayErrorMessage("Could not open the output file");
+                return;
+            }
+            inFile->seek(0);      // rewind input file
+            eof = combineRecords(startTime, endTime, inFile, outFile, header);
+            header = false;
+            outFile->close();
+            delete outFile;
+        }
+        startTime = QDateTime(startTime.date().addDays(1),QTime(0,0,0));
+        if (startTime > DataProcessingMainUi.endTime->dateTime()) return;
+    }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Find Energy Balance.
+
+Add up the ampere hour energy taken from batteries and supplied by the source
+over the specified time interval. Display these in a table form. The battery
+energy includes loads and sources and therefore itself provides sufficient
+information. The loads and sources alone do not account for onboard electronics
+power usage. The total balance is displayed.
+
+The load and source currents show large negative swings when the undervoltage
+or overcurrent indicators are triggered. Any negative swing on those currents
+is set to zero. The indicator settings are captured but not used at this stage.
+*/
+
+void DataProcessingGui::on_energyButton_clicked()
+{
+    if (inFile == NULL) return;
+    if (! inFile->isOpen()) return;
+    inFile->seek(0);      // rewind file
+    int interval = DataProcessingMainUi.intervalSpinBox->value();
+    int intervaltype = DataProcessingMainUi.intervalType->currentIndex();
+    QTextStream inStream(inFile);
+    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
+    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
+    QDateTime time = startTime;
+    QDateTime previousTime = startTime;
+// Cumulative energy measures
+    long long battery1Energy = 0;
+    long long battery2Energy = 0;
+    long long battery3Energy = 0;
+    long long load1Energy = 0;
+    long long load2Energy = 0;
+    long long panelEnergy = 0;
+    long battery1Seconds = 0;
+    long battery2Seconds = 0;
+    long battery3Seconds = 0;
+    long load1Seconds = 0;
+    long load2Seconds = 0;
+    long panelSeconds = 0;
+    long elapsedSeconds = 0;
+    int indicators = 0;
+    while (! inStream.atEnd())
+    {
+      	QString lineIn = inStream.readLine();
+        QStringList breakdown = lineIn.split(",");
+        int size = breakdown.size();
+        if (size <= 0) break;
+        QString firstText = breakdown[0].simplified();
+        int secondField = 0;
+        int thirdField = 0;
+// Extract the time record for time range comparison
+        if (size > 1)
+        {
+            if (firstText == "pH")
+            {
+                previousTime = time;
+                time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
+                elapsedSeconds = previousTime.secsTo(time);
+            }
+            else
+            {
+                secondField = breakdown[1].simplified().toInt();
+            }
+        }
+        if (size > 2) thirdField = breakdown[2].simplified().toInt();
+        if  (time > endTime) break;
+// Extract records of measured currents
+        if (time >= startTime)
+        {
+            if (firstText == "dB1")
+            {
+                battery1Energy += secondField*elapsedSeconds;
+                battery1Seconds += elapsedSeconds;
+            }
+            if (firstText == "dB2")
+            {
+                battery2Energy += secondField*elapsedSeconds;
+                battery2Seconds += elapsedSeconds;
+            }
+            if (firstText == "dB3")
+            {
+                battery3Energy += secondField*elapsedSeconds;
+                battery3Seconds += elapsedSeconds;
+            }
+            if (firstText == "dL1")
+            {
+                if (secondField < 0) secondField = 0;
+                load1Energy += secondField*elapsedSeconds;
+                load1Seconds += elapsedSeconds;
+            }
+            if (firstText == "dL2")
+            {
+                if (secondField < 0) secondField = 0;
+                load2Energy += secondField*elapsedSeconds;
+                load2Seconds += elapsedSeconds;
+            }
+            if (firstText == "dM1")
+            {
+                if (secondField < 0) secondField = 0;
+                panelEnergy += secondField*elapsedSeconds;
+                panelSeconds += elapsedSeconds;
+            }
+// Get record of indicators
+            if (firstText == "dI")
+            {
+                indicators = secondField;
+            }
+        }
+    }
+    QTableWidgetItem *battery1Item = new QTableWidgetItem(tr("%1").arg(
+         (float)battery1Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 0, battery1Item);
+    QTableWidgetItem *battery2Item = new QTableWidgetItem(tr("%1").arg(
+         (float)battery2Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 1, battery2Item);
+    QTableWidgetItem *battery3Item = new QTableWidgetItem(tr("%1").arg(
+         (float)battery3Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 2, battery3Item);
+    QTableWidgetItem *load1Item = new QTableWidgetItem(tr("%1").arg(
+         (float)load1Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 3, load1Item);
+    QTableWidgetItem *load2Item = new QTableWidgetItem(tr("%1").arg(
+         (float)load2Energy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 4, load2Item);
+    QTableWidgetItem *panelItem = new QTableWidgetItem(tr("%1").arg(
+         (float)panelEnergy/921600,0,'g',3));
+    DataProcessingMainUi.energyView->setItem(0, 5, panelItem);
+// Display total in last column
+    QTableWidgetItem *energyTotal = new QTableWidgetItem(tr("%1").arg(
+         (float)(battery1Energy+battery2Energy+battery3Energy)/921600,0,'g',3));
+    QFont tableFont = QApplication::font();
+    tableFont.setBold(true);
+    energyTotal->setFont(tableFont);
+    DataProcessingMainUi.energyView->setItem(0, 6, energyTotal);
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Extract Data.
+
+Up to three data sets specified are extracted and written to a file for
+plotting.
+
+An interval is specified over which data may be taken as the first sample, the
+maximum or the average. The time over which the extraction occurs can be
+specified.
+
+A header is built from the selected record types specified.
+Each record when found is written directly, excluding the ident field.
+This means that some records will have more than one field and so are dealt
+with individually.
+*/
+
+void DataProcessingGui::on_extractButton_clicked()
+{
+    if (inFile == NULL) return;
+    if (! inFile->isOpen()) return;
+    if (! openSaveFile()) return;
+    inFile->seek(0);      // rewind input file
+    int interval = DataProcessingMainUi.intervalSpinBox->value();
+    int intervaltype = DataProcessingMainUi.intervalType->currentIndex();
+    QTextStream inStream(inFile);
+    QTextStream outStream(outFile);
+    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
+    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
+    QDateTime time;
+    QString header;
+    QString comboRecord;
+    int recordType_1 = DataProcessingMainUi.recordType_1->currentIndex();
+    int recordType_2 = DataProcessingMainUi.recordType_2->currentIndex();
+    int recordType_3 = DataProcessingMainUi.recordType_3->currentIndex();
+    int recordType_4 = DataProcessingMainUi.recordType_4->currentIndex();
+    int recordType_5 = DataProcessingMainUi.recordType_5->currentIndex();
+// The first time record is a reference. Anything before that must be ignored.
+// firstTime allows the program to build a header and the first record.
+    bool firstTime = true;
+// The first record only is preceded by the constructed header.
+    bool firstRecord = true;
+    while (! inStream.atEnd())
+    {
+      	QString lineIn = inStream.readLine();
+        QStringList breakdown = lineIn.split(",");
+        int size = breakdown.size();
+        if (size <= 0) break;
+        QString firstText = breakdown[0].simplified();
+// Extract the time record for time range comparison.
+        if (size > 1)
+        {
+            if (firstText == "pH")
+            {
+                time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
+                if ((time >= startTime) && (time <= endTime))
+                {
+                    if (!firstTime)
+                    {
+// On the first pass output the accumulated header string.
+                        if (firstRecord)
+                        {
+                            outStream << header << "\n\r";
+                            firstRecord = false;
+                        }
+// Output the combined record and null it for next pass.
+                        outStream << comboRecord << "\n\r";
+                        comboRecord = QString();
+                    }
+                    firstTime = false;
+                }
+            }
+        }
+// Extract records after the reference time record and between specified times.
+        if (!firstTime && (time >= startTime) && (time <= endTime))
+        {
+// Find the relevant records and extract their fields.
+            int rec = 0;
+            if ((recordType_1 > 0) && (firstText == recordType[recordType_1-1]))
+                rec = recordType_1;
+            if ((recordType_2 > 0) && (firstText == recordType[recordType_2-1]))
+                rec = recordType_2;
+            if ((recordType_3 > 0) && (firstText == recordType[recordType_3-1]))
+                rec = recordType_3;
+            if ((recordType_4 > 0) && (firstText == recordType[recordType_4-1]))
+                rec = recordType_4;
+            if ((recordType_5 > 0) && (firstText == recordType[recordType_5-1]))
+                rec = recordType_5;
+            if (rec > 0)
+            {
+                if (firstRecord)
+                {
+                    if (! header.isEmpty()) header += ",";
+                    header += recordText[rec-1];
+                    if (size > 2) header += " I," + recordText[rec-1] + " V";
+                }
+                if (! comboRecord.isEmpty()) comboRecord += ",";
+                comboRecord += breakdown[1].simplified();
+                if (size > 2) comboRecord += "," + breakdown[2].simplified();
+            }
+        }
+    }
+    if (saveFile.isEmpty())
+        displayErrorMessage("File already closed");
+    else
+    {
+        outFile->close();
+        delete outFile;
+//! Null the name to prevent the same file being used.
+        saveFile = QString();
+    }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Extract and Combine Raw Records to CSV.
+
+Raw records are combined into single records for each time interval, and written
+to a csv file. Format suitable for spreadsheet analysis.
+
+@param[in] QDateTime start time.
+@param[in] QDateTime end time.
+@param[in] QFile* input file.
+@param[in] QFile* output file.
+*/
+
+bool DataProcessingGui::combineRecords(QDateTime startTime, QDateTime endTime,
+                                       QFile* inFile, QFile* outFile,bool header)
 {
     int battery1Voltage = -1;
     int battery1Current = 0;
@@ -146,22 +545,20 @@ void DataProcessingGui::on_dumpAllButton_clicked()
     int debug1b = -1;
     int debug2b = -1;
     int debug3b = -1;
-    if (! inFile->isOpen()) return;
-    if (! openSaveFile()) return;
-    inFile->seek(0);      // rewind file
-    QTextStream inStream(inFile);
     bool blockStart = false;
+    QTextStream inStream(inFile);
     QTextStream outStream(outFile);
-    outStream << "Time,";
-    outStream << "B1 I," << "B1 V," << "B1 Cap," << "B1 Op," << "B1 State," << "B1 Charge,";
-    outStream << "B2 I," << "B2 V," << "B2 Cap," << "B2 Op," << "B2 State," << "B2 Charge,";
-    outStream << "B3 I," << "B3 V," << "B3 Cap," << "B3 Op," << "B3 State," << "B3 Charge,";
-    outStream << "L1 I," << "L1 V," << "L2 I," << "L2 V," << "M1 I," << "M1 V,";
-    outStream << "Temp," << "Controls," << "Switches," << "Decisions," << "Indicators,";
-    outStream << "Debug 1a," << "Debug 1b," << "Debug 2a," << "Debug 2b," << "Debug 3a," << "Debug 3b";
-    outStream << "\n\r";
-    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
-    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
+    if (header)
+    {
+        outStream << "Time,";
+        outStream << "B1 I," << "B1 V," << "B1 Cap," << "B1 Op," << "B1 State," << "B1 Charge,";
+        outStream << "B2 I," << "B2 V," << "B2 Cap," << "B2 Op," << "B2 State," << "B2 Charge,";
+        outStream << "B3 I," << "B3 V," << "B3 Cap," << "B3 Op," << "B3 State," << "B3 Charge,";
+        outStream << "L1 I," << "L1 V," << "L2 I," << "L2 V," << "M1 I," << "M1 V,";
+        outStream << "Temp," << "Controls," << "Switches," << "Decisions," << "Indicators,";
+        outStream << "Debug 1a," << "Debug 1b," << "Debug 2a," << "Debug 2b," << "Debug 3a," << "Debug 3b";
+        outStream << "\n\r";
+    }
     QDateTime time = startTime;
     while (! inStream.atEnd())
     {
@@ -405,195 +802,24 @@ void DataProcessingGui::on_dumpAllButton_clicked()
                 if (size > 2) debug3b = thirdField;
             }
         }
-    }    
-    if (saveFile.isEmpty())
-        displayErrorMessage("File already closed");
-    else
-    {
-        outFile->close();
-        delete outFile;
-//! Clear the name to prevent the same file being used.
-        saveFile = QString();
     }
+    return inStream.atEnd();
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Find Energy Balance.
+/** @brief Seek First Time Record.
 
-Add up the ampere hour energy taken from batteries and supplied by the source
-over the specified time interval. Display these in a table form. The battery
-energy includes loads and sources and therefore itself provides sufficient
-information. The loads and sources alone do not account for onboard electronics
-power usage. The total balance is displayed.
+The input file is searched record by record until the first time record is
+found.
 
-The load and source currents show large negative swings when the undervoltage
-or overcurrent indicators are triggered. Any negative swing on those currents
-is set to zero. The indicator settings are captured but not used at this stage.
+@param[in] QFile* input file.
+@returns QDateTime time of first time record. Null if not found.
 */
 
-void DataProcessingGui::on_energyButton_clicked()
+QDateTime DataProcessingGui::findFirstTimeRecord(QFile* inFile)
 {
-    if (inFile == NULL) return;
-    if (! inFile->isOpen()) return;
-    inFile->seek(0);      // rewind file
-    int interval = DataProcessingMainUi.intervalSpinBox->value();
-    int intervaltype = DataProcessingMainUi.intervalType->currentIndex();
-    QTextStream inStream(inFile);
-    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
-    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
-    QDateTime time = startTime;
-    QDateTime previousTime = startTime;
-// Cumulative energy measures
-    long long battery1Energy = 0;
-    long long battery2Energy = 0;
-    long long battery3Energy = 0;
-    long long load1Energy = 0;
-    long long load2Energy = 0;
-    long long panelEnergy = 0;
-    long battery1Seconds = 0;
-    long battery2Seconds = 0;
-    long battery3Seconds = 0;
-    long load1Seconds = 0;
-    long load2Seconds = 0;
-    long panelSeconds = 0;
-    long elapsedSeconds = 0;
-    int indicators = 0;
-    while (! inStream.atEnd())
-    {
-      	QString lineIn = inStream.readLine();
-        QStringList breakdown = lineIn.split(",");
-        int size = breakdown.size();
-        if (size <= 0) break;
-        QString firstText = breakdown[0].simplified();
-        int secondField = 0;
-        int thirdField = 0;
-// Extract the time record for time range comparison
-        if (size > 1)
-        {
-            if (firstText == "pH")
-            {
-                previousTime = time;
-                time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
-                elapsedSeconds = previousTime.secsTo(time);
-            }
-            else
-            {
-                secondField = breakdown[1].simplified().toInt();
-            }
-        }
-        if (size > 2) thirdField = breakdown[2].simplified().toInt();
-        if  (time > endTime) break;
-// Extract records of measured currents
-        if (time >= startTime)
-        {
-            if (firstText == "dB1")
-            {
-                battery1Energy += secondField*elapsedSeconds;
-                battery1Seconds += elapsedSeconds;
-            }
-            if (firstText == "dB2")
-            {
-                battery2Energy += secondField*elapsedSeconds;
-                battery2Seconds += elapsedSeconds;
-            }
-            if (firstText == "dB3")
-            {
-                battery3Energy += secondField*elapsedSeconds;
-                battery3Seconds += elapsedSeconds;
-            }
-            if (firstText == "dL1")
-            {
-                if (secondField < 0) secondField = 0;
-                load1Energy += secondField*elapsedSeconds;
-                load1Seconds += elapsedSeconds;
-            }
-            if (firstText == "dL2")
-            {
-                if (secondField < 0) secondField = 0;
-                load2Energy += secondField*elapsedSeconds;
-                load2Seconds += elapsedSeconds;
-            }
-            if (firstText == "dM1")
-            {
-                if (secondField < 0) secondField = 0;
-                panelEnergy += secondField*elapsedSeconds;
-                panelSeconds += elapsedSeconds;
-            }
-// Get record of indicators
-            if (firstText == "dI")
-            {
-                indicators = secondField;
-            }
-        }
-    }
-    QTableWidgetItem *battery1Item = new QTableWidgetItem(tr("%1").arg(
-         (float)battery1Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 0, battery1Item);
-    QTableWidgetItem *battery2Item = new QTableWidgetItem(tr("%1").arg(
-         (float)battery2Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 1, battery2Item);
-    QTableWidgetItem *battery3Item = new QTableWidgetItem(tr("%1").arg(
-         (float)battery3Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 2, battery3Item);
-    QTableWidgetItem *load1Item = new QTableWidgetItem(tr("%1").arg(
-         (float)load1Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 3, load1Item);
-    QTableWidgetItem *load2Item = new QTableWidgetItem(tr("%1").arg(
-         (float)load2Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 4, load2Item);
-    QTableWidgetItem *panelItem = new QTableWidgetItem(tr("%1").arg(
-         (float)panelEnergy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 5, panelItem);
-// Display total in last column
-    QTableWidgetItem *energyTotal = new QTableWidgetItem(tr("%1").arg(
-         (float)(battery1Energy+battery2Energy+battery3Energy)/921600,0,'g',3));
-    QFont tableFont = QApplication::font();
-    tableFont.setBold(true);
-    energyTotal->setFont(tableFont);
-    DataProcessingMainUi.energyView->setItem(0, 6, energyTotal);
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Extract Data.
-
-Up to three data sets specified are extracted and written to a file for
-plotting.
-
-An interval is specified over which data may be taken as the first sample, the
-maximum or the average. The time over which the extraction occurs can be
-specified.
-
-A header is built from the selected record types specified.
-Each record when found is written directly, excluding the ident field.
-This means that some records will have more than one field and so are dealt
-with individually.
-*/
-
-void DataProcessingGui::on_extractButton_clicked()
-{
-    if (inFile == NULL) return;
-    if (! inFile->isOpen()) return;
-    if (! openSaveFile()) return;
-    inFile->seek(0);      // rewind input file
-    int interval = DataProcessingMainUi.intervalSpinBox->value();
-    int intervaltype = DataProcessingMainUi.intervalType->currentIndex();
-    QTextStream inStream(inFile);
-    QTextStream outStream(outFile);
-    QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
-    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
     QDateTime time;
-    QString header;
-    QString comboRecord;
-    int recordType_1 = DataProcessingMainUi.recordType_1->currentIndex();
-    int recordType_2 = DataProcessingMainUi.recordType_2->currentIndex();
-    int recordType_3 = DataProcessingMainUi.recordType_3->currentIndex();
-    int recordType_4 = DataProcessingMainUi.recordType_4->currentIndex();
-    int recordType_5 = DataProcessingMainUi.recordType_5->currentIndex();
-// The first time record is a reference. Anything before that must be ignored.
-// firstTime allows the program to build a header and the first record.
-    bool firstTime = true;
-// The first record only is preceded by the constructed header.
-    bool firstRecord = true;
+    QTextStream inStream(inFile);
     while (! inStream.atEnd())
     {
       	QString lineIn = inStream.readLine();
@@ -601,68 +827,14 @@ void DataProcessingGui::on_extractButton_clicked()
         int size = breakdown.size();
         if (size <= 0) break;
         QString firstText = breakdown[0].simplified();
-// Extract the time record for time range comparison.
-        if (size > 1)
+// Find and extract the time record
+        if ((size > 1) && (firstText == "pH"))
         {
-            if (firstText == "pH")
-            {
-                time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
-                if ((time >= startTime) && (time <= endTime))
-                {
-                    if (!firstTime)
-                    {
-// On the first pass output the accumulated header string.
-                        if (firstRecord)
-                        {
-                            outStream << header << "\r\n";
-                            firstRecord = false;
-                        }
-// Output the combined record and null it for next pass.
-                        outStream << comboRecord << "\r\n";
-                        comboRecord = QString();
-                    }
-                    firstTime = false;
-                }
-            }
-        }
-// Extract records after the reference time record and between specified times.
-        if (!firstTime && (time >= startTime) && (time <= endTime))
-        {
-// Find the relevant records and extract their fields.
-            int rec = 0;
-            if ((recordType_1 > 0) && (firstText == recordType[recordType_1-1]))
-                rec = recordType_1;
-            if ((recordType_2 > 0) && (firstText == recordType[recordType_2-1]))
-                rec = recordType_2;
-            if ((recordType_3 > 0) && (firstText == recordType[recordType_3-1]))
-                rec = recordType_3;
-            if ((recordType_4 > 0) && (firstText == recordType[recordType_4-1]))
-                rec = recordType_4;
-            if ((recordType_5 > 0) && (firstText == recordType[recordType_5-1]))
-                rec = recordType_5;
-            if (rec > 0)
-            {
-                if (firstRecord)
-                {
-                    if (! header.isEmpty()) header += ",";
-                    header += recordText[rec-1];
-                    if (size > 2) header += " I," + recordText[rec-1] + " V";
-                }
-                if (! comboRecord.isEmpty()) comboRecord += ",";
-                comboRecord += breakdown[1].simplified();
-                if (size > 2) comboRecord += "," + breakdown[2].simplified();
-            }
+            time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
+            break;
         }
     }
-    if (saveFile.isEmpty())
-        displayErrorMessage("File already closed");
-    else
-    {
-        outFile->close();
-        delete outFile;
-//! Null the name to prevent the same file being used.
-        saveFile = QString();
-    }
+    return time;
 }
 
 //-----------------------------------------------------------------------------
@@ -697,34 +869,6 @@ bool DataProcessingGui::openSaveFile()
         return false;
     }
     return true;
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Open a data file for Reading.
-
-*/
-
-void DataProcessingGui::on_openReadFileButton_clicked()
-{
-    QString errorMessage;
-    QFileInfo fileInfo;
-    QString filename = QFileDialog::getOpenFileName(this,
-                                "Data File","./","Text Files (*.txt)");
-    if (filename.isEmpty())
-    {
-        displayErrorMessage("No filename specified");
-        return;
-    }
-    inFile = new QFile(filename);
-    fileInfo.setFile(filename);
-    if (inFile->open(QIODevice::ReadOnly))
-    {
-        scanFile(inFile);
-    }
-    else
-    {
-        displayErrorMessage(QString("%1").arg((uint)inFile->error()));
-    }
 }
 
 //-----------------------------------------------------------------------------

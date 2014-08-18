@@ -1,5 +1,7 @@
-/*          Power Management Data Processing Header
-
+/**
+@mainpage Power Management Data Processing Main Window
+@version 1.0
+@author Ken Sarkies (www.jiggerjuice.net)
 @date 22 March 2014
 */
 
@@ -71,11 +73,15 @@ private slots:
     void on_extractButton_clicked();
     void on_dumpAllButton_clicked();
     void on_energyButton_clicked();
+    void on_splitButton_clicked();
 private:
 // User Interface object instance
     Ui::DataProcessingMainWindow DataProcessingMainUi;
     void scanFile(QFile* file);
+    bool combineRecords(QDateTime startTime, QDateTime endTime,
+                                   QFile* inFile, QFile* outFile, bool header);
     void displayErrorMessage(QString message);
+    QDateTime findFirstTimeRecord(QFile* inFile);
     bool openSaveFile(void);
     QStringList recordType;
     QStringList recordText;
