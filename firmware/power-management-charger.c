@@ -144,8 +144,11 @@ Use first order exponential filters, separate coefficients. */
                         ((getAlphaC()*(current - currentAv[i]))>>8);
         }
 
-/* Get the battery to be charged from the monitor task. */
-        uint8_t battery = getBatteryUnderCharge();
+/* If autotracking then get battery under charge from the monitor, otherwise
+get it from the manual settings. */
+    if (isAutoTrack()) battery = getBatteryUnderCharge();
+    else battery = getManualSwitchSetting();
+
 /* If this is different to the battery currently under charge, change over
 and reset the measurements and duty cycle. Nothing should happen if no
 charger is allocated. */

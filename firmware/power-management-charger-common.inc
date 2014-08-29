@@ -38,7 +38,7 @@ static int16_t voltageLimit(uint16_t limitV);
 static void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle);
 static void calculateAverageMeasures(void);
 /* These must be defined in the including module */
-static void chargerControl(void);
+static void chargerControl(uint8_t battery);
 static void initLocals(void);
 
 /* Local Persistent Variables */
@@ -46,6 +46,7 @@ static int16_t voltageAv[NUM_BATS];
 static int16_t currentAv[NUM_BATS];
 static battery_Ch_States batteryChargingPhase[NUM_BATS];
 static uint8_t chargerWatchdogCount;
+static uint8_t batteryUnderCharge;
 
 /*--------------------------------------------------------------------------*/
 /* @brief Charging Task
@@ -76,8 +77,17 @@ terminal voltage drops below a charging restart threshold (95%). */
                 (getBatterySoC(i) < FLOAT_BULK_SOC))
                 batteryChargingPhase[i] = bulkC;
         }
+/* Compute the average current and voltage */
+        calculateAverageMeasures();
 
-        chargerControl();
+        uint8_t battery;                /* Preferred Battery */
+/* if autotracking then get battery under charge from the monitor, otherwise
+get it from the manual panel switch settings. */
+        if (isAutoTrack()) battery = getBatteryUnderCharge();
+        else battery = getManualSwitchSetting();
+
+
+        chargerControl(battery);
 
     }
 }

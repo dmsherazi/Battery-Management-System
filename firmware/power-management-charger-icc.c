@@ -73,7 +73,6 @@ Initial 14 June 2014
 static uint8_t batteryNextIndex;    /* Next battery for spare slot */
 static uint8_t slotBattery;         /* Slot available for battery */
 static uint8_t slotTime;            /* Slot time counter */
-static uint8_t battery;             /* Battery to be put on charger */
 
 /* Include the common code here so that everything compiles as a unit */
 #include "power-management-charger-common.inc"
@@ -95,60 +94,72 @@ static void initLocals(void)
 
 */
 
-static void chargerControl(void)
+static void chargerControl(uint8_t battery)
 {
-/* Compute the average current and voltage */
-    calculateAverageMeasures();
+    slotTime++;
 
+    if (battery > 0)
+    {
 /* If the designated battery under charge is in bulk phase, allocate it in all
 slots to ensure it gets priority charge. */
-    slotTime++;
-    uint8_t batteryUnderCharge = getBatteryUnderCharge();
-    if (batteryChargingPhase[batteryUnderCharge] == bulkC)
-        battery = batteryUnderCharge;
+        if (batteryChargingPhase[battery-1] == bulkC)
+            batteryUnderCharge = battery;
 /* else allocate the battery under charge to the battery owning the slot,
 unless it happens to be enforced idle (float or rest), in which case
 yield it up to the next battery under bulk charge in turn. */ 
-    else if (slotTime > SLOT_PERIOD/getChargerDelay())
-    {
-        slotTime = 0;
-        slotBattery++;
-        if (slotBattery > NUM_SLOTS) slotBattery = 1;
-/* Manage change from bulk to rest phase */
-        if ((batteryChargingPhase[slotBattery] == bulkC) &&
-            (voltageAv[slotBattery] > voltageLimit(getAbsorptionVoltage(slotBattery))))
-            batteryChargingPhase[slotBattery] = restC;
-/* Manage change from rest to absorption (pulsed charging) phase */
-        if ((batteryChargingPhase[slotBattery] == restC) &&
-            (computeSoC(voltageAv[slotBattery],getTemperature(),
-                           getBatteryType(slotBattery)) < 97*256))
-            batteryChargingPhase[slotBattery] = absorptionC;
-/* Manage change from absorption to float phase. */
-        if ((batteryChargingPhase[slotBattery] == absorptionC) &&
-            (voltageAv[slotBattery] > voltageLimit(getAbsorptionVoltage(slotBattery))))
-            batteryChargingPhase[slotBattery] = floatC;
-/* Check if slot is needed by the battery */
-        if ((batteryChargingPhase[slotBattery] == floatC) ||
-            (batteryChargingPhase[slotBattery] == restC) ||
-            (slotBattery > NUM_SLOTS))
+        else
+/* Wait until the end of the slot. */
         {
-            uint8_t i = 0;
-            for (i=0; i < NUM_BATS; i++)
+            if (slotTime > SLOT_PERIOD/getChargerDelay())
             {
-                uint8_t j = i + batteryNextIndex + 1;
-                if (j > NUM_BATS) j = 1;
-                if (batteryChargingPhase[j] == bulkC)
+                slotTime = 0;
+                slotBattery++;
+                if (slotBattery > NUM_SLOTS) slotBattery = 1;
+/* Check if slot is needed by the battery.
+If the slot's allocated battery is not in use, check other batteries.
+If they are in bulk phase, grab the slot.
+This code should allow an even allocation of batteries in bulk charge
+over time. */
+                if ((batteryChargingPhase[slotBattery-1] == floatC) ||
+                    (batteryChargingPhase[slotBattery-1] == restC))
                 {
-                    battery = batteryNextIndex;
-                    batteryNextIndex = j;
-                    break;
+                    uint8_t i = 0;
+                    for (i=0; i < NUM_BATS; i++)
+                    {
+                        uint8_t j = i + batteryNextIndex + 1;
+                        if (j > NUM_BATS) j = 1;
+                        if (batteryChargingPhase[j-1] == bulkC)
+                        {
+                            batteryUnderCharge = batteryNextIndex;
+                            batteryNextIndex = j;
+                            break;
+                        }
+                    }
+/* If no battery found to take the slot, turn off charger. */
+dataMessageSend("Dni",batteryNextIndex,i);
+                    if (i >= NUM_BATS) batteryUnderCharge = 0;
                 }
+                else batteryUnderCharge = slotBattery;
             }
         }
-        else battery = slotBattery;
-    }
+        uint8_t index = batteryUnderCharge-1;
+/* Manage change from absorption to float phase. */
+        if ((batteryChargingPhase[index] == absorptionC) &&
+            (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
+            batteryChargingPhase[index] = floatC;
+/* Manage change from rest to absorption (pulsed charging) phase */
+        if ((batteryChargingPhase[index] == restC) &&
+            (computeSoC(voltageAv[index],getTemperature(),
+                           getBatteryType(index)) < 97*256))
+            batteryChargingPhase[index] = absorptionC;
+/* Manage change from bulk to rest phase */
+        if ((batteryChargingPhase[index] == bulkC) &&
+            (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
+            batteryChargingPhase[index] = restC;
 /* Set the Switches to connect the panel to the selected battery */
-    if (isAutoTrack()) setSwitch(battery,PANEL);
+        setSwitch(batteryUnderCharge,PANEL);
+        pwmSetDutyCycle(100*256);
+    }
 
 }
 

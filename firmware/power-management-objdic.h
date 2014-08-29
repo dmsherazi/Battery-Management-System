@@ -40,7 +40,7 @@ tasks running on the same microcontroller.
 typedef enum {wetT=0, gelT=1, agmT=2} battery_Type;
 typedef enum {normalF=0, lowF=1, criticalF=2, faultyF=3} battery_Fl_States;
 typedef enum {loadedO=0, chargingO=1, isolatedO=2} battery_Op_States;
-typedef enum {bulkC=0, absorptionC=1, floatC=2, equalizationC=3, restC=4} battery_Ch_States;
+typedef enum {bulkC=0, absorptionC=1, floatC=2, restC=3, equalizationC=4} battery_Ch_States;
 typedef enum {goodH=0, faultyH=1, missingH=2} battery_Hl_States;
 
 /* Represent the measured data arrays in a union as separate or combined */
@@ -83,6 +83,7 @@ struct Config
     bool recording;             /* Controls recording of performance data */
     bool autoTrack;             /* Allows automatic management of batteries */
     bool icc;                   /* Use ICC charging algorithm */
+    uint8_t manualSwitchSetting;   /* Value of any manual switch setting made */
     uint8_t monitorStrategy;
 /* Delay Variables */
     portTickType watchdogDelay;
@@ -128,6 +129,7 @@ portTickType getChargerDelay(void);
 portTickType getMeasurementDelay(void);
 portTickType getMonitorDelay(void);
 portTickType getCalibrationDelay(void);
+uint8_t getManualSwitchSetting(void);
 bool isRecording(void);
 bool isAutoTrack(void);
 bool isICC(void);

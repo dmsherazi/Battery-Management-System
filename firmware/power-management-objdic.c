@@ -74,6 +74,7 @@ void setGlobalDefaults(void)
     configData.config.measurementDelay = MEASUREMENT_DELAY;
     configData.config.monitorDelay = MONITOR_DELAY;
     configData.config.calibrationDelay = CALIBRATION_DELAY;
+    configData.config.manualSwitchSetting = 0;
     configData.config.alphaR = 100;           /* about 0.4 */
     configData.config.alphaV = 256;           /* No Filter */
     configData.config.alphaC = 180;           /* about 0.7, only for detecting float state. */
@@ -315,6 +316,16 @@ This is the time between measurement updates.
 portTickType getCalibrationDelay(void)
 {
     return configData.config.calibrationDelay;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Provide any Manual Switch Setting
+
+*/
+
+uint8_t getManualSwitchSetting(void)
+{
+    return configData.config.manualSwitchSetting;
 }
 
 /*--------------------------------------------------------------------------*/

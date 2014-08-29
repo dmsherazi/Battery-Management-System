@@ -164,7 +164,7 @@ static void parseCommand(uint8_t* line)
     if (line[0] == 'a')
     {
 /* Snm Manually set Switch.
-S followed by battery (1-3, 0 = none) and load (1-2)/panel (3).
+S followed by battery (1-3, 0 = none) and load (0-1)/panel (2).
 Each two-bit field represents a load or panel, and the setting is the
 battery to be connected (no two batteries can be connected to a load/panel).
 The final bit pattern of settings go into PB8-13.
@@ -176,6 +176,7 @@ Preserve the lower 8 bits. */
                 uint8_t battery = line[2]-'0';
                 uint8_t setting = line[3]-'0'-1;
                 if ((battery < 4) && (setting < 4)) setSwitch(battery, setting);
+                if (setting == 2) configData.config.manualSwitchSetting = battery;
                 break;
             }
 /* R Reset a tripped overcurrent circuit breaker.

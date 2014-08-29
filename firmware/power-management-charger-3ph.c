@@ -93,17 +93,22 @@ static void initLocals(void)
 
 */
 
-static void chargerControl(void)
+static void chargerControl(uint8_t battery)
 {
-/* Compute the average current and voltage */
-    calculateAverageMeasures();
+/* If this is different to the battery currently under charge, change over
+and reset the duty cycle. Nothing should happen if no charger is allocated. */
+    if (battery != batteryUnderCharge)
+    {
+        batteryUnderCharge = battery;   /* Set new battery to charge */
+        if (batteryUnderCharge > 0) dutyCycle = 50*256;
+    }
 
-    uint8_t batteryUnderCharge = getBatteryUnderCharge();
+/* Set the Switches to connect the panel to the selected battery if in
+autotrack mode, otherwise leave settings on manual. */
+    if (isAutoTrack()) setSwitch(batteryUnderCharge,PANEL);
 
     if (batteryUnderCharge > 0)
     {
-/* Set the Switches to connect the panel to the selected battery */
-        if (isAutoTrack()) setSwitch(batteryUnderCharge,PANEL);
 
         uint8_t index = batteryUnderCharge-1;
 
@@ -113,7 +118,7 @@ static void chargerControl(void)
 
 /* Check that the battery doesn't remain too long in the absorption phase while
 the current is not falling (within a 5% error). 0.5 hour max. Then go to float.
-NOTE: in the following all measured currents are negative while charging. */
+NOTE: in the following all battery currents are negative while charging. */
         if ((batteryChargingPhase[index] == absorptionC) &&
             ((absorptionPhaseCurrent[index]*240)/256 > currentAv[index]))
         {

@@ -208,7 +208,7 @@ settings go into the switch control port, preserving the lower bits. */
 /*--------------------------------------------------------------------------*/
 /** @brief Return the Switch Settings
 
-Each two-bit field represents load 1 bits 0-1, load2 bits 2-3 panel bits 4-5,
+Each two-bit field represents load 1 bits 0-1, load 2 bits 2-3 panel bits 4-5,
 and the setting is the battery (1-3) to be connected. Battery 0 = none connected.
 
 @returns uint16_t: the switch settings from the relevant port.

@@ -4,7 +4,7 @@ Battery Management System
 This project provides software for monitoring, control and charging of batteries
 for a solar powered installation.
 
-The motivation to build this arose from the poor performance and lack of
+The motivation to build this arose from the poor performance, lack of
 adequate control, lack of configuration for different battery types, and poor
 user interface of commercially available BMS, at least for those reasonably
 priced.
