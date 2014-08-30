@@ -83,7 +83,7 @@ struct Config
     bool recording;             /* Controls recording of performance data */
     bool autoTrack;             /* Allows automatic management of batteries */
     bool icc;                   /* Use ICC charging algorithm */
-    uint8_t manualSwitchSetting;   /* Value of any manual switch setting made */
+    uint8_t panelSwitchSetting;   /* Value of any manual switch setting made */
     uint8_t monitorStrategy;
 /* Delay Variables */
     portTickType watchdogDelay;
@@ -129,7 +129,8 @@ portTickType getChargerDelay(void);
 portTickType getMeasurementDelay(void);
 portTickType getMonitorDelay(void);
 portTickType getCalibrationDelay(void);
-uint8_t getManualSwitchSetting(void);
+uint8_t getPanelSwitchSetting(void);
+void setPanelSwitchSetting(uint8_t battery);
 bool isRecording(void);
 bool isAutoTrack(void);
 bool isICC(void);

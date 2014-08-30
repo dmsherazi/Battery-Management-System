@@ -5,8 +5,8 @@ Version: First Prototype
 The firmware is written for an STM32F103 ARM Cortex M3 microcontroller and uses
 specific hardware published here.
 
-The firmware uses libopencm3 for hardware drivers, FreeRTOS and ChaN FAT for
-managing the local storage filesystem.
+The firmware uses libopencm3 for hardware drivers, FreeRTOS for task management
+and ChaN FAT for managing the local storage filesystem.
 
 Several tasks are defined to manage:
 
@@ -17,17 +17,21 @@ Several tasks are defined to manage:
 - measurement,
 - program execution watchdog and error recovery.
 
-It is designed to use CANopen to manage communications with an external PC, in
-case the project is further developed.
+It is designed to be adapted to allow CANopen to manage communications with an
+external PC, in case the project is further developed.
 
 The hardware component values set the various scaling factors for voltages and
 currents, and these may change for different hardware versions.
 
-Two versions are here represented. The second refers to slightly different
+Three versions are here represented. Each refers to slightly different
 voltage and current scales in the measurement header for the PCB version.
-It is compiled with 'make VERSION=2'
+It is compiled with 'make VERSION=x' where x = 2 or 3. Version 1 is obsolete.
 
-(c) K. Sarkies 08/04/2014
+Two charger algorithms are provided: three phase and interrupted charge control.
+It is compiled with 'make CHARGER=x" where x = ORIG, 3PH or ICC. The ORIG
+algorithm is three phase, now deprecated as development is now centered on 3PH.
+
+(c) K. Sarkies 30/08/2014
 
 TODO
 
@@ -36,15 +40,10 @@ TODO
 4. Measurement - Increase switching speed to 25kHz. May need hardware changes.
 5. Charger - add acceleration to pull overvoltage back quickly.
 6. Comms - additional commands for more configuration options.
-7. Comms - by default do not send messages until instructed.
-8. File - add file info (date, size) to GUI.
+7. Comms - by default do not send messages until instructed, to save power.
+8. File - add file info (date) to GUI.
 9. GUI - download feature (may cause saturation of the comms interface).
 
 BUGS
 
-1. Time - fix date setting.
-2. Monitor - missing battery, when removed, is not handled and loads are still
-     allocated to it.
-3. Monitor - when battery drops voltage below critical, needs to be removed
-     from loads until recharged.
 

@@ -80,12 +80,8 @@ terminal voltage drops below a charging restart threshold (95%). */
 /* Compute the average current and voltage */
         calculateAverageMeasures();
 
-        uint8_t battery;                /* Preferred Battery */
-/* if autotracking then get battery under charge from the monitor, otherwise
-get it from the manual panel switch settings. */
-        if (isAutoTrack()) battery = getBatteryUnderCharge();
-        else battery = getManualSwitchSetting();
-
+/* get battery under charge from the manual panel switch settings. */
+        uint8_t battery = getPanelSwitchSetting();
 
         chargerControl(battery);
 

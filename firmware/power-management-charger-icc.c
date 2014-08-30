@@ -108,8 +108,8 @@ slots to ensure it gets priority charge. */
 unless it happens to be enforced idle (float or rest), in which case
 yield it up to the next battery under bulk charge in turn. */ 
         else
-/* Wait until the end of the slot. */
         {
+/* Wait until the end of the slot. */
             if (slotTime > SLOT_PERIOD/getChargerDelay())
             {
                 slotTime = 0;
@@ -127,16 +127,18 @@ over time. */
                     for (i=0; i < NUM_BATS; i++)
                     {
                         uint8_t j = i + batteryNextIndex + 1;
-                        if (j > NUM_BATS) j = 1;
+                        if (j > NUM_BATS) j -= NUM_BATS;
+dataMessageSend("D1",slotBattery,i);
+dataMessageSend("D2",batteryNextIndex,j);
+dataMessageSend("D3",batteryChargingPhase[j-1],slotTime);
                         if (batteryChargingPhase[j-1] == bulkC)
                         {
-                            batteryUnderCharge = batteryNextIndex;
+                            batteryUnderCharge = j;
                             batteryNextIndex = j;
                             break;
                         }
                     }
 /* If no battery found to take the slot, turn off charger. */
-dataMessageSend("Dni",batteryNextIndex,i);
                     if (i >= NUM_BATS) batteryUnderCharge = 0;
                 }
                 else batteryUnderCharge = slotBattery;

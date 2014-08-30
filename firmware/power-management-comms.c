@@ -176,7 +176,7 @@ Preserve the lower 8 bits. */
                 uint8_t battery = line[2]-'0';
                 uint8_t setting = line[3]-'0'-1;
                 if ((battery < 4) && (setting < 4)) setSwitch(battery, setting);
-                if (setting == 2) configData.config.manualSwitchSetting = battery;
+                if (setting == 2) setPanelSwitchSetting(battery);
                 break;
             }
 /* R Reset a tripped overcurrent circuit breaker.

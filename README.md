@@ -11,7 +11,7 @@ priced.
 
 The system allows for up to three batteries to be managed separately. This
 ensures that failed batteries may be isolated without adversely affecting the
-other batteries as could happen if batteries were connected in parallel. Also
+other batteries, as could happen if batteries were connected in parallel. Also
 note that if batteries were connected in parallel, the same type and age of
 battery must be used, which would necessitate changing all batteries if one were
 to fail.
@@ -26,7 +26,17 @@ batteries one may be isolated long enough to allow the terminal voltage to
 settle to a level that will allow SoC to be computed accurately.
 
 In the long term it is intended to allow a variety of configurations for
-charging and monitoring of batteries.
+charging and monitoring of batteries:
+
+1. The common three phase charger is provided using PWM to reduce the voltage
+   in the absorption phase. In float phase the charger is disconnected until the
+   terminal voltage drops to a threshold value. Equalization is not provided.
+
+2. An algorithm based on Interrupted Charge Control (ICC) is also provided.
+   This has advantages of:
+   (a) better utilization of the charger among the batteries,
+   (b) low EMI,
+   (c) reduced gas generation.
 
 A wide range of state information is stored on a removable memory, and also
 transmitted over a serial link to allow a GUI to display the state accurately
@@ -34,24 +44,26 @@ and in detail.
 
 A GUI is provided to allow control and observation of operations.
 
-Each interface has an overcurrent circuit breaker and low voltage detector, as
-well as providing current and voltage measurements.
+Each of the six interfaces has a hardware overcurrent circuit breaker and low
+voltage detector, as well as providing current and voltage measurements.
 
 A central controller based on STM32F103 controls all interfaces and the MOSFET
-switches directly.
+switches directly. Hardware signals for overcurrent and low voltage are applied
+directly to the MOSFET switches for rapid disconnect.
 
 A data processing program is also provided to generate reports of various types
 from the recorded performance data.
 
-More information is availale on:
+More information is available on:
 
 http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-overview.html
 
-(c) K. Sarkies 15/03/2014
+(c) K. Sarkies 30/08/2014
 
 TODO
 
-1. Improvement of MOSFET switch drivers to reduce EMI at higher rates.
+1. Improvement of MOSFET switch drivers to reduce EMI at higher rates. May not
+   be needed if ICC works well.
 2. Development of a 433MHz transponder set to convert serial transmissions 3.3V
    and RS232 levels, to RF signalling.
 3. Development of a 50W linear regulator to add to the solar panel side. This

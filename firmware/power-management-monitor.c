@@ -411,10 +411,11 @@ panel. */
 /* @TODO update code for more panels (chargers) and loads. */
         uint8_t highestBattery = batteryFillStateSort[0];
         uint8_t lowestBattery = batteryFillStateSort[numBats-1];
+        uint8_t chargingBattery = (getSwitchControlBits() >> 4) & 0x03;
 /* decisionStatus is a variable used to record the reason for any decision */
         decisionStatus = 0;
 
-/* One battery: just allocate load and charger to it */
+/*### One battery: just allocate load and charger to it */
         if (numBats == 1)
         {
             decisionStatus = 0x100;
@@ -428,7 +429,7 @@ panel. */
                 batteryUnderCharge = 0;
             }
         }
-/* Two batteries: just allocate load to highest and charger to lowest. */
+/*### Two batteries: just allocate load to highest and charger to lowest. */
         else if (numBats == 2)
         {
             decisionStatus = 0x200;
@@ -457,12 +458,12 @@ leave the charger unallocated. */
                         break;
                     }
                 }
-/* However if this has allocated the charger to the loaded battery, then
+            }
+/* If the charger has been allocated to the loaded battery, then
 reallocate the loaded battery. This will allow the charger to swap back and
 forth as the loaded battery droops and the charging battery completes charge. */
-                if (batteryUnderLoad == batteryUnderCharge)
-                    batteryUnderLoad = 0;
-            }
+            if (batteryUnderLoad == chargingBattery)
+                batteryUnderLoad = 0;
 /* (2) If the loads are unallocated, set to the highest SoC unallocated battery.
 Avoid the battery that has been idle for the longest time, and also the battery
 under charge if the strategies require it. */
@@ -477,7 +478,7 @@ under charge if the strategies require it. */
                         decisionStatus |= 0x20;
                         break;
                     }
-                    if (batteryUnderLoad != batteryUnderCharge)
+                    if (batteryUnderLoad != chargingBattery)
                     {
                         decisionStatus |= 0x40;
                         break;
@@ -487,9 +488,9 @@ under charge if the strategies require it. */
 /* If the battery under load is on a low or critical battery, allocate to the
 charging battery regardless. */
             if (batteryFillState[batteryUnderLoad-1] != normalF)
-                batteryUnderLoad = batteryUnderCharge;
+                batteryUnderLoad = chargingBattery;
         }
-/* More than two batteries: manage isolation and charge state. */
+/*### More than two batteries: manage isolation and charge state. */
         else if (numBats > 2)
         {
 /*--- All batteries normal fill state. Isolated battery already allocated. ---*/
@@ -521,12 +522,12 @@ leave the charger unallocated. */
                             break;
                         }
                     }
-/* However if this has allocated the charger to the loaded battery, then
+                }
+/* If the charger has been allocated to the loaded battery, then
 reallocate the loaded battery. This will allow the charger to swap back and
 forth as the loaded battery droops and the charging battery completes charge. */
-                    if (batteryUnderLoad == batteryUnderCharge)
-                        batteryUnderLoad = 0;
-                }
+                if (batteryUnderLoad == chargingBattery)
+                    batteryUnderLoad = 0;
 /* (2) If the loads are unallocated, set to the highest SoC unallocated battery.
 Avoid the battery that has been idle for the longest time, and also the battery
 under charge if the strategies require it. */
@@ -544,7 +545,7 @@ under charge if the strategies require it. */
                                 decisionStatus |= 0x20;
                                 break;
                             }
-                            if (batteryUnderLoad != batteryUnderCharge)
+                            if (batteryUnderLoad != chargingBattery)
                             {
                                 decisionStatus |= 0x40;
                                 break;
@@ -553,7 +554,7 @@ under charge if the strategies require it. */
                     }
                 }
             }
-/*--- At least one battery is normal, and some others are low or critical. ---*/
+/*--- At least one battery is normal, and some are low or critical. ---*/
             else if (batteryFillState[highestBattery-1] == normalF)
             {
                 decisionStatus = 0x400;
@@ -585,7 +586,7 @@ critical, set to the highest SoC unallocated battery ... */
                         if (batteryUnderLoad != longestBattery)
                         {
                             if (!(getMonitorStrategy() & SEPARATE_LOAD)) break;
-                            if (batteryUnderLoad != batteryUnderCharge) break;
+                            if (batteryUnderLoad != chargingBattery) break;
                         }
                     }
 /* ... however if it still ends up on a low battery then there is only one
@@ -640,14 +641,15 @@ battery (isolation is not possible due to leakage of charging current to other
 batteries). Do not reset to zero so that the current isolated timer can handover
 later. */
                 if ((batteryOpState[i] != isolatedO) ||
-                    (batteryUnderLoad == batteryUnderCharge))
+                    (batteryUnderLoad == chargingBattery))
                     batteryIsolationTime[i] = 10;
             }
         }
-/* Set Switches. Turn off low priority loads if batteries are all critical */
         if (isAutoTrack())
         {
+/* Set Load Switches. */
             setSwitch(batteryUnderLoad,LOAD_2);
+/* Turn off low priority loads if batteries are all critical */
             if (batteryFillState[batteryUnderLoad-1] == criticalF)
             {
                 setSwitch(0,LOAD_1);
@@ -656,6 +658,9 @@ later. */
             {
                 setSwitch(batteryUnderLoad,LOAD_1);
             }
+/* Set the battery selected for charge as the preferred battery so that it is
+used if autotrack is turned off. */
+            setPanelSwitchSetting(batteryUnderCharge);
         }
 
 /*---------------- RESET SoC AFTER IDLE TIME --------------------*/
@@ -811,16 +816,6 @@ void resetBatterySoC(int battery)
 void startCalibration()
 {
     calibrate = true;
-}
-
-/*--------------------------------------------------------------------------*/
-/** @brief Get the Battery Under Charge
-
-*/
-
-uint8_t getBatteryUnderCharge(void)
-{
-    return batteryUnderCharge;
 }
 
 /*--------------------------------------------------------------------------*/

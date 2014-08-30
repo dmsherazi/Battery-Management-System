@@ -74,7 +74,7 @@ void setGlobalDefaults(void)
     configData.config.measurementDelay = MEASUREMENT_DELAY;
     configData.config.monitorDelay = MONITOR_DELAY;
     configData.config.calibrationDelay = CALIBRATION_DELAY;
-    configData.config.manualSwitchSetting = 0;
+    configData.config.panelSwitchSetting = 0;
     configData.config.alphaR = 100;           /* about 0.4 */
     configData.config.alphaV = 256;           /* No Filter */
     configData.config.alphaC = 180;           /* about 0.7, only for detecting float state. */
@@ -323,9 +323,19 @@ portTickType getCalibrationDelay(void)
 
 */
 
-uint8_t getManualSwitchSetting(void)
+uint8_t getPanelSwitchSetting(void)
 {
-    return configData.config.manualSwitchSetting;
+    return configData.config.panelSwitchSetting;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Provide any Manual Switch Setting
+
+*/
+
+void setPanelSwitchSetting(uint8_t battery)
+{
+    configData.config.panelSwitchSetting = battery;
 }
 
 /*--------------------------------------------------------------------------*/
