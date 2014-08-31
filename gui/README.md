@@ -22,5 +22,12 @@ More information is available on:
 
 http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-gui.html
 
-(c) K. Sarkies 29/03/2014
+(c) K. Sarkies 31/08/2014
+
+TODO
+
+1. Feature to reset SoC manually for each battery.
+2. File - add file info (date).
+3. Download feature (may cause saturation of the comms interface).
+
 

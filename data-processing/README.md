@@ -12,6 +12,7 @@ a specified time interval:
 - average currents to allow analysis of energy budget.
 - extracted measures with average, peak or sample within a subinterval, to a csv
   file for plotting.
+- Split a large file into day files and merge with previous set of day files.
 
-(c) K. Sarkies 22/03/2014
+(c) K. Sarkies 31/08/2014
 

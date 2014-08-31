@@ -62,10 +62,10 @@ http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-overview.html
 
 TODO
 
-1. Improvement of MOSFET switch drivers to reduce EMI at higher rates. May not
-   be needed if ICC works well.
-2. Development of a 433MHz transponder set to convert serial transmissions 3.3V
+1. Development of a 433MHz transponder set to convert serial transmissions 3.3V
    and RS232 levels, to RF signalling.
+2. Improvement of MOSFET switch drivers to reduce EMI at higher rates. May not
+   be needed if ICC works well.
 3. Development of a 50W linear regulator to add to the solar panel side. This
    will allow avoidance of switching while limiting the battery charge voltage.
    Ideally this would be controlled through the processor DAC but that would

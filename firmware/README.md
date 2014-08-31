@@ -37,12 +37,12 @@ TODO
 
 1. Firmware upload - from within the program. Base on stm32flash.
 2. Comms - test queue space available for each data message to send.
-4. Measurement - Increase switching speed to 25kHz. May need hardware changes.
-5. Charger - add acceleration to pull overvoltage back quickly.
-6. Comms - additional commands for more configuration options.
-7. Comms - by default do not send messages until instructed, to save power.
-8. File - add file info (date) to GUI.
-9. GUI - download feature (may cause saturation of the comms interface).
+3. Charger 3PH - add acceleration to pull overvoltage back quickly.
+4. Comms - additional commands for more configuration options.
+5. Comms - by default do not send messages until instructed, to save power.
+6. File - add file info (date) to GUI.
+7. GUI - download feature (may cause saturation of the comms interface).
+8. Measurement - Increase switching speed to 25kHz. May need hardware changes.
 
 BUGS
 

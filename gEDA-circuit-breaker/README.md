@@ -16,13 +16,11 @@ the circuit breaker will be ineffective. Similarly for the low voltage
 detection. The circuit breaker is based on those proposed by R Paisley
 http://home.cogeco.ca/~rpaisley4/CircuitBreaker05.html
 
-(c) K. Sarkies 25/04/2014
+(c) K. Sarkies 31/08/2014
 
 TODO:
+
 1. The reference voltage to the current monitor is taken from the 2.5V
 reference for the voltage measurement circuit. However this latter uses the
 battery ground rather than the local ground, and a small bias voltage can
 be present. Ideally the current monitor should have its own reference voltage.
-
-2. The voltage measurement circuit needs to have the opamp gain setting
-resistors recomputed to eliminate the ground bias.
