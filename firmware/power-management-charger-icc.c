@@ -98,6 +98,7 @@ static void chargerControl(uint8_t battery)
 {
     slotTime++;
 
+/* Battery will only be zero if manually set or if power source is absent. */
     if (battery > 0)
     {
 /* If the designated battery under charge is in bulk phase, allocate it in all
@@ -144,7 +145,14 @@ dataMessageSend("D3",batteryChargingPhase[j-1],slotTime);
                 else batteryUnderCharge = slotBattery;
             }
         }
-        uint8_t index = batteryUnderCharge-1;
+/* Set the Switches to connect the panel to the selected battery */
+        setSwitch(batteryUnderCharge,PANEL);
+        pwmSetDutyCycle(100*256);
+    }
+
+    uint8_t index = 0;
+    for (index=0; index < NUM_BATS; index++)
+    {
 /* Manage change from absorption to float phase. */
         if ((batteryChargingPhase[index] == absorptionC) &&
             (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
@@ -158,11 +166,9 @@ dataMessageSend("D3",batteryChargingPhase[j-1],slotTime);
         if ((batteryChargingPhase[index] == bulkC) &&
             (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
             batteryChargingPhase[index] = restC;
-/* Set the Switches to connect the panel to the selected battery */
-        setSwitch(batteryUnderCharge,PANEL);
-        pwmSetDutyCycle(100*256);
+dataMessageSend("Dc",computeSoC(voltageAv[index],getTemperature(),
+                           getBatteryType(index)),index);
     }
-
 }
 
 
