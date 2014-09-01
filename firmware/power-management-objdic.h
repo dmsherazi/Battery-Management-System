@@ -78,12 +78,13 @@ struct Config
     int16_t alphaV;         /* forgetting factor for battery voltage smoothing */
     int16_t alphaC;         /* forgetting factor for battery current smoothing */
 /* Control Variables */
+    bool enableSend;            /* Controls if communications transmission occurs */
     bool measurementSend;       /* Controls if measurements are transmitted */
     bool debugMessageSend;      /* Controls if debug messages are transmitted */
     bool recording;             /* Controls recording of performance data */
     bool autoTrack;             /* Allows automatic management of batteries */
     bool icc;                   /* Use ICC charging algorithm */
-    uint8_t panelSwitchSetting;   /* Value of any manual switch setting made */
+    uint8_t panelSwitchSetting; /* Value of the panel switch setting */
     uint8_t monitorStrategy;
 /* Delay Variables */
     portTickType watchdogDelay;

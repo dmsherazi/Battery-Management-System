@@ -31,18 +31,16 @@ Two charger algorithms are provided: three phase and interrupted charge control.
 It is compiled with 'make CHARGER=x" where x = ORIG, 3PH or ICC. The ORIG
 algorithm is three phase, now deprecated as development is now centered on 3PH.
 
-(c) K. Sarkies 30/08/2014
+(c) K. Sarkies 01/09/2014
 
 TODO
 
 1. Firmware upload - from within the program. Base on stm32flash.
 2. Comms - test queue space available for each data message to send.
 3. Charger 3PH - add acceleration to pull overvoltage back quickly.
-4. Comms - additional commands for more configuration options.
-5. Comms - by default do not send messages until instructed, to save power.
-6. File - add file info (date) to GUI.
-7. GUI - download feature (may cause saturation of the comms interface).
-8. Measurement - Increase switching speed to 25kHz. May need hardware changes.
+4. File - add file info (date) to GUI.
+5. GUI - download feature (may cause saturation of the comms interface).
+6. Measurement - Increase switching speed to 25kHz. May need hardware changes.
 
 BUGS
 

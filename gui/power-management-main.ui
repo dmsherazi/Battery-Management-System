@@ -1970,6 +1970,69 @@
     <string/>
    </property>
   </widget>
+  <widget class="QPushButton" name="battery1SoCReset">
+   <property name="geometry">
+    <rect>
+     <x>142</x>
+     <y>180</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>6</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Recompute battery SoC.</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="battery2SoCReset">
+   <property name="geometry">
+    <rect>
+     <x>318</x>
+     <y>180</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>6</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Recompute battery SoC.</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="battery3SoCReset">
+   <property name="geometry">
+    <rect>
+     <x>496</x>
+     <y>180</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>6</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Recompute battery SoC.</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc"/>

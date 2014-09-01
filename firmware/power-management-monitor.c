@@ -809,6 +809,22 @@ void resetBatterySoC(int battery)
 }
 
 /*--------------------------------------------------------------------------*/
+/** @brief Set the Battery State of Charge
+
+State of charge is percentage times 256.
+
+@param[in] battery: 0..NUM_BATS-1
+@param[in] soc: int16_t 0..25600
+*/
+
+void setBatterySoC(int battery,int16_t soc)
+{
+    batterySoC[battery] = soc;
+/* SoC is computed from the charge so this is the quantity changed. */
+    batteryCharge[battery] = soc*getBatteryCapacity(battery)*36;
+}
+
+/*--------------------------------------------------------------------------*/
 /** @brief Request Calibration Sequence
 
 */

@@ -129,9 +129,9 @@ over time. */
                     {
                         uint8_t j = i + batteryNextIndex + 1;
                         if (j > NUM_BATS) j -= NUM_BATS;
-dataMessageSend("D1",slotBattery,i);
-dataMessageSend("D2",batteryNextIndex,j);
-dataMessageSend("D3",batteryChargingPhase[j-1],slotTime);
+//dataMessageSend("D1",slotBattery,i);
+//dataMessageSend("D2",batteryNextIndex,j);
+//dataMessageSend("D3",batteryChargingPhase[j-1],slotTime);
                         if (batteryChargingPhase[j-1] == bulkC)
                         {
                             batteryUnderCharge = j;
@@ -166,8 +166,8 @@ dataMessageSend("D3",batteryChargingPhase[j-1],slotTime);
         if ((batteryChargingPhase[index] == bulkC) &&
             (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
             batteryChargingPhase[index] = restC;
-dataMessageSend("Dc",computeSoC(voltageAv[index],getTemperature(),
-                           getBatteryType(index)),index);
+//dataMessageSend("Dc",computeSoC(voltageAv[index],getTemperature(),
+//                           getBatteryType(index)),index);
     }
 }
 

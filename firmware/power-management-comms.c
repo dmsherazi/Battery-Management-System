@@ -145,6 +145,7 @@ static void initGlobals(void)
     readFileHandle = 0xFF;
     configData.config.measurementSend = true;
     configData.config.debugMessageSend = false;
+    configData.config.enableSend = false;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -207,6 +208,14 @@ released. The command is followed by an interface number 0-5 being batteries
                 sendStringLowPriority("DD", "Battery Management System v0.1");
                 break;
             }
+/* Set the battery SoC from the OCV */
+        case 'B':
+            {
+                uint8_t battery = line[2]-'1';
+                setBatterySoC(battery,computeSoC(getBatteryVoltage(battery),
+                           getTemperature(),getBatteryType(battery)));
+                break;
+            }
         }
     }
 /* ======================== Data request commands ================  */
@@ -261,6 +270,13 @@ released. The command is followed by an interface number 0-5 being batteries
                 if (battery < 3)
                     configData.config.absorptionVoltage[battery] =
                         asciiToInt((char*)line+3);
+                break;
+            }
+/* c-, c+ Turn communications sending on or off */
+        case 'c':
+            {
+                if (line[2] == '-') configData.config.enableSend = false;
+                else if (line[2] == '+') configData.config.enableSend = true;
                 break;
             }
 /* C Start a calibration sequence */
@@ -318,14 +334,14 @@ released. The command is followed by an interface number 0-5 being batteries
         case 'M':
             {
                 if (line[2] == '-') configData.config.measurementSend = false;
-                if (line[2] == '+') configData.config.measurementSend = true;
+                else if (line[2] == '+') configData.config.measurementSend = true;
                 break;
             }
 /* M-, M+ Turn on/off battery missing */
         case 'm':
             {
                 if (line[3] == '-') setBatteryMissing(battery,false);
-                if (line[3] == '+') setBatteryMissing(battery,true);
+                else if (line[3] == '+') setBatteryMissing(battery,true);
                 break;
             }
 /* r-, r+ Turn recording on or off */
@@ -346,7 +362,7 @@ released. The command is followed by an interface number 0-5 being batteries
         case 'S':
             {
                 if (line[2] == '-') configData.config.icc = false;
-                if (line[2] == '+') configData.config.icc = true;
+                else if (line[2] == '+') configData.config.icc = true;
                 break;
             }
 /* Tntxx Set battery type and capacity, n is battery, t is type, xx is capacity */
@@ -913,13 +929,16 @@ a corrupted message.
 
 void commsPrintChar(char *ch)
 {
-    commsEnableTxInterrupt(false);
-  	while (xQueueSendToBack(commsSendQueue,ch,COMMS_SEND_TIMEOUT) != pdTRUE)
+    if (configData.config.enableSend)
     {
-        xQueueReset(commsSendQueue);
+        commsEnableTxInterrupt(false);
+      	while (xQueueSendToBack(commsSendQueue,ch,COMMS_SEND_TIMEOUT) != pdTRUE)
+        {
+            xQueueReset(commsSendQueue);
+            commsEnableTxInterrupt(true);
+            taskYIELD();
+        }
         commsEnableTxInterrupt(true);
-        taskYIELD();
     }
-    commsEnableTxInterrupt(true);
 }
 

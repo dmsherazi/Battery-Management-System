@@ -98,6 +98,9 @@ private slots:
     void on_battery1CheckBox_clicked();
     void on_battery2CheckBox_clicked();
     void on_battery3CheckBox_clicked();
+    void on_battery1SoCReset_clicked();
+    void on_battery2SoCReset_clicked();
+    void on_battery3SoCReset_clicked();
     bool testIndicator(const IndicatorType indicator);
     void on_saveFileButton_clicked();
     void on_closeFileButton_clicked();

@@ -143,12 +143,29 @@ PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
     PowerManagementMainUi.load2CheckBox->setChecked(false);
     PowerManagementMainUi.panelCheckBox->setChecked(false);
 
+    PowerManagementMainUi.battery1SoCReset->
+        setStyleSheet("background-color:lightpink;");
+    PowerManagementMainUi.battery1SoCReset->
+        setText("R");
+    PowerManagementMainUi.battery2SoCReset->
+        setStyleSheet("background-color:lightpink;");
+    PowerManagementMainUi.battery2SoCReset->
+        setText("R");
+    PowerManagementMainUi.battery3SoCReset->
+        setStyleSheet("background-color:lightpink;");
+    PowerManagementMainUi.battery3SoCReset->
+        setText("R");
+
+/* Turn on microcontroller communications */
+    socket->write("pc+\n\r");
 /* This should cause the microcontroller to respond with all data */
     socket->write("dS\n\r");
 }
 
 PowerManagementGui::~PowerManagementGui()
 {
+/* Turn off microcontroller communications */
+    socket->write("pc-\n\r");
 #ifndef SERIAL
     if (socket != NULL) socket->close();
 #endif
@@ -755,12 +772,33 @@ void PowerManagementGui::processResponse(const QString response)
             PowerManagementMainUi.battery1Charging->
                 setText("A");
         }
-        else
+        else if (chargingState == 2)
         {
             PowerManagementMainUi.battery1Charging->
                 setStyleSheet("background-color:lightgreen;");
             PowerManagementMainUi.battery1Charging->
                 setText("F");
+        }
+        else if (chargingState == 3)
+        {
+            PowerManagementMainUi.battery1Charging->
+                setStyleSheet("background-color:pink;");
+            PowerManagementMainUi.battery1Charging->
+                setText("R");
+        }
+        else if (chargingState == 4)
+        {
+            PowerManagementMainUi.battery1Charging->
+                setStyleSheet("background-color:lightblue;");
+            PowerManagementMainUi.battery1Charging->
+                setText("E");
+        }
+        else
+        {
+            PowerManagementMainUi.battery1Charging->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery1Charging->
+                setText(" ");
         }
         if (healthState == 0)
         {
@@ -869,12 +907,33 @@ void PowerManagementGui::processResponse(const QString response)
             PowerManagementMainUi.battery2Charging->
                 setText("A");
         }
-        else
+        else if (chargingState == 2)
         {
             PowerManagementMainUi.battery2Charging->
                 setStyleSheet("background-color:lightgreen;");
             PowerManagementMainUi.battery2Charging->
                 setText("F");
+        }
+        else if (chargingState == 3)
+        {
+            PowerManagementMainUi.battery2Charging->
+                setStyleSheet("background-color:pink;");
+            PowerManagementMainUi.battery2Charging->
+                setText("R");
+        }
+        else if (chargingState == 4)
+        {
+            PowerManagementMainUi.battery2Charging->
+                setStyleSheet("background-color:lightblue;");
+            PowerManagementMainUi.battery2Charging->
+                setText("E");
+        }
+        else
+        {
+            PowerManagementMainUi.battery2Charging->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery2Charging->
+                setText(" ");
         }
         if (healthState == 0)
         {
@@ -983,12 +1042,33 @@ void PowerManagementGui::processResponse(const QString response)
             PowerManagementMainUi.battery3Charging->
                 setText("A");
         }
-        else
+        else if (chargingState == 2)
         {
             PowerManagementMainUi.battery3Charging->
                 setStyleSheet("background-color:lightgreen;");
             PowerManagementMainUi.battery3Charging->
                 setText("F");
+        }
+        else if (chargingState == 3)
+        {
+            PowerManagementMainUi.battery3Charging->
+                setStyleSheet("background-color:pink;");
+            PowerManagementMainUi.battery3Charging->
+                setText("R");
+        }
+        else if (chargingState == 4)
+        {
+            PowerManagementMainUi.battery3Charging->
+                setStyleSheet("background-color:lightblue;");
+            PowerManagementMainUi.battery3Charging->
+                setText("E");
+        }
+        else
+        {
+            PowerManagementMainUi.battery3Charging->
+                setStyleSheet("background-color:white;");
+            PowerManagementMainUi.battery3Charging->
+                setText(" ");
         }
         if (healthState == 0)
         {
@@ -1485,6 +1565,28 @@ void PowerManagementGui::on_battery3CheckBox_clicked()
         PowerManagementMainUi.load2Battery3->setEnabled(false);
         PowerManagementMainUi.panelBattery3->setEnabled(false);
     }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Actions for SoC Recomputations
+
+These are called when an SoC Reset button is clicked.
+
+*/
+
+void PowerManagementGui::on_battery1SoCReset_clicked()
+{
+    socket->write("aB1\n\r");
+}
+
+void PowerManagementGui::on_battery2SoCReset_clicked()
+{
+    socket->write("aB2\n\r");
+}
+
+void PowerManagementGui::on_battery3SoCReset_clicked()
+{
+    socket->write("aB3\n\r");
 }
 
 //-----------------------------------------------------------------------------
