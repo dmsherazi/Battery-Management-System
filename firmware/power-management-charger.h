@@ -36,7 +36,7 @@ it will take the duty cycle to rise in response to changes. */
 #define MIN_DUTYCYCLE   256
 
 /* The period, 5 seconds, for the pulsed charging phase of the ICC algorithm */
-#define SLOT_PERIOD     5*1024
+#define SLOT_PERIOD     30*1024
 
 /* Number of slots in the ICC algorithm for pulsed charging cycle. */
 #define NUM_SLOTS       3

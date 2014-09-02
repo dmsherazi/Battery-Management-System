@@ -76,7 +76,7 @@ void prvChargerTask(void *pvParameters)
 	while (1)
 	{
 /* Wait until the next tick cycle */
-	    vTaskDelay(getChargerDelay());
+        vTaskDelay(getChargerDelay());
 /* Reset watchdog counter */
         chargerWatchdogCount = 0;
 

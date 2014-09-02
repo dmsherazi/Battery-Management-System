@@ -93,6 +93,8 @@ void initLocalsICC(void)
         voltageAv[i] = 0;
         currentAv[i] = 0;
     }
+/* Turn on charger by setting PWM to maximum. */
+    pwmSetDutyCycle(100*256);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -103,7 +105,7 @@ void initLocalsICC(void)
 void chargerControlICC(uint8_t battery)
 {
 /* Compute the average current and voltage */
-        calculateAverageMeasures();
+    calculateAverageMeasures();
 
     slotTime++;
 
@@ -151,16 +153,19 @@ over time. */
                 else batteryUnderCharge = slotBattery;
             }
         }
-/* Set the Switches to connect the panel to the selected battery */
-        setSwitch(batteryUnderCharge,PANEL);
-        pwmSetDutyCycle(100*256);
+/* Set the switches to connect the panel to the selected battery if it
+is in an active charging phase, otherwise turn it off to prevent overvoltage
+during the slot. */
+        uint8_t index = batteryUnderCharge;
+        if ((getBatteryChargingPhase(index) == absorptionC) ||
+            (getBatteryChargingPhase(index) == bulkC))
+            setSwitch(batteryUnderCharge,PANEL);
+        else setSwitch(0,PANEL);
     }
 
     uint8_t index = 0;
     for (index=0; index < NUM_BATS; index++)
     {
-dataMessageSend("D1",index,getBatteryChargingPhase(index));
-dataMessageSend("D2",voltageAv[index],voltageLimit(getAbsorptionVoltage(index)));
 /* Manage change from absorption to float phase. */
         if ((getBatteryChargingPhase(index) == absorptionC) &&
             (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
