@@ -1,11 +1,6 @@
 /* STM32F1 Power Management for Solar Power
 
-Battery Charging Task
-
-This task implements an algorithm to manage charging of batteries. Battery
-current and terminal voltage are monitored constantly. If either rise beyond
-the preset limits, charging is cut off and held off until the quantity drops
-below the limit.
+Battery Charging Algorithm Common files
 
 This file contains common code for different algorithms. It must be included
 within the source file for each algorithm.
@@ -33,78 +28,14 @@ Initial 14 June 2014
  */
 
 /* Local Prototypes */
-static void initGlobals(void);
 static int16_t voltageLimit(uint16_t limitV);
 static void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle);
 static void calculateAverageMeasures(void);
-/* These must be defined in the including module */
-static void chargerControl(uint8_t battery);
-static void initLocals(void);
+static uint8_t batteryUnderCharge;
 
 /* Local Persistent Variables */
 static int16_t voltageAv[NUM_BATS];
 static int16_t currentAv[NUM_BATS];
-static battery_Ch_States batteryChargingPhase[NUM_BATS];
-static uint8_t chargerWatchdogCount;
-static uint8_t batteryUnderCharge;
-
-/*--------------------------------------------------------------------------*/
-/* @brief Charging Task
-
-This task runs over long times, implementing the charging algorithm on a
-battery or batteries that have been designated for charging.
-*/
-
-void prvChargerTask(void *pvParameters)
-{
-
-    initGlobals();
-    initLocals();
-
-	while (1)
-	{
-/* Wait until the next tick cycle */
-	    vTaskDelay(getChargerDelay());
-/* Reset watchdog counter */
-        chargerWatchdogCount = 0;
-
-/* Change each battery to bulk phase when it is in float phase and the
-terminal voltage drops below a charging restart threshold (95%). */
-        uint8_t i;
-        for (i=0; i<NUM_BATS; i++)
-        {
-            if ((batteryChargingPhase[i] == floatC) &&
-                (getBatterySoC(i) < FLOAT_BULK_SOC))
-                batteryChargingPhase[i] = bulkC;
-        }
-/* Compute the average current and voltage */
-        calculateAverageMeasures();
-
-/* get battery under charge from the manual panel switch settings. */
-        uint8_t battery = getPanelSwitchSetting();
-
-        chargerControl(battery);
-
-    }
-}
-
-/*--------------------------------------------------------------------------*/
-/** @brief Initialise Global Variables
-
-Set the charger default parameters.
-*/
-
-static void initGlobals(void)
-{
-    uint8_t i=0;
-    for (i=0; i<NUM_BATS; i++)
-    {
-        batteryChargingPhase[i] = bulkC;
-        voltageAv[i] = 0;
-        currentAv[i] = 0;
-    }
-    chargerWatchdogCount = 0;
-}
 
 /*--------------------------------------------------------------------------*/
 /** @brief Compute Averaged Voltages and Currents
@@ -145,17 +76,6 @@ static int16_t voltageLimit(uint16_t limitV)
 }
 
 /*--------------------------------------------------------------------------*/
-/** @brief Access the Battery Charging Phase Variable
-
-@param[in] battery: 0..NUM_BATS-1
-*/
-
-battery_Ch_States getBatteryChargingPhase(int battery)
-{
-    return batteryChargingPhase[battery];
-}
-
-/*--------------------------------------------------------------------------*/
 /** @brief Charging Voltage Control
 
 Adapt the PWM Duty Cycle to bring the voltage to its limit point.
@@ -185,23 +105,4 @@ static void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle)
     }
     *dutyCycle = newDutyCycle;
 }
-
-/*--------------------------------------------------------------------------*/
-/** @brief Check the watchdog state
-
-The watchdog counter is decremented. If it reaches zero then the task is reset.
-*/
-
-void checkChargerWatchdog(void)
-{
-    if (chargerWatchdogCount++ > 10*getChargerDelay()/getWatchdogDelay())
-    {
-        vTaskDelete(prvChargerTask);
-	    xTaskCreate(prvChargerTask, (signed portCHAR * ) "Charger", \
-                    configMINIMAL_STACK_SIZE, NULL, CHARGER_TASK_PRIORITY, NULL);
-        sendStringLowPriority("D","Charger Restarted");
-        recordString("D","Charger Restarted");
-    }
-}
-
 

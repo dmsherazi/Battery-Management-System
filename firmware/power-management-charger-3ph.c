@@ -76,7 +76,7 @@ static int16_t absorptionPhaseCurrent[NUM_BATS];
 
 */
 
-static void initLocals(void)
+void initLocals3PH(void)
 {
     dutyCycle = 50*256;                    /* percentage times 256 */
     dutyCycleMax = 100*256;
@@ -85,6 +85,8 @@ static void initLocals(void)
     {
         absorptionPhaseTime[i] = 0;
         absorptionPhaseCurrent[i] = 0;
+        voltageAv[i] = 0;
+        currentAv[i] = 0;
     }
 }
 
@@ -93,8 +95,11 @@ static void initLocals(void)
 
 */
 
-static void chargerControl(uint8_t battery)
+void chargerControl3PH(uint8_t battery)
 {
+/* Compute the average current and voltage */
+        calculateAverageMeasures();
+
 /* If this is different to the battery currently under charge, change over
 and reset the duty cycle. Nothing should happen if no charger is allocated. */
     if (battery != batteryUnderCharge)
@@ -114,23 +119,23 @@ autotrack mode, otherwise leave settings on manual. */
 
 /* Manage the change from bulk to absorption phase. */
         if (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index)))
-            batteryChargingPhase[index] = absorptionC;  /* Change. */
+            setBatteryChargingPhase(index,absorptionC);  /* Change. */
 
 /* Check that the battery doesn't remain too long in the absorption phase while
 the current is not falling (within a 5% error). 0.5 hour max. Then go to float.
 NOTE: in the following all battery currents are negative while charging. */
-        if ((batteryChargingPhase[index] == absorptionC) &&
+        if ((getBatteryChargingPhase(index) == absorptionC) &&
             ((absorptionPhaseCurrent[index]*240)/256 > currentAv[index]))
         {
             absorptionPhaseTime[index]++;
             if (absorptionPhaseTime[index] > 1800000/getChargerDelay())
             {
-                batteryChargingPhase[index] = floatC;
+                setBatteryChargingPhase(index,floatC);
                 absorptionPhaseTime[index] = 0;
                 absorptionPhaseCurrent[index] = 0;
             }
         }
-        else if (batteryChargingPhase[index] == bulkC)
+        else if (getBatteryChargingPhase(index) == bulkC)
         {
             absorptionPhaseTime[index] = 0;
             absorptionPhaseCurrent[index] = currentAv[index];
@@ -142,23 +147,23 @@ essential. (Note: measured currents are negative while charging).
 When the change occurs, force the SoC to 100%. This may not be correct if
 the battery is faulty with a low terminal voltage, but that case is handled
 by the resetBattery function. */
-        if ((batteryChargingPhase[index] == absorptionC) &&
+        if ((getBatteryChargingPhase(index) == absorptionC) &&
             (-currentAv[index] < getFloatStageCurrent(index)))
         {
-            batteryChargingPhase[index] = floatC;
+            setBatteryChargingPhase(index, floatC);
             resetBatterySoC(batteryUnderCharge-1);
         }
 
 /* Manage the change to bulk phase when the terminal voltage drops below the
 absorption threshold, and the duty cycle reaches 100%. This can happen when the
 charger voltage drops, as in a solar panel application. */
-        if ((batteryChargingPhase[index] == absorptionC) &&
+        if ((getBatteryChargingPhase(index) == absorptionC) &&
             (voltageAv[index] < voltageLimit(getAbsorptionVoltage(index))*240/256) &&
             (dutyCycle == dutyCycleMax))
-            batteryChargingPhase[index] = bulkC;
+            setBatteryChargingPhase(index,bulkC);
 
 /* Manage the float phase voltage limit. */
-        if (batteryChargingPhase[index] == floatC)
+        if (getBatteryChargingPhase(index) == floatC)
         {
             adaptDutyCycle(voltageAv[index],getFloatVoltage(index),&dutyCycle);
         }
@@ -185,7 +190,7 @@ value that will allow it to grow again if needed (round-off error problem). */
         if (dutyCycle > dutyCycleMax) dutyCycle = dutyCycleMax;
         uint16_t dutyCycleActual = dutyCycle;
 /* If the voltage drifts too high in float phase, turn off charging altogether.*/
-        if ((batteryChargingPhase[index] == floatC) &&
+        if ((getBatteryChargingPhase(index) == floatC) &&
             (voltageAv[index] > voltageLimit(getFloatVoltage(index))*260/256))
             dutyCycleActual = 0;
 /* If the voltage drifts above absorption voltage in any phase, turn off

@@ -82,11 +82,17 @@ static uint8_t slotTime;            /* Slot time counter */
 
 */
 
-static void initLocals(void)
+void initLocalsICC(void)
 {
     batteryNextIndex = 1;
     slotBattery = 1;
     slotTime = 0;
+    uint8_t i=0;
+    for (i=0; i<NUM_BATS; i++)
+    {
+        voltageAv[i] = 0;
+        currentAv[i] = 0;
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -94,8 +100,11 @@ static void initLocals(void)
 
 */
 
-static void chargerControl(uint8_t battery)
+void chargerControlICC(uint8_t battery)
 {
+/* Compute the average current and voltage */
+        calculateAverageMeasures();
+
     slotTime++;
 
 /* Battery will only be zero if manually set or if power source is absent. */
@@ -103,7 +112,7 @@ static void chargerControl(uint8_t battery)
     {
 /* If the designated battery under charge is in bulk phase, allocate it in all
 slots to ensure it gets priority charge. */
-        if (batteryChargingPhase[battery-1] == bulkC)
+        if (getBatteryChargingPhase(battery-1) == bulkC)
             batteryUnderCharge = battery;
 /* else allocate the battery under charge to the battery owning the slot,
 unless it happens to be enforced idle (float or rest), in which case
@@ -121,18 +130,15 @@ If the slot's allocated battery is not in use, check other batteries.
 If they are in bulk phase, grab the slot.
 This code should allow an even allocation of batteries in bulk charge
 over time. */
-                if ((batteryChargingPhase[slotBattery-1] == floatC) ||
-                    (batteryChargingPhase[slotBattery-1] == restC))
+                if ((getBatteryChargingPhase(slotBattery-1) == floatC) ||
+                    (getBatteryChargingPhase(slotBattery-1) == restC))
                 {
                     uint8_t i = 0;
                     for (i=0; i < NUM_BATS; i++)
                     {
                         uint8_t j = i + batteryNextIndex + 1;
                         if (j > NUM_BATS) j -= NUM_BATS;
-//dataMessageSend("D1",slotBattery,i);
-//dataMessageSend("D2",batteryNextIndex,j);
-//dataMessageSend("D3",batteryChargingPhase[j-1],slotTime);
-                        if (batteryChargingPhase[j-1] == bulkC)
+                        if (getBatteryChargingPhase(j-1) == bulkC)
                         {
                             batteryUnderCharge = j;
                             batteryNextIndex = j;
@@ -153,21 +159,21 @@ over time. */
     uint8_t index = 0;
     for (index=0; index < NUM_BATS; index++)
     {
+dataMessageSend("D1",index,getBatteryChargingPhase(index));
+dataMessageSend("D2",voltageAv[index],voltageLimit(getAbsorptionVoltage(index)));
 /* Manage change from absorption to float phase. */
-        if ((batteryChargingPhase[index] == absorptionC) &&
+        if ((getBatteryChargingPhase(index) == absorptionC) &&
             (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
-            batteryChargingPhase[index] = floatC;
+            setBatteryChargingPhase(index,floatC);
 /* Manage change from rest to absorption (pulsed charging) phase */
-        if ((batteryChargingPhase[index] == restC) &&
+        if ((getBatteryChargingPhase(index) == restC) &&
             (computeSoC(voltageAv[index],getTemperature(),
                            getBatteryType(index)) < 97*256))
-            batteryChargingPhase[index] = absorptionC;
+            setBatteryChargingPhase(index,absorptionC);
 /* Manage change from bulk to rest phase */
-        if ((batteryChargingPhase[index] == bulkC) &&
+        if ((getBatteryChargingPhase(index) == bulkC) &&
             (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
-            batteryChargingPhase[index] = restC;
-//dataMessageSend("Dc",computeSoC(voltageAv[index],getTemperature(),
-//                           getBatteryType(index)),index);
+            setBatteryChargingPhase(index,restC);
     }
 }
 

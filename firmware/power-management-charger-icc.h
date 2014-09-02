@@ -1,9 +1,9 @@
 /* STM32F1 Power Management for Solar Power
 
 This header file contains defines and prototypes specific to the charging
-task.
+task ICC algorithm.
 
-Initial 18 October 2013
+Initial 02 September 2014
 
 */
 
@@ -26,23 +26,8 @@ Initial 18 October 2013
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POWER_MANAGEMENT_CHARGER_H_
-#define POWER_MANAGEMENT_CHARGER_H_
-
-/* This defines the lowest the duty cycle is allowed to go as it may not recover
-when it needs to be raised. Check that the duty cycle reduction doesn't
-cause duty cycle to go to zero at any time. The lower this is, the longer
-it will take the duty cycle to rise in response to changes. */
-#define MIN_DUTYCYCLE   256
-
-/* The period, 5 seconds, for the pulsed charging phase of the ICC algorithm */
-#define SLOT_PERIOD     5*1024
-
-/* Number of slots in the ICC algorithm for pulsed charging cycle. */
-#define NUM_SLOTS       3
-
-/* SoC above which charging is stopped in float phase */
-#define FLOAT_BULK_SOC  95*256
+#ifndef POWER_MANAGEMENT_CHARGER_ICC_H_
+#define POWER_MANAGEMENT_CHARGER_ICC_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -50,11 +35,9 @@ it will take the duty cycle to rise in response to changes. */
 /*--------------------------------------------------------------------------*/
 /* Prototypes */
 /*--------------------------------------------------------------------------*/
-void prvChargerTask(void *pvParameters);
 
-battery_Ch_States getBatteryChargingPhase(int battery);
-void setBatteryChargingPhase(int battery, battery_Ch_States chargePhase);
-void checkChargerWatchdog(void);
+void initLocalsICC(void);
+void chargerControlICC(uint8_t battery);
 
 #endif
 
