@@ -676,6 +676,7 @@ bool DataProcessingGui::combineRecords(QDateTime startTime, QDateTime endTime,
                 if (battery1Charge == 0) battery1ChargeText = "Bulk";
                 else if (battery1Charge == 1) battery1ChargeText = "Absorp";
                 else if (battery1Charge == 2) battery1ChargeText = "Float";
+                else if (battery1Charge == 3) battery1ChargeText = "Rest";
                 else battery1ChargeText = "?";
             }
             if (firstText == "dO2")
@@ -696,6 +697,7 @@ bool DataProcessingGui::combineRecords(QDateTime startTime, QDateTime endTime,
                 if (battery2Charge == 0) battery2ChargeText = "Bulk";
                 else if (battery2Charge == 1) battery2ChargeText = "Absorp";
                 else if (battery2Charge == 2) battery2ChargeText = "Float";
+                else if (battery2Charge == 3) battery2ChargeText = "Rest";
                 else battery2ChargeText = "?";
             }
             if (firstText == "dO3")
@@ -716,6 +718,7 @@ bool DataProcessingGui::combineRecords(QDateTime startTime, QDateTime endTime,
                 if (battery3Charge == 0) battery3ChargeText = "Bulk";
                 else if (battery3Charge == 1) battery3ChargeText = "Absorp";
                 else if (battery3Charge == 2) battery3ChargeText = "Float";
+                else if (battery3Charge == 3) battery3ChargeText = "Rest";
                 else battery3ChargeText = "?";
             }
             if (firstText == "dL1")
