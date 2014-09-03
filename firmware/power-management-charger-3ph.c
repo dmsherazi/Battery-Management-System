@@ -61,6 +61,7 @@ Initial 18 October 2013
 #include "power-management-measurement.h"
 #include "power-management-monitor.h"
 #include "power-management-charger.h"
+#include "power-management-charger-3ph.h"
 
 /* Local Persistent Variables */
 static uint16_t dutyCycle;      /* percentage times 256 */

@@ -60,7 +60,10 @@ private slots:
     void on_closeButton_clicked();
     void on_setBatteryButton_clicked();
     void displayErrorMessage(const QString message);
-    void on_setOptionButton_clicked();
+    void on_setTrackOptionButton_clicked();
+    void on_threePhaseButton_clicked();
+    void on_icButton_clicked();
+    void on_iccButton_clicked();
     void on_debugMessageCheckbox_clicked();
     void on_dataMessageCheckbox_clicked();
     void on_echoTestButton_clicked();

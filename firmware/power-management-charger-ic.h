@@ -26,8 +26,8 @@ Initial 02 September 2014
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POWER_MANAGEMENT_CHARGER_ICC_H_
-#define POWER_MANAGEMENT_CHARGER_ICC_H_
+#ifndef POWER_MANAGEMENT_CHARGER_IC_H_
+#define POWER_MANAGEMENT_CHARGER_IC_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -42,8 +42,8 @@ Initial 02 September 2014
 /* Prototypes */
 /*--------------------------------------------------------------------------*/
 
-void initLocalsICC(void);
-void chargerControlICC(uint8_t battery);
+void initLocalsIC(void);
+void chargerControlIC(uint8_t battery);
 
 #endif
 

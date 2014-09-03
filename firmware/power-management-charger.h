@@ -29,18 +29,6 @@ Initial 18 October 2013
 #ifndef POWER_MANAGEMENT_CHARGER_H_
 #define POWER_MANAGEMENT_CHARGER_H_
 
-/* This defines the lowest the duty cycle is allowed to go as it may not recover
-when it needs to be raised. Check that the duty cycle reduction doesn't
-cause duty cycle to go to zero at any time. The lower this is, the longer
-it will take the duty cycle to rise in response to changes. */
-#define MIN_DUTYCYCLE   256
-
-/* The period, 5 seconds, for the pulsed charging phase of the ICC algorithm */
-#define SLOT_PERIOD     30*1024
-
-/* Number of slots in the ICC algorithm for pulsed charging cycle. */
-#define NUM_SLOTS       3
-
 /* SoC above which charging is stopped in float phase */
 #define FLOAT_BULK_SOC  95*256
 

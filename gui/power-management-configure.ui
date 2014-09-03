@@ -41,10 +41,16 @@
      <height>471</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string/>
+   </property>
    <property name="currentIndex">
     <number>0</number>
    </property>
    <widget class="QWidget" name="generalTab">
+    <property name="toolTip">
+     <string>Time and debug display settings</string>
+    </property>
     <attribute name="title">
      <string>General</string>
     </attribute>
@@ -212,6 +218,9 @@
     </widget>
    </widget>
    <widget class="QWidget" name="batteriesTab">
+    <property name="toolTip">
+     <string>Set battery parameters</string>
+    </property>
     <attribute name="title">
      <string>Batteries</string>
     </attribute>
@@ -837,6 +846,9 @@
     </widget>
    </widget>
    <widget class="QWidget" name="calibrationTab">
+    <property name="toolTip">
+     <string>Calibrate zero of current measurements</string>
+    </property>
     <attribute name="title">
      <string>Calibration</string>
     </attribute>
@@ -953,6 +965,9 @@
     </widget>
    </widget>
    <widget class="QWidget" name="socTab">
+    <property name="toolTip">
+     <string>Configuration items for computing State of Charge</string>
+    </property>
     <attribute name="title">
      <string>SoC Tracking</string>
     </attribute>
@@ -1053,54 +1068,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QCheckBox" name="accelChargeCheckBox">
-     <property name="geometry">
-      <rect>
-       <x>56</x>
-       <y>245</y>
-       <width>241</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Accelerate return to voltage limit when charging voltage is excessive.</string>
-     </property>
-     <property name="text">
-      <string>Use Charge Acceleration</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="accelChargeText">
-     <property name="geometry">
-      <rect>
-       <x>78</x>
-       <y>270</y>
-       <width>487</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>When the battery terminal voltage exceeds the absorption or float limit, the current is reduced at a rate proportional to the voltage difference, thus pulling the voltage back faster as the difference increases.</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignJustify|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="setOptionButton">
+    <widget class="QPushButton" name="setTrackOptionButton">
      <property name="geometry">
       <rect>
        <x>266</x>
@@ -1113,52 +1081,146 @@
       <string>Set</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="switchAvoidanceCheckBox">
+   </widget>
+   <widget class="QWidget" name="chargingTab">
+    <property name="toolTip">
+     <string>Set parameters to control charging algorithms</string>
+    </property>
+    <attribute name="title">
+     <string>Charging</string>
+    </attribute>
+    <widget class="QGroupBox" name="chargeAlgorithmGroupBox">
      <property name="geometry">
       <rect>
-       <x>56</x>
-       <y>325</y>
-       <width>241</width>
-       <height>22</height>
+       <x>20</x>
+       <y>20</y>
+       <width>589</width>
+       <height>276</height>
       </rect>
      </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
+     <property name="title">
+      <string>Charge Algorithm</string>
      </property>
-     <property name="toolTip">
-      <string>Accelerate return to voltage limit when charging voltage is excessive.</string>
-     </property>
-     <property name="text">
-      <string>Use Switch Avoidance</string>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="accelChargeText_2">
-     <property name="geometry">
-      <rect>
-       <x>76</x>
-       <y>350</y>
-       <width>487</width>
-       <height>36</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>When the charger enters absorption phase, use a bang-bang control of current switching rather than the noisy PWM.</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignJustify|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
+     <widget class="QRadioButton" name="threePhaseButton">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>25</y>
+        <width>109</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Three Phase</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="icButton">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>100</y>
+        <width>161</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Intermittent Charge</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="iccButton">
+      <property name="geometry">
+       <rect>
+        <x>22</x>
+        <y>175</y>
+        <width>211</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Interrupted Charge Control</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="threePhaseText">
+      <property name="geometry">
+       <rect>
+        <x>46</x>
+        <y>50</y>
+        <width>501</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>After the voltage reaches the gassing limit, the absorption phase holds the voltage at that point until the current falls to a specified trigger point, or levels out. This is the most common method used in lead-acid chargers.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="threePhaseText_2">
+      <property name="geometry">
+       <rect>
+        <x>46</x>
+        <y>125</y>
+        <width>509</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>After the voltage reaches the gassing limit, the charger is turned off until the voltage falls below a preset threshold. The charger cycles through this process until the average current falls to a specified trigger point.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="threePhaseText_3">
+      <property name="geometry">
+       <rect>
+        <x>44</x>
+        <y>200</y>
+        <width>507</width>
+        <height>66</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>After the voltage reaches the gassing limit, the charger is turned off until the voltage falls below the battery's fully charged open circuit voltage. The charger then cycles with a 90 second period and a 33% duty cycle until the voltage again reaches the gassing limit.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>

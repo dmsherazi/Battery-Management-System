@@ -42,6 +42,7 @@ typedef enum {normalF=0, lowF=1, criticalF=2, faultyF=3} battery_Fl_States;
 typedef enum {loadedO=0, chargingO=1, isolatedO=2} battery_Op_States;
 typedef enum {bulkC=0, absorptionC=1, floatC=2, restC=3, equalizationC=4} battery_Ch_States;
 typedef enum {goodH=0, faultyH=1, missingH=2} battery_Hl_States;
+typedef enum {threePH=0, ic=1, icc=2} charge_algorithm;
 
 /* Represent the measured data arrays in a union as separate or combined */
 struct Interface
@@ -61,6 +62,7 @@ union InterfaceGroup
 /*--------------------------------------------------------------------------*/
 /****** Object Dictionary Items *******/
 /* Configuration items, updated externally, are stored to NVM */
+/* Values must be initialized in setGlobalDefaults(). */
 
 /*--------------------------------------------------------------------------*/
 struct Config
@@ -77,15 +79,18 @@ struct Config
     int16_t alphaR;         /* forgetting factor for battery resistance estimator */
     int16_t alphaV;         /* forgetting factor for battery voltage smoothing */
     int16_t alphaC;         /* forgetting factor for battery current smoothing */
-/* Control Variables */
-    bool enableSend;            /* Controls if communications transmission occurs */
-    bool measurementSend;       /* Controls if measurements are transmitted */
-    bool debugMessageSend;      /* Controls if debug messages are transmitted */
-    bool recording;             /* Controls recording of performance data */
-    bool autoTrack;             /* Allows automatic management of batteries */
-    bool icc;                   /* Use ICC charging algorithm */
-    uint8_t panelSwitchSetting; /* Value of the panel switch setting */
-    uint8_t monitorStrategy;
+/* Communications Control Variables */
+    bool enableSend;            /* Any communications transmission occurs */
+    bool measurementSend;       /* Measurements are transmitted */
+    bool debugMessageSend;      /* Debug messages are transmitted */
+/* Recording Control Variables */
+    bool recording;             /* Recording of performance data */
+/* Tracking Control Variables */
+    bool autoTrack;             /* Automatic management of batteries */
+    uint8_t monitorStrategy;    /* Bitmap of monitoring strategies (see monitor header). */
+    uint8_t panelSwitchSetting; /* Global value of the panel switch setting */
+/* Charging Control Variables */
+    charge_algorithm chargeAlgorithm;   /* Charging algorithm */
 /* Delay Variables */
     portTickType watchdogDelay;
     portTickType chargerDelay;
@@ -134,7 +139,7 @@ uint8_t getPanelSwitchSetting(void);
 void setPanelSwitchSetting(uint8_t battery);
 bool isRecording(void);
 bool isAutoTrack(void);
-bool isICC(void);
+charge_algorithm getChargeAlgorithm(void);
 uint8_t getMonitorStrategy(void);
 uint16_t getControls(void);
 

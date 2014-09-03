@@ -50,6 +50,7 @@ Initial 14 June 2014
 #include "power-management-charger.h"
 #include "power-management-charger-icc.h"
 #include "power-management-charger-3ph.h"
+#include "power-management-charger-ic.h"
 #include "power-management-objdic.h"
 
 /* Local Prototypes */
@@ -72,6 +73,7 @@ void prvChargerTask(void *pvParameters)
     initGlobals();
     initLocalsICC();
     initLocals3PH();
+    initLocalsIC();
 
 	while (1)
 	{
@@ -93,8 +95,12 @@ terminal voltage drops below a charging restart threshold (95%). */
 /* get battery under charge from the manual panel switch settings. */
         uint8_t battery = getPanelSwitchSetting();
 
-        if (isICC()) chargerControlICC(battery);
-        else chargerControl3PH(battery);
+        if (getChargeAlgorithm() == icc)
+            chargerControlICC(battery);
+        else if (getChargeAlgorithm() == threePH)
+            chargerControl3PH(battery);
+        else if (getChargeAlgorithm() == ic)
+            chargerControlIC(battery);
 
     }
 }

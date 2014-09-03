@@ -92,7 +92,6 @@ PowerManagementConfigGui::PowerManagementConfigGui(QTcpSocket* tcpSocket, QWidge
     on_queryBatteryButton_clicked();
 /* Ask for control settings */
     socket->write("dS\n\r");
-qDebug() << "Configure Start";
 }
 
 PowerManagementConfigGui::~PowerManagementConfigGui()
@@ -160,14 +159,13 @@ void PowerManagementConfigGui::on_setBatteryButton_clicked()
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Set Strategy Options
+/** @brief Set Tracking Strategy Options
 
 0x01 The option allowing or preventing loads connected to the charging battery.
 0x02 The option allowing or preventing a battery being maintained in isolation.
-0x04 The option allowing the accelerated charging algorithm.
 */
 
-void PowerManagementConfigGui::on_setOptionButton_clicked()
+void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
 {
     int option = 0;
     if (PowerManagementConfigUi.loadChargeCheckBox->isChecked())
@@ -186,27 +184,38 @@ void PowerManagementConfigGui::on_setOptionButton_clicked()
     {
         option &= ~0x02;
     }
-    if (PowerManagementConfigUi.accelChargeCheckBox->isChecked())
-    {
-        option |= 0x04;
-    }
-    else
-    {
-        option &= ~0x04;
-    }
     QString command = "ps";
     socket->write(command.append(QString("%1").arg(option,2)).append("\n\r")
                          .toAscii().constData());
-    if (PowerManagementConfigUi.switchAvoidanceCheckBox->isChecked())
-    {
-        QString command = "pS+\n\r";
-        socket->write(command.toAscii().constData());
-    }
-    else
-    {
-        QString command = "pS-\n\r";
-        socket->write(command.toAscii().constData());
-    }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Set Charge Algorithm Options
+
+*/
+
+/* 0 Three Phase Algorithm. */
+void PowerManagementConfigGui::on_threePhaseButton_clicked()
+{
+    QString command = "pS0";
+    socket->write(command.append(QString("%1")).append("\n\r")
+                         .toAscii().constData());
+}
+
+/* 1 Intermittent Charge Algorithm. */
+void PowerManagementConfigGui::on_icButton_clicked()
+{
+    QString command = "pS1";
+    socket->write(command.append(QString("%1")).append("\n\r")
+                         .toAscii().constData());
+}
+
+/* 2 Interrupted Charge Control Algorithm. */
+void PowerManagementConfigGui::on_iccButton_clicked()
+{
+    QString command = "pS2";
+    socket->write(command.append(QString("%1")).append("\n\r")
+                         .toAscii().constData());
 }
 
 //-----------------------------------------------------------------------------
@@ -494,22 +503,27 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
             }
             break;
         }
-/* Show control settings */
+/* Show debug control settings */
         case 'D':
         {
             if (size < 2) break;
-            if (((controlByte&0x08) > 0) &&
-                ! PowerManagementConfigUi.dataMessageCheckbox->isChecked())
+            bool dataMessage = ((controlByte & (1<<3)) > 0);
+            if (dataMessage)
                 PowerManagementConfigUi.dataMessageCheckbox->setChecked(true);
-            else if (((controlByte&0x08) == 0) &&
-                PowerManagementConfigUi.dataMessageCheckbox->isChecked())
+            else
                 PowerManagementConfigUi.dataMessageCheckbox->setChecked(false);
-            if (((controlByte&0x10) > 0) &&
-                ! PowerManagementConfigUi.debugMessageCheckbox->isChecked())
+            bool debugMessage = ((controlByte & (1<<4)) > 0);
+            if (debugMessage)
                 PowerManagementConfigUi.debugMessageCheckbox->setChecked(true);
-            else if (((controlByte&0x10) == 0) &&
-                PowerManagementConfigUi.debugMessageCheckbox->isChecked())
+            else
                 PowerManagementConfigUi.debugMessageCheckbox->setChecked(false);
+            int chargeAlgorithm = (controlByte >> 5) & 0x03;
+            if (chargeAlgorithm == 0)
+                PowerManagementConfigUi.threePhaseButton->setChecked(true);
+            if (chargeAlgorithm == 1)
+                PowerManagementConfigUi.icButton->setChecked(true);
+            if (chargeAlgorithm == 2)
+                PowerManagementConfigUi.iccButton->setChecked(true);
             break;
         }
 // Show current time settings from the system

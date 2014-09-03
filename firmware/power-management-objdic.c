@@ -69,32 +69,37 @@ void setGlobalDefaults(void)
     flashReadData((uint32_t*)configDataBlock.data,
                    configData.data,sizeof(configData.config));
     if (configData.config.validBlock == VALID_BLOCK) return;
+/* Set default battery parameters */
+    configData.config.batteryCapacity[0] = 54;
+    configData.config.batteryCapacity[1] = 54;
+    configData.config.batteryCapacity[2] = 54;
+    configData.config.batteryType[0] = wetT;
+    configData.config.batteryType[1] = wetT;
+    configData.config.batteryType[2] = wetT;
+    configData.config.alphaR = 100;             /* about 0.4 */
+    configData.config.alphaV = 256;             /* No Filter */
+    configData.config.alphaC = 180;     /* about 0.7, for detecting float state. */
+    uint8_t i=0;
+    for (i=0; i<NUM_BATS; i++) setBatteryChargeParameters(i);
+    for (i=0; i<NUM_IFS; i++) setCurrentOffset(i,0);    /* Zero current offsets. */
+/* Set default communications control variables */
+    configData.config.measurementSend = true;
+    configData.config.debugMessageSend = false;
+    configData.config.enableSend = false;
+/* Set default recording control variables */
+    configData.config.recording = false;
+/* Set default tracking parameters */
+    configData.config.autoTrack = false;    /* Don't track unless instructed */
+    configData.config.monitorStrategy = 0xFF;   /* All strategies on */
+    configData.config.panelSwitchSetting = 0;
+/* Set default charging control variables */
+    configData.config.chargeAlgorithm = icc;
+/* Set default system control variables */
     configData.config.watchdogDelay = WATCHDOG_DELAY;
     configData.config.chargerDelay = CHARGER_DELAY;
     configData.config.measurementDelay = MEASUREMENT_DELAY;
     configData.config.monitorDelay = MONITOR_DELAY;
     configData.config.calibrationDelay = CALIBRATION_DELAY;
-    configData.config.panelSwitchSetting = 0;
-    configData.config.alphaR = 100;           /* about 0.4 */
-    configData.config.alphaV = 256;           /* No Filter */
-    configData.config.alphaC = 180;           /* about 0.7, only for detecting float state. */
-/* Set default battery parameters */
-    configData.config.batteryCapacity[0] = 100;
-    configData.config.batteryCapacity[1] = 100;
-    configData.config.batteryCapacity[2] = 80;
-    configData.config.batteryType[0] = gelT;
-    configData.config.batteryType[1] = gelT;
-    configData.config.batteryType[2] = gelT;
-    configData.config.monitorStrategy = 0xFF;
-    uint8_t i=0;
-    for (i=0; i<NUM_BATS; i++)
-        setBatteryChargeParameters(i);
-/* Zero the offsets. */
-    for (i=0; i<NUM_IFS; i++) configData.config.currentOffsets.data[i] = 0;
-/* Don't track unless instructed externally */
-    configData.config.autoTrack = false;
-    configData.config.debugMessageSend = false;
-    configData.config.icc = true;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -361,14 +366,14 @@ bool isAutoTrack(void)
 }
 
 /*--------------------------------------------------------------------------*/
-/** @brief ICC Charging Algorithm
+/** @brief  Charging Algorithm
 
-True if the ICC strategy is requested.
+@returns the charging algorithm, 0 = 3 phase, 1 = IC, 2 = ICC.
 */
 
-bool isICC(void)
+charge_algorithm getChargeAlgorithm(void)
 {
-    return configData.config.icc;
+    return configData.config.chargeAlgorithm;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -387,20 +392,20 @@ uint8_t getMonitorStrategy(void)
 
 bit 0 if autoTrack,
 bit 1 if recording,
-bit 2 if switch avoidance
 bit 3 if measurements are being sent
 bit 4 if debug messages are being sent
+bits 5,6 charge algorithm
 
 @returns uint16_t status of controls
 */
 uint16_t getControls(void)
 {
-    uint8_t controls = 0;
+    uint16_t controls = 0;
     if (configData.config.autoTrack) controls |= 1<<0;
     if (configData.config.recording) controls |= 1<<1;
-    if (configData.config.icc) controls |= 1<<2;
     if (configData.config.measurementSend) controls |= 1<<3;
     if (configData.config.debugMessageSend) controls |= 1<<4;
+    controls |= (configData.config.chargeAlgorithm & 0x03) << 5;
     return controls;
 }
 

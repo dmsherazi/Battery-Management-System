@@ -69,7 +69,7 @@ Initial 14 June 2014
 #include "power-management-measurement.h"
 #include "power-management-monitor.h"
 #include "power-management-charger.h"
-#include "power-management-charger-icc.h"
+#include "power-management-charger-ic.h"
 
 static uint8_t batteryNextIndex;    /* Next battery for spare slot */
 static uint8_t slotBattery;         /* Slot available for battery */
@@ -83,7 +83,7 @@ static uint8_t slotTime;            /* Slot time counter */
 
 */
 
-void initLocalsICC(void)
+void initLocalsIC(void)
 {
     batteryNextIndex = 1;
     slotBattery = 1;
@@ -103,7 +103,7 @@ void initLocalsICC(void)
 
 */
 
-void chargerControlICC(uint8_t battery)
+void chargerControlIC(uint8_t battery)
 {
 /* Compute the average current and voltage */
     calculateAverageMeasures();

@@ -36,19 +36,23 @@ Initial 29 September 2013
 /* Delay to allow time for first measurements to come in */
 #define MONITOR_STARTUP_DELAY       (( portTickType )1000/portTICK_RATE_MS )
 
+/*--------------------------------------------------------------------------*/
 /* Calibration Constants */
-/* Threshold to test for valid offset measurement (without power on the interface,
-the result is maximum negative, around -4000) */
+/* Threshold to test for valid offset measurement (without power on the
+interface, the result is maximum negative, around -4000) */
 #define CALIBRATION_THRESHOLD       -50
 /* Arbitrary high value to start off the minimum value offset computation */
 #define OFFSET_START_VALUE          100
 /* Number of tests of switch combinations */
 #define NUM_TESTS                   NUM_IFS+1
 
+/*--------------------------------------------------------------------------*/
 /* Battery capacity scale to precision of SoC tracking from sample time
 (500 ms in this case) to hours. */
 
-/* Battery state triggers */
+/*--------------------------------------------------------------------------*/
+/* Battery state triggers. */
+/* These depend on the electronic component values (see measurement header). */
 #define LOW_VOLTAGE         2816    /* 11.0V */
 #define CRITICAL_VOLTAGE    2688    /* 10.5V */
 #define LOW_SOC             60*256   /* 60% */
@@ -56,6 +60,7 @@ the result is maximum negative, around -4000) */
 /* SoC above which charging is stopped in float phase */
 #define FLOAT_CHARGE_SOC    95*256
 
+/*--------------------------------------------------------------------------*/
 /* Battery Monitoring Strategy Fields */
 #define SEPARATE_LOAD       1 << 0
 #define PRESERVE_ISOLATION  1 << 1

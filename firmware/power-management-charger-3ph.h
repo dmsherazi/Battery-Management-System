@@ -32,6 +32,12 @@ Initial 02 September 2014
 #include <stdint.h>
 #include <stdbool.h>
 
+/* This defines the lowest the duty cycle is allowed to go as it may not recover
+when it needs to be raised. Check that the duty cycle reduction doesn't
+cause duty cycle to go to zero at any time. The lower this is, the longer
+it will take the duty cycle to rise in response to changes. */
+#define MIN_DUTYCYCLE   256
+
 /*--------------------------------------------------------------------------*/
 /* Prototypes */
 /*--------------------------------------------------------------------------*/

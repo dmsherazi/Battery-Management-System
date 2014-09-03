@@ -143,9 +143,6 @@ static void initGlobals(void)
     readFileName[0] = 0;
     writeFileHandle = 0xFF;
     readFileHandle = 0xFF;
-    configData.config.measurementSend = true;
-    configData.config.debugMessageSend = false;
-    configData.config.enableSend = false;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -358,11 +355,15 @@ released. The command is followed by an interface number 0-5 being batteries
                 configData.config.monitorStrategy = asciiToInt((char*)line+3);
                 break;
             }
-/* S-, S+ Turn ICC charging algorithm on or off */
+/* Sn Set charging algorithm */
         case 'S':
             {
-                if (line[2] == '-') configData.config.icc = false;
-                else if (line[2] == '+') configData.config.icc = true;
+                uint8_t chargeAlgorithm = line[2]-'0';
+                if (chargeAlgorithm < 3)
+                {
+                    configData.config.chargeAlgorithm =
+                        (charge_algorithm)chargeAlgorithm;
+                }
                 break;
             }
 /* Tntxx Set battery type and capacity, n is battery, t is type, xx is capacity */
