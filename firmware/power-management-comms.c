@@ -246,6 +246,17 @@ released. The command is followed by an interface number 0-5 being batteries
                                    (int32_t)configData.config.absorptionVoltage[battery]);
                 break;
             }
+/* C Ask for charger parameters to be sent */
+        case 'C':
+            {
+                char id[] = "p3";
+                dataMessageSend(id,256,0);
+                id[1] = 'P';
+                dataMessageSend(id,30,3);
+                id[1] = 'V';
+                dataMessageSend(id,97,0);
+                break;
+            }
         }
     }
 /* ================ Parameter setting commands ================  */
