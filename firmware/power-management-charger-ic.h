@@ -3,7 +3,7 @@
 This header file contains defines and prototypes specific to the charging
 task ICC algorithm.
 
-Initial 02 September 2014
+Initial 2 September 2014
 
 */
 
@@ -32,11 +32,8 @@ Initial 02 September 2014
 #include <stdint.h>
 #include <stdbool.h>
 
-/* The period, 5 seconds, for the pulsed charging phase of the ICC algorithm */
-#define SLOT_PERIOD     30*1024
-
-/* Number of slots in the ICC algorithm for pulsed charging cycle. */
-#define NUM_SLOTS       3
+/* Voltage at which rest phase ends and absorption phase starts */
+#define REST_VOLTAGE    97*256
 
 /*--------------------------------------------------------------------------*/
 /* Prototypes */

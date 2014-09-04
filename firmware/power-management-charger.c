@@ -71,9 +71,9 @@ void prvChargerTask(void *pvParameters)
 {
 
     initGlobals();
-    initLocalsICC();
     initLocals3PH();
     initLocalsIC();
+    initLocalsICC();
 
 	while (1)
 	{
@@ -114,6 +114,35 @@ Set the charger default parameters.
 static void initGlobals(void)
 {
     chargerWatchdogCount = 0;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Reset Battery Parameters when Algorithm changed
+
+This should be called only when the algorithm is changed to a different one.
+The charger parameters are reset and the battery charge state is modified to
+suit the algorithm.
+
+The current charge algorithm in use is not checked, so this could be used to
+reset the algorithm state if necessary.
+
+param[in] chargeAlgorithm. The new charge algorithm.
+*/
+
+void resetChargeAlgorithm(charge_algorithm chargeAlgorithm)
+{
+    if (chargeAlgorithm == threePH)
+    {
+        initLocals3PH();
+    }
+    else if (chargeAlgorithm == ic)
+    {
+        initLocalsIC();
+    }
+    else if (chargeAlgorithm == icc)
+    {
+        initLocalsICC();
+    }
 }
 
 /*--------------------------------------------------------------------------*/

@@ -38,6 +38,9 @@ Initial 02 September 2014
 /* Number of slots in the ICC algorithm for pulsed charging cycle. */
 #define NUM_SLOTS       3
 
+/* Voltage at which rest phase ends and absorption phase starts */
+#define REST_VOLTAGE    97*256
+
 /*--------------------------------------------------------------------------*/
 /* Prototypes */
 /*--------------------------------------------------------------------------*/

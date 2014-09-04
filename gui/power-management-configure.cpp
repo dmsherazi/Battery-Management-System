@@ -81,6 +81,13 @@ PowerManagementConfigGui::PowerManagementConfigGui(QTcpSocket* tcpSocket, QWidge
     PowerManagementConfigUi.battery3TypeCombo->addItem("Gel Cell");
     PowerManagementConfigUi.battery3TypeCombo->addItem("AGM Cell");
     PowerManagementConfigUi.battery3TypeCombo->setCurrentIndex(1);
+// Hide the charging algorithm parameter spinboxes and text.
+    PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(false);
+    PowerManagementConfigUi.chargeParameterText_1->setVisible(false);
+    PowerManagementConfigUi.chargeParameterSpinBox_2->setVisible(false);
+    PowerManagementConfigUi.chargeParameterText_2->setVisible(false);
+    PowerManagementConfigUi.chargeParameterSpinBox_3->setVisible(false);
+    PowerManagementConfigUi.chargeParameterText_3->setVisible(false);
 // Set the resistance display default (with Unicode Omega)
     PowerManagementConfigUi.battery1Resistance
             ->setText(QString("0 m").append(QChar(0x03A9)));
@@ -519,11 +526,47 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.debugMessageCheckbox->setChecked(false);
             int chargeAlgorithm = (controlByte >> 5) & 0x03;
             if (chargeAlgorithm == 0)
+            {
                 PowerManagementConfigUi.threePhaseButton->setChecked(true);
+                PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
+                PowerManagementConfigUi.chargeParameterSpinBox_1->
+                    setToolTip("Lowest duty cycle allowed to prevent it crashing to zero");
+                PowerManagementConfigUi.chargeParameterText_1->setVisible(true);
+                PowerManagementConfigUi.chargeParameterText_1->
+                    setText("Minimum Duty Cycle (%)");
+            }
             if (chargeAlgorithm == 1)
+            {
                 PowerManagementConfigUi.icButton->setChecked(true);
+                PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
+                PowerManagementConfigUi.chargeParameterSpinBox_1->
+                    setToolTip("Low voltage threshold ending the charging phase and starting the rest phase in percent of OCV");
+                PowerManagementConfigUi.chargeParameterText_1->setVisible(true);
+                PowerManagementConfigUi.chargeParameterText_1->
+                    setText("Voltage of Rest Phase");
+            }
             if (chargeAlgorithm == 2)
+            {
                 PowerManagementConfigUi.iccButton->setChecked(true);
+                PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
+                PowerManagementConfigUi.chargeParameterSpinBox_1->
+                    setToolTip("Length of a slot in a cycle of the absorption phase");
+                PowerManagementConfigUi.chargeParameterText_1->setVisible(true);
+                PowerManagementConfigUi.chargeParameterText_1->
+                    setText("Slot Length (secs)");
+                PowerManagementConfigUi.chargeParameterSpinBox_2->setVisible(true);
+                PowerManagementConfigUi.chargeParameterSpinBox_2->
+                    setToolTip("Number of slots in a cycle of the absorption phase");
+                PowerManagementConfigUi.chargeParameterText_2->setVisible(true);
+                PowerManagementConfigUi.chargeParameterText_2->
+                    setText("Number of Slots");
+                PowerManagementConfigUi.chargeParameterSpinBox_3->setVisible(true);
+                PowerManagementConfigUi.chargeParameterSpinBox_3->
+                    setToolTip("Low voltage threshold ending the rest phase and starting the absorption phase in percent of OCV");
+                PowerManagementConfigUi.chargeParameterText_3->setVisible(true);
+                PowerManagementConfigUi.chargeParameterText_3->
+                    setText("Voltage of Rest Phase");
+            }
             break;
         }
 // Show current time settings from the system

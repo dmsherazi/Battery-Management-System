@@ -355,7 +355,7 @@ released. The command is followed by an interface number 0-5 being batteries
                 configData.config.monitorStrategy = asciiToInt((char*)line+3);
                 break;
             }
-/* Sn Set charging algorithm */
+/* Sn Set charging algorithm and reset the algorithm if different to current one */
         case 'S':
             {
                 uint8_t chargeAlgorithm = line[2]-'0';
@@ -363,6 +363,8 @@ released. The command is followed by an interface number 0-5 being batteries
                 {
                     configData.config.chargeAlgorithm =
                         (charge_algorithm)chargeAlgorithm;
+                    if (getChargeAlgorithm() != chargeAlgorithm)
+                        resetChargeAlgorithm(chargeAlgorithm);
                 }
                 break;
             }

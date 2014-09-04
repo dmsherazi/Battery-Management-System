@@ -88,6 +88,10 @@ void initLocals3PH(void)
         absorptionPhaseCurrent[i] = 0;
         voltageAv[i] = 0;
         currentAv[i] = 0;
+/* Set battery state if inappropriate. If in rest phase from the ICC
+algorithm then move to absorption phase. */
+        if (getBatteryChargingPhase(i) == restC)
+            setBatteryChargingPhase(i,absorptionC);
     }
 }
 

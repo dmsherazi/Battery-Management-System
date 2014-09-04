@@ -40,6 +40,7 @@ Initial 18 October 2013
 /*--------------------------------------------------------------------------*/
 void prvChargerTask(void *pvParameters);
 
+void resetChargeAlgorithm(charge_algorithm chargeAlgorithm);
 battery_Ch_States getBatteryChargingPhase(int battery);
 void setBatteryChargingPhase(int battery, battery_Ch_States chargePhase);
 void checkChargerWatchdog(void);

@@ -93,6 +93,10 @@ void initLocalsICC(void)
     {
         voltageAv[i] = 0;
         currentAv[i] = 0;
+/* Set battery state if inappropriate. If in absorption phase from the 3PH
+algorithm then move to rest phase. */
+        if (getBatteryChargingPhase(i) == absorptionC)
+            setBatteryChargingPhase(i,restC);
     }
 /* Turn on charger by setting PWM to maximum. */
     pwmSetDutyCycle(100*256);
@@ -174,7 +178,7 @@ during the slot. */
 /* Manage change from rest to absorption (pulsed charging) phase */
         if ((getBatteryChargingPhase(index) == restC) &&
             (computeSoC(voltageAv[index],getTemperature(),
-                           getBatteryType(index)) < 97*256))
+                           getBatteryType(index)) < REST_VOLTAGE))
             setBatteryChargingPhase(index,absorptionC);
 /* Manage change from bulk to rest phase */
         if ((getBatteryChargingPhase(index) == bulkC) &&
