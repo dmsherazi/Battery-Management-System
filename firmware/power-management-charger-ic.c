@@ -62,6 +62,11 @@ Initial 4 September 2014
 #include "power-management-charger-ic.h"
 
 static uint8_t batteryNextIndex;    /* Next battery for spare slot */
+static uint32_t bulkTime;           /* length of a charge cycle */
+static uint32_t restTime;           /* length of a rest cycle */
+static uint32_t cycleTime;          /* length of a cycle */
+static int32_t accumulatedCharge;   /* accumulated charge in a cycle */
+static int32_t averageCurrent;      /* average current over the cycle */
 
 /* Include the common code here so that everything compiles as a unit */
 #include "power-management-charger-common.inc"
@@ -73,6 +78,10 @@ static uint8_t batteryNextIndex;    /* Next battery for spare slot */
 
 void initLocalsIC(void)
 {
+    bulkTime = 1;
+    restTime = 0;
+    accumulatedCharge = 0;
+    averageCurrent = 0;
     batteryNextIndex = 1;
     uint8_t i=0;
     for (i=0; i<NUM_BATS; i++)
@@ -98,12 +107,56 @@ void chargerControlIC(uint8_t battery)
 /* Compute the average current and voltage */
     calculateAverageMeasures();
 
+    uint8_t index = battery-1;
+/* Compute the average current over a charge/rest cycle for the battery
+under charge only. */
+    if (getBatteryChargingPhase(index) == bulkC)
+    {
+/* When a cycle is completed the average current over the entire cycle is found.
+The accumulated charge and rest time are zeroed ready for the next cycle. */
+        if (bulkTime == 0)      /* Have just completed a cycle */
+        {
+            cycleTime += restTime;
+            if (cycleTime > 0) averageCurrent = accumulatedCharge/cycleTime;
+            else averageCurrent = 0;
+            accumulatedCharge = 0;
+            restTime = 0;
+        }
+/* Build up the accumulated charge over the bulk phase period. */
+        accumulatedCharge += getBatteryCurrent(index)-getBatteryCurrentOffset(index);
+        bulkTime++;
+    }
+/* When the charging phase passes to the rest phase, keep the time in bulk
+phase and reset the bulk timer to signal when the cycle is ended. */
+    else if (getBatteryChargingPhase(index) == restC)
+    {
+        if (restTime == 0)
+        {
+            cycleTime = bulkTime;
+            bulkTime = 0;
+        }
+        restTime++;
+    }
+
+/* Manage the change to float phase when the current drops below the float
+threshold. (Note: measured currents are negative while charging).
+When the change occurs, force the SoC to 100%. This may not be correct if
+the battery is faulty with a low terminal voltage, but that case is handled
+by the resetBattery function.
+Also change to float if the cycle time has gone too long. */
+    if ((-averageCurrent < getFloatStageCurrent(index)) ||
+        (restTime > FLOAT_DELAY/getChargerDelay()))
+    {
+        setBatteryChargingPhase(index, floatC);
+        resetBatterySoC(index);
+    }
+
 /* Battery will only be zero if manually set or if power source is absent. */
     if (battery > 0)
     {
 /* If the designated battery under charge is in bulk phase, allocate it to
 ensure it gets priority charge. */
-        if (getBatteryChargingPhase(battery-1) == bulkC)
+        if (getBatteryChargingPhase(index) == bulkC)
             batteryUnderCharge = battery;
 /* else allocate the battery under charge to the next battery under bulk charge
 in turn. */ 
@@ -132,7 +185,6 @@ is in an active charging phase, otherwise turn it off. */
         else setSwitch(0,PANEL);
     }
 
-    uint8_t index = 0;
     for (index=0; index < NUM_BATS; index++)
     {
 /* Manage change from rest to bulk phase */

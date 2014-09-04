@@ -133,7 +133,7 @@ NOTE: in the following all battery currents are negative while charging. */
             ((absorptionPhaseCurrent[index]*240)/256 > currentAv[index]))
         {
             absorptionPhaseTime[index]++;
-            if (absorptionPhaseTime[index] > 1800000/getChargerDelay())
+            if (absorptionPhaseTime[index] > FLOAT_DELAY/getChargerDelay())
             {
                 setBatteryChargingPhase(index,floatC);
                 absorptionPhaseTime[index] = 0;
