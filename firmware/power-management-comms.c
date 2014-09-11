@@ -48,6 +48,7 @@ Initial 29 September 2013
 #include "power-management-file.h"
 #include "power-management-measurement.h"
 #include "power-management-monitor.h"
+#include "power-management-charger.h"
 #include "power-management-time.h"
 #include "power-management-lib.h"
 #include "power-management-comms.h"

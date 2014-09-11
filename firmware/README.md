@@ -27,11 +27,12 @@ Three versions are here represented. Each refers to slightly different
 voltage and current scales in the measurement header for the PCB version.
 It is compiled with 'make VERSION=x' where x = 2 or 3. Version 1 is obsolete.
 
-Two charger algorithms are provided: three phase and interrupted charge control.
-It is compiled with 'make CHARGER=x" where x = ORIG, 3PH or ICC. The ORIG
-algorithm is three phase, now deprecated as development is now centered on 3PH.
+Three charger algorithms are provided: Three Phase, Intermittent Charge and
+Interrupted Charge Control. the latter two avoid EMI problems caused by PWM
+switching in Three Phase, and also reduce overcharging by keeping the battery
+charge voltages as low as possible.
 
-(c) K. Sarkies 01/09/2014
+(c) K. Sarkies 11/09/2014
 
 TODO
 

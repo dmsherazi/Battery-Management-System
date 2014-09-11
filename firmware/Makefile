@@ -2,7 +2,6 @@
 
 PROJECT	    = power-management
 VERSION    ?= 3
-CHARGER    ?= 3PH
 PREFIX	    = arm-none-eabi
 CC		    = $(PREFIX)-gcc
 LD		    = $(PREFIX)-gcc
