@@ -793,7 +793,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Absorption Voltage Limit</string>
+      <string>Gassing Voltage Limit</string>
      </property>
     </widget>
     <widget class="QLabel" name="battery1AbsorptionVoltage">
@@ -1037,7 +1037,7 @@
       </font>
      </property>
      <property name="toolTip">
-      <string>Accelerate return to voltage limit when charging voltage is excessive.</string>
+      <string>This allows a battery to be isolated for SoC checking.</string>
      </property>
      <property name="text">
       <string>Maintain Batteries under Isolation</string>
@@ -1398,7 +1398,7 @@
        <x>62</x>
        <y>390</y>
        <width>81</width>
-       <height>36</height>
+       <height>46</height>
       </rect>
      </property>
      <property name="toolTip">
@@ -1443,7 +1443,7 @@
        <x>162</x>
        <y>390</y>
        <width>81</width>
-       <height>36</height>
+       <height>46</height>
       </rect>
      </property>
      <property name="toolTip">
@@ -1478,7 +1478,7 @@
        <x>260</x>
        <y>390</y>
        <width>81</width>
-       <height>36</height>
+       <height>46</height>
       </rect>
      </property>
      <property name="toolTip">

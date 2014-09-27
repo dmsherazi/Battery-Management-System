@@ -1449,7 +1449,7 @@
   <widget class="QCheckBox" name="autoTrackCheckBox">
    <property name="geometry">
     <rect>
-     <x>252</x>
+     <x>14</x>
      <y>515</y>
      <width>151</width>
      <height>22</height>
@@ -1876,8 +1876,8 @@
   <widget class="QPushButton" name="connectButton">
    <property name="geometry">
     <rect>
-     <x>94</x>
-     <y>515</y>
+     <x>284</x>
+     <y>510</y>
      <width>89</width>
      <height>27</height>
     </rect>
@@ -2031,6 +2031,32 @@
    </property>
    <property name="text">
     <string/>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="sourceComboBox">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>510</y>
+     <width>87</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Source of data stream</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="sourceLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>378</x>
+     <y>510</y>
+     <width>113</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>/dev/ttyUSB0</string>
    </property>
   </widget>
  </widget>

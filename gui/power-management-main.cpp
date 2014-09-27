@@ -69,6 +69,10 @@ PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
 {
 // Build the User Interface display from the Ui class in ui_mainwindowform.h
     PowerManagementMainUi.setupUi(this);
+    PowerManagementMainUi.sourceComboBox->addItem("Serial");
+    PowerManagementMainUi.sourceComboBox->addItem("TCP/IP");
+    PowerManagementMainUi.sourceComboBox->setCurrentIndex(0);    //Serial Default
+    PowerManagementMainUi.sourceLineEdit->setText("/dev/ttyUSB0");
 #ifdef SERIAL
     PowerManagementMainUi.connectButton->setEnabled(false);
     socket = new SerialPort(SERIAL_PORT);
@@ -84,7 +88,7 @@ PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
                             "You may need root privileges?");
 #else
 // Query the socket to establish a connection
-    connectAddress = "192.168.2.15";
+    connectAddress = "192.168.2.14";
     connectPort = 6666;
     socket = NULL;
     on_connectButton_clicked();

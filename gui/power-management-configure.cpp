@@ -552,10 +552,10 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.icButton->setChecked(true);
                 PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
                 PowerManagementConfigUi.chargeParameterSpinBox_1->
-                    setToolTip("Low voltage threshold ending the charging phase and starting the rest phase in percent of OCV");
+                    setToolTip("Low voltage threshold ending the charging phase and starting the rest phase, in percent of OCV");
                 PowerManagementConfigUi.chargeParameterText_1->setVisible(true);
                 PowerManagementConfigUi.chargeParameterText_1->
-                    setText("Voltage of Rest Phase");
+                    setText("Rest Phase Voltage %OCV");
                 PowerManagementConfigUi.chargeParameterSpinBox_2->setVisible(false);
                 PowerManagementConfigUi.chargeParameterText_2->setVisible(false);
                 PowerManagementConfigUi.chargeParameterSpinBox_3->setVisible(false);
@@ -566,10 +566,10 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.iccButton->setChecked(true);
                 PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
                 PowerManagementConfigUi.chargeParameterSpinBox_1->
-                    setToolTip("Low voltage threshold ending the rest phase and starting the absorption phase in percent of OCV");
+                    setToolTip("Low voltage threshold ending the rest phase and starting the absorption phase, in percent of OCV");
                 PowerManagementConfigUi.chargeParameterText_1->setVisible(true);
                 PowerManagementConfigUi.chargeParameterText_1->
-                    setText("Voltage of Rest Phase");
+                    setText("Rest Phase Voltage %OCV");
                 PowerManagementConfigUi.chargeParameterSpinBox_2->setVisible(true);
                 PowerManagementConfigUi.chargeParameterSpinBox_2->
                     setToolTip("Length of a slot in a cycle of the absorption phase");
@@ -583,6 +583,16 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.chargeParameterText_3->
                     setText("Number of Slots");
             }
+            bool avoidLoad = (((controlByte >> 7) & 0x01) > 0);
+            if (avoidLoad)
+                PowerManagementConfigUi.loadChargeCheckBox->setChecked(true);
+            else
+                PowerManagementConfigUi.loadChargeCheckBox->setChecked(false);
+            bool maintainIsolate = (((controlByte >> 8) & 0x01) > 0);
+            if (maintainIsolate)
+                PowerManagementConfigUi.isolationMaintainCheckBox->setChecked(true);
+            else
+                PowerManagementConfigUi.isolationMaintainCheckBox->setChecked(false);
             break;
         }
 // Show charger minimum duty cycle parameter
