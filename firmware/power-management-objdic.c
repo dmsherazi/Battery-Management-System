@@ -390,11 +390,13 @@ uint8_t getMonitorStrategy(void)
 /*--------------------------------------------------------------------------*/
 /** @brief Return a status word showing software controls.
 
-bit 0 if autoTrack,
-bit 1 if recording,
-bit 3 if measurements are being sent
-bit 4 if debug messages are being sent
+bit  0   if autoTrack,
+bit  1   if recording,
+bit  3   if measurements are being sent
+bit  4   if debug messages are being sent
 bits 5,6 charge algorithm
+bit  7   avoid load on charging battery
+bit  8   maintain battery under isolation
 
 @returns uint16_t status of controls
 */

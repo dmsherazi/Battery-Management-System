@@ -145,7 +145,7 @@ the battery is faulty with a low terminal voltage, but that case is handled
 by the resetBattery function.
 Also change to float if the cycle time has gone too long. */
     if ((-averageCurrent < getFloatStageCurrent(index)) ||
-        (restTime > FLOAT_DELAY/getChargerDelay()))
+        (restTime > (FLOAT_DELAY*1024)/getChargerDelay()))
     {
         setBatteryChargingPhase(index, floatC);
         resetBatterySoC(index);
