@@ -442,6 +442,7 @@ Checks the filename and handle for the write and read files, if they are open. *
             break;
         }
     }
+/* Return the file status */
     xQueueSendToBack(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
 }
 
@@ -517,8 +518,8 @@ uint8_t recordSingle(char* ident, int32_t param1)
             stringAppend(record, "\r\n");
             uint8_t length = stringLength(record);
             record[0] = writeFileHandle;
-            sendFileCommand('P',length, (uint8_t*)record);
-            xQueueReceive(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
+            if (sendFileCommand('P',length, (uint8_t*)record))
+                xQueueReceive(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
             xSemaphoreGive(fileSendSemaphore);
         }
     }
@@ -564,8 +565,8 @@ uint8_t recordDual(char* ident, int32_t param1, int32_t param2)
             stringAppend(record, "\r\n");
             uint8_t length = stringLength(record);
             record[0] = writeFileHandle;
-            sendFileCommand('P',length, (uint8_t*)record);
-            xQueueReceive(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
+            if (sendFileCommand('P',length, (uint8_t*)record))
+                xQueueReceive(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
             xSemaphoreGive(fileSendSemaphore);
         }
     }
@@ -605,8 +606,8 @@ uint8_t recordString(char* ident, char* string)
             stringAppend(record, "\r\n");
             uint8_t length = stringLength(record);
             record[0] = writeFileHandle;
-            sendFileCommand('P',length, (uint8_t*)record);
-            xQueueReceive(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
+            if (sendFileCommand('P',length, (uint8_t*)record))
+                xQueueReceive(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
             xSemaphoreGive(fileSendSemaphore);
         }
     }
@@ -622,21 +623,26 @@ All commands are a single character followed by the length of the parameters.
 The command is aborted in its entirety if there is insufficient space available
 in the queue.
 
-@param[in] char command: Command to be sent
+@param[in] char command: Command to be sent.
 @param[in] uint8_t length: Length of parameter set only.
-@param[in] uint8_t *parameters: Parameter list. 
+@param[in] uint8_t *parameters: Parameter list.
+@returns true if the command succeeded.
 */
 
-void sendFileCommand(char command, uint8_t length, uint8_t *parameters)
+bool sendFileCommand(char command, uint8_t length, uint8_t *parameters)
 {
     uint8_t i;
     uint8_t totalLength = length+2;
     if (uxQueueSpacesAvailable(fileSendQueue) >= totalLength)
     {
-        xQueueSendToBack(fileSendQueue,&command,FILE_SEND_TIMEOUT);
-        xQueueSendToBack(fileSendQueue,&totalLength,FILE_SEND_TIMEOUT);
+        if (xQueueSendToBack(fileSendQueue,&command,FILE_SEND_TIMEOUT))
+            return false;
+        if (xQueueSendToBack(fileSendQueue,&totalLength,FILE_SEND_TIMEOUT))
+            return false;
         for (i=0; i<length; i++)
-            xQueueSendToBack(fileSendQueue,parameters+i,FILE_SEND_TIMEOUT);
+            if (xQueueSendToBack(fileSendQueue,parameters+i,FILE_SEND_TIMEOUT))
+                return false;
     }
+    return true;
 }
 

@@ -24,4 +24,12 @@
 auxiliary/
 moc_*
 ui_*
+qrc_*
+*.txt
+Makefile
+*.cmd
+*.net
+data-processing
+power-management
+power-management-tcp
 

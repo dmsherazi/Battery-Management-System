@@ -40,7 +40,7 @@ void prvFileTask(void *pvParameters);
 uint8_t recordString(char* ident, char* string);
 uint8_t recordDual(char* ident, int32_t param1, int32_t param2);
 uint8_t recordSingle(char* ident, int32_t param1);
-void sendFileCommand(char command, uint8_t length, uint8_t *parameters);
+bool sendFileCommand(char command, uint8_t length, uint8_t *parameters);
 
 #endif
 
