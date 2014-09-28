@@ -636,6 +636,16 @@ periods. */
                 {
                     batteryOpState[i] = chargingO;
                 }
+/* If the operational state changes from isolated, update SoC if it has been
+isolated for over 2 hours */
+                if ((lastOpState == isolatedO) &&
+                    (batteryOpState[i] != isolatedO) &&
+                    (batteryIsolationTime[i] > (uint32_t)(2*3600*1024)/getMonitorDelay()))
+                {
+                    batterySoC[i] = computeSoC(getBatteryVoltage(i),
+                                               getTemperature(),getBatteryType(i));
+                    batteryIsolationTime[i] = 0;
+                }
 /* Restart isolation timer if not isolated or if charger and loads on same
 battery (isolation is not possible due to leakage of charging current to other
 batteries). Do not reset to zero so that the current isolated timer can handover
@@ -667,7 +677,7 @@ used if autotrack is turned off. */
 /* Compute state of charge estimates from OCV if currents are low for an hour.
 The steady current indicator is incremented on each cycle that the current is
 below a threshold of about 80mA. */
-        uint32_t monitorHour = 3600*1000/(portTICK_RATE_MS*getMonitorDelay());
+        uint32_t monitorHour = (uint32_t)(3600*1000)/getMonitorDelay();
         for (i=0; i<NUM_BATS; i++)
         {
             if (batteryHealthState[i] != missingH)

@@ -70,7 +70,6 @@ void prvWatchdogTask(void *pvParameters)
 	{
 /* Reset the hardware independent watchdog timer */
         iwdgReset();
-/* Wait until the next tick cycle */
 		vTaskDelay(getWatchdogDelay());
         checkChargerWatchdog();
         checkMeasurementWatchdog();
