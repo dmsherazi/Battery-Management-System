@@ -66,7 +66,7 @@ Initial 18 October 2013
 /* Local Persistent Variables */
 static uint16_t dutyCycle;      /* percentage times 256 */
 static uint16_t dutyCycleMax;
-static uint16_t absorptionPhaseTime[NUM_BATS];   /* time in absorption */
+static uint32_t absorptionPhaseTime[NUM_BATS];   /* time in absorption */
 static int16_t absorptionPhaseCurrent[NUM_BATS];
 
 /* Include the common code here so that everything compiles as a unit */
@@ -134,7 +134,7 @@ NOTE: in the following all battery currents are negative while charging. */
             {
                 absorptionPhaseTime[index]++;
 /* If time exceeded, change to float regardless */
-                if (absorptionPhaseTime[index] > (FLOAT_DELAY*1024)/getChargerDelay())
+                if (absorptionPhaseTime[index] > (uint32_t)(FLOAT_DELAY*1024)/getChargerDelay())
                 {
                     setBatteryChargingPhase(index,floatC);
                     absorptionPhaseTime[index] = 0;
