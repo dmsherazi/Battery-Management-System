@@ -635,12 +635,12 @@ bool sendFileCommand(char command, uint8_t length, uint8_t *parameters)
     uint8_t totalLength = length+2;
     if (uxQueueSpacesAvailable(fileSendQueue) >= totalLength)
     {
-        if (xQueueSendToBack(fileSendQueue,&command,FILE_SEND_TIMEOUT))
+        if (! xQueueSendToBack(fileSendQueue,&command,FILE_SEND_TIMEOUT))
             return false;
-        if (xQueueSendToBack(fileSendQueue,&totalLength,FILE_SEND_TIMEOUT))
+        if (! xQueueSendToBack(fileSendQueue,&totalLength,FILE_SEND_TIMEOUT))
             return false;
         for (i=0; i<length; i++)
-            if (xQueueSendToBack(fileSendQueue,parameters+i,FILE_SEND_TIMEOUT))
+            if (! xQueueSendToBack(fileSendQueue,parameters+i,FILE_SEND_TIMEOUT))
                 return false;
     }
     return true;
