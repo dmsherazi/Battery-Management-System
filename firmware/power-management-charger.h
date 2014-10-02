@@ -31,8 +31,7 @@ Initial 18 October 2013
 
 /* SoC above which charging is stopped in float phase */
 #define FLOAT_BULK_SOC  95*256
-/* Time to wait before passing to float. 2 hours.
-The number is in seconds. */
+/* Time to wait before passing to float. 2 hours, in seconds. */
 #define FLOAT_DELAY     7200
 
 #include <stdint.h>

@@ -60,7 +60,7 @@ Initial 2 October 2014
 
 static uint32_t offTime[NUM_BATS];  /* Battery time in rest */
 static uint32_t onTime[NUM_BATS];   /* Battery time in charge */
-static int32_t averageCurrent[NUM_BATS];    /* average current over the cycle */
+static int64_t cumulatedOffTime[NUM_BATS];
 static int64_t cumulatedCurrent[NUM_BATS];
 static uint8_t batteryUnderCharge;
 
@@ -76,8 +76,8 @@ void initLocalsPulse(void)
     {
         offTime[i] = 0;
         onTime[i] = 0;
-        averageCurrent[i] = 0;
         cumulatedCurrent[i] = 0;
+        cumulatedOffTime[i] = 0;
 /* Set battery state if inappropriate. If in absorption phase from the 3PH
 algorithm then move to rest phase. */
         if (getBatteryChargingPhase(i) == absorptionC)
@@ -88,7 +88,7 @@ algorithm then move to rest phase. */
 }
 
 /*--------------------------------------------------------------------------*/
-/* @brief Execute one cycle of the ICC Algorithm
+/* @brief Execute one cycle of the Pulse Charger Algorithm
 
 */
 
@@ -126,19 +126,26 @@ current over the last full cycle. */
             {
                 setBatteryChargingPhase(index,restC);
                 batteryUnderCharge = 0;
-                averageCurrent[index] = cumulatedCurrent[index];
-/* If computed average current is below float threshold, or time exceeded,
-go to float phase */
-                if ((averageCurrent[index] < getFloatStageCurrent(index)) ||
-                    (offTime[index] > (uint32_t)(FLOAT_DELAY*1024)/getChargerDelay()))
+                uint32_t totalTime = (offTime[index] + onTime[index]);
+/* Average current over the cycle is the cumulation over the on-time, divided by
+the total time. If the latter is zero, set average to avoid triggering float. */
+                int32_t averageCurrent = getFloatStageCurrent(index);;
+                if (totalTime > 0)
+                    averageCurrent = cumulatedCurrent[index]/totalTime;
+/* Update cumulated off time to check against charging time limit */
+                cumulatedOffTime[index] += offTime[index];
+/* If average current is below float threshold, or time exceeded, go to float */
+                if ((averageCurrent < getFloatStageCurrent(index)) ||
+                    (cumulatedOffTime[index] > (uint32_t)(FLOAT_DELAY*1024)/getChargerDelay()))
                 {
-                    averageCurrent[index] = 0;
+                    cumulatedCurrent[index] = 0;
+                    cumulatedOffTime[index] = 0;
                     setBatteryChargingPhase(index,floatC);
                 }
             }
         }
-/* If the charger isn't allocated, check all batteries starting at designated,
-for one in bulk phase. */
+/* If the charger isn't allocated, check all batteries, starting at designated,
+to locate one in bulk phase. */
         if (batteryUnderCharge == 0)
         {
             uint8_t i = 0;
