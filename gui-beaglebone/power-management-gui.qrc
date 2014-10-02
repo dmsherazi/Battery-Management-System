@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="main">
+    <file>battery2.png</file>
+    <file>light2.png</file>
+    <file>panel4.png</file>
+  </qresource>
+</RCC>
