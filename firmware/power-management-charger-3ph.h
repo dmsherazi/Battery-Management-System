@@ -38,10 +38,6 @@ cause duty cycle to go to zero at any time. The lower this is, the longer
 it will take the duty cycle to rise in response to changes. */
 #define MIN_DUTYCYCLE   256
 
-/* Time to wait before passing to float. 2 hours.
-The number is in seconds. */
-#define FLOAT_DELAY     7200
-
 /*--------------------------------------------------------------------------*/
 /* Prototypes */
 /*--------------------------------------------------------------------------*/

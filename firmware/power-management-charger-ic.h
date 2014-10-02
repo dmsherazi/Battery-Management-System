@@ -35,9 +35,6 @@ Initial 2 September 2014
 /* Voltage at which rest phase ends and absorption phase starts */
 #define REST_VOLTAGE    97*256
 
-/* Time to wait before passing to float. 2 hours. */
-#define FLOAT_DELAY     28800
-
 /*--------------------------------------------------------------------------*/
 /* Prototypes */
 /*--------------------------------------------------------------------------*/

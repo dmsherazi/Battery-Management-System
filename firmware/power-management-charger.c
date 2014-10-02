@@ -50,7 +50,7 @@ Initial 14 June 2014
 #include "power-management-charger.h"
 #include "power-management-charger-icc.h"
 #include "power-management-charger-3ph.h"
-#include "power-management-charger-ic.h"
+#include "power-management-charger-pulse.h"
 #include "power-management-objdic.h"
 
 /* Local Prototypes */
@@ -59,6 +59,8 @@ static void initGlobals(void);
 /* Local Persistent Variables */
 static battery_Ch_States batteryChargingPhase[NUM_BATS];
 static uint8_t chargerWatchdogCount;
+static int16_t voltageAv[NUM_BATS];
+static int16_t currentAv[NUM_BATS];
 
 /*--------------------------------------------------------------------------*/
 /* @brief Charging Task
@@ -72,8 +74,8 @@ void prvChargerTask(void *pvParameters)
 
     initGlobals();
     initLocals3PH();
-    initLocalsIC();
     initLocalsICC();
+    initLocalsPulse();
 
 	while (1)
 	{
@@ -100,7 +102,7 @@ terminal voltage drops below a charging restart threshold (95%). */
         else if (getChargeAlgorithm() == threePH)
             chargerControl3PH(battery);
         else if (getChargeAlgorithm() == ic)
-            chargerControlIC(battery);
+            chargerControlPulse(battery);
 
     }
 }
@@ -114,6 +116,12 @@ Set the charger default parameters.
 static void initGlobals(void)
 {
     chargerWatchdogCount = 0;
+    uint8_t i;
+    for (i=0; i<NUM_BATS; i++)
+    {
+        voltageAv[i] = 0;
+        currentAv[i] = 0;
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -135,14 +143,36 @@ void resetChargeAlgorithm(charge_algorithm chargeAlgorithm)
     {
         initLocals3PH();
     }
-    else if (chargeAlgorithm == ic)
-    {
-        initLocalsIC();
-    }
     else if (chargeAlgorithm == icc)
     {
         initLocalsICC();
     }
+    else if (chargeAlgorithm == ic)
+    {
+        initLocalsPulse();
+    }
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Access the Averaged Battery Terminal Voltage
+
+@param[in] battery: 0..NUM_BATS-1
+*/
+
+int16_t getVoltageAv(int battery)
+{
+    return voltageAv[battery];
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Access the Averaged Battery Terminal Current
+
+@param[in] battery: 0..NUM_BATS-1
+*/
+
+int16_t getCurrentAv(int battery)
+{
+    return currentAv[battery];
 }
 
 /*--------------------------------------------------------------------------*/
@@ -182,6 +212,75 @@ void checkChargerWatchdog(void)
                     configMINIMAL_STACK_SIZE, NULL, CHARGER_TASK_PRIORITY, NULL);
         sendStringLowPriority("D","Charger Restarted");
         recordString("D","Charger Restarted");
+    }
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Correct the Voltage Limit for Temperature
+
+Based on an heuristic measure from battery data.
+*/
+
+int16_t voltageLimit(uint16_t limitV)
+{
+    int32_t voltageOffset = (1984*(6835-getTemperature())) >> 16;
+    return limitV + voltageOffset;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Charging Voltage Control
+
+Adapt the PWM Duty Cycle to bring the voltage to its limit point.
+The limit voltage is adjusted according to temperature.
+
+@param[in] int16_t voltage: The measured voltage.
+@param[in] int16_t vLimit: The limit voltage target.
+@param[in] int16_t dutyCycle: The current duty cycle.
+@returns int16_t The adjusted duty cycle.
+*/
+
+void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle)
+{
+    uint32_t newDutyCycle = *dutyCycle;
+    int16_t vLimitAdjusted = voltageLimit(vLimit);
+    int16_t voltageDiff = (voltage - vLimitAdjusted);
+    if (voltageDiff > 0)
+    {
+/* Speed up the return to the voltage limit as the difference is greater */
+/*        newDutyCycle = (newDutyCycle*((vLimitAdjusted-11*256)*115)/(voltage-11*256))>>7;*/
+        newDutyCycle = (newDutyCycle*115)>>7;
+    }
+    else
+    {
+/* Increase by about 9% */
+        newDutyCycle = (newDutyCycle*140)>>7;
+    }
+    *dutyCycle = newDutyCycle;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Compute Averaged Voltages and Currents
+
+Compute averaged voltages and currents to manage phase switchover.
+Use first order exponential filters, separate coefficients.
+Do this for all batteries. Missing ones will be ignored anyway.
+*/
+
+void calculateAverageMeasures(void)
+{
+    uint8_t i;
+    for (i=0; i<NUM_BATS; i++)
+    {
+        int16_t current = getBatteryCurrent(i)-getBatteryCurrentOffset(i);
+        int16_t voltage = getBatteryVoltage(i);
+/* Seed the filter with the most recent measurement (rather than zero) */
+        if (voltageAv[i] == 0) voltageAv[i] = voltage;
+        if (currentAv[i] == 0) currentAv[i] = current;
+/* IIR filters with fairly short time constant */
+        voltageAv[i] = voltageAv[i] +
+                    ((getAlphaV()*(voltage - voltageAv[i]))>>8);
+        currentAv[i] = currentAv[i] +
+                    ((getAlphaC()*(current - currentAv[i]))>>8);
     }
 }
 

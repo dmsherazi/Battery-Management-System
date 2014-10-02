@@ -31,6 +31,9 @@ Initial 18 October 2013
 
 /* SoC above which charging is stopped in float phase */
 #define FLOAT_BULK_SOC  95*256
+/* Time to wait before passing to float. 2 hours.
+The number is in seconds. */
+#define FLOAT_DELAY     7200
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -44,6 +47,11 @@ void resetChargeAlgorithm(charge_algorithm chargeAlgorithm);
 battery_Ch_States getBatteryChargingPhase(int battery);
 void setBatteryChargingPhase(int battery, battery_Ch_States chargePhase);
 void checkChargerWatchdog(void);
+void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle);
+void calculateAverageMeasures(void);
+int16_t voltageLimit(uint16_t limitV);
+int16_t getVoltageAv(int battery);
+int16_t getCurrentAv(int battery);
 
 #endif
 

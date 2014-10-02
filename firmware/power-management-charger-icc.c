@@ -3,9 +3,7 @@
 Battery Charging Task
 
 This task implements an algorithm to manage charging of batteries. Battery
-current and terminal voltage are monitored constantly. If either rise beyond
-the preset limits, charging is cut off and held off until the quantity drops
-below the limit.
+current and terminal voltage are monitored constantly.
 
 The charging task uses the Interrupted Charge Control algorithm. This
 algorithm stops charging the battery when the gassing voltage is reached, and
@@ -21,15 +19,15 @@ specified limit, at which point the charger reverts to bulk phase.
    their allocated time slot then reallocate it to other bulk charging
    batteries, if any, in a round-robin scheme.
 2. Rest until the voltage falls to the equivalent of 97% SoC.
-3. Charge for 5 seconds at full rate.
-4. Rest for 10 seconds.
-5. Stop when the gassing voltage is reached.
+3. Charge for 30 seconds at full rate.
+4. Rest for 60 seconds.
+5. Stop when the gassing voltage is again reached.
 
-The monitor designates a battery under charge. This will be a battery with a
-low SoC. The charging algorithm uses this to prioritise the charging of the
-batteries. The designated battery will be charged exclusively while in bulk
-phase. When it enters the rest phase the other batteries will be charged
-without priority.
+While a battery is in a rest phase another battery may be put on charge.
+
+The monitor designates a battery under charge. This will normally be a battery
+with the lowest SoC. The charging algorithm uses this to prioritise the
+charging of the batteries.
 
 Initial 14 June 2014
 */
@@ -74,9 +72,7 @@ Initial 14 June 2014
 static uint8_t batteryNextIndex;    /* Next battery for spare slot */
 static uint8_t slotBattery;         /* Slot available for battery */
 static uint8_t slotTime;            /* Slot time counter */
-
-/* Include the common code here so that everything compiles as a unit */
-#include "power-management-charger-common.inc"
+static uint8_t batteryUnderCharge;
 
 /*--------------------------------------------------------------------------*/
 /* @brief Initialise Local Variables
@@ -91,8 +87,6 @@ void initLocalsICC(void)
     uint8_t i=0;
     for (i=0; i<NUM_BATS; i++)
     {
-        voltageAv[i] = 0;
-        currentAv[i] = 0;
 /* Set battery state if inappropriate. If in absorption phase from the 3PH
 algorithm then move to rest phase. */
         if (getBatteryChargingPhase(i) == absorptionC)
@@ -114,7 +108,9 @@ void chargerControlICC(uint8_t battery)
 
     slotTime++;
 
-/* Battery will only be zero if manually set or if power source is absent. */
+/* Battery will only be zero if manually set or if power source is absent.
+In such a case we don't allocate other batteries, but just follow the
+selected one. */
     if (battery > 0)
     {
 /* If the designated battery under charge is in bulk phase, allocate it in all
@@ -152,8 +148,11 @@ over time. */
                             break;
                         }
                     }
-/* If no battery found to take the slot, turn off charger. */
-                    if (i >= NUM_BATS) batteryUnderCharge = 0;
+/* If no battery found to take the slot, turn off the charger. */
+                    if (i >= NUM_BATS)
+                    {
+                        batteryUnderCharge = 0;
+                    }
                 }
                 else batteryUnderCharge = slotBattery;
             }
@@ -173,16 +172,16 @@ during the slot. */
     {
 /* Manage change from absorption to float phase. */
         if ((getBatteryChargingPhase(index) == absorptionC) &&
-            (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
+            (getVoltageAv(index) > voltageLimit(getAbsorptionVoltage(index))))
             setBatteryChargingPhase(index,floatC);
 /* Manage change from rest to absorption (pulsed charging) phase */
         if ((getBatteryChargingPhase(index) == restC) &&
-            (computeSoC(voltageAv[index],getTemperature(),
+            (computeSoC(getVoltageAv(index),getTemperature(),
                            getBatteryType(index)) < REST_VOLTAGE))
             setBatteryChargingPhase(index,absorptionC);
 /* Manage change from bulk to rest phase */
         if ((getBatteryChargingPhase(index) == bulkC) &&
-            (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
+            (getVoltageAv(index) > voltageLimit(getAbsorptionVoltage(index))))
             setBatteryChargingPhase(index,restC);
     }
 }

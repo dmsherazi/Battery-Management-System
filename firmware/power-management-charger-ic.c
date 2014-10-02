@@ -15,11 +15,9 @@ the average current over the cycle period drops to the float limit or the duty
 cycle continues for an extended period. At this point the battery is charged
 and only side reactions are occurring.
 
-The monitor designates a battery under charge. This will be a battery with a
-low SoC. The charging algorithm uses this to prioritise the charging of the
-batteries. The designated battery will be charged exclusively while in bulk
-phase. When it enters the rest phase the other batteries will be charged
-without priority.
+The monitor designates a battery under charge. This will normally be a battery
+with the lowest SoC. The charging algorithm uses this to prioritise the
+charging of the batteries.
 
 Initial 4 September 2014
 */
@@ -67,9 +65,7 @@ static uint32_t restTime;           /* length of a rest cycle */
 static uint32_t cycleTime;          /* length of a cycle */
 static int32_t accumulatedCharge;   /* accumulated charge in a cycle */
 static int32_t averageCurrent;      /* average current over the cycle */
-
-/* Include the common code here so that everything compiles as a unit */
-#include "power-management-charger-common.inc"
+static uint8_t batteryUnderCharge;
 
 /*--------------------------------------------------------------------------*/
 /* @brief Initialise Local Variables
@@ -86,8 +82,6 @@ void initLocalsIC(void)
     uint8_t i=0;
     for (i=0; i<NUM_BATS; i++)
     {
-        voltageAv[i] = 0;
-        currentAv[i] = 0;
 /* Set battery state if inappropriate. If in absorption phase from the 3PH
 algorithm then move to rest phase. */
         if (getBatteryChargingPhase(i) == absorptionC)
@@ -189,12 +183,12 @@ is in an active charging phase, otherwise turn it off. */
     {
 /* Manage change from rest to bulk phase */
         if ((getBatteryChargingPhase(index) == restC) &&
-            (computeSoC(voltageAv[index],getTemperature(),
+            (computeSoC(getVoltageAv(index),getTemperature(),
                            getBatteryType(index)) < REST_VOLTAGE))
             setBatteryChargingPhase(index,absorptionC);
 /* Manage change from bulk to rest phase */
         if ((getBatteryChargingPhase(index) == bulkC) &&
-            (voltageAv[index] > voltageLimit(getAbsorptionVoltage(index))))
+            (getVoltageAv(index) > voltageLimit(getAbsorptionVoltage(index))))
             setBatteryChargingPhase(index,restC);
     }
 }
