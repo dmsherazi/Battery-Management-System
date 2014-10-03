@@ -101,7 +101,7 @@ terminal voltage drops below a charging restart threshold (95%). */
             chargerControlICC(battery);
         else if (getChargeAlgorithm() == threePH)
             chargerControl3PH(battery);
-        else if (getChargeAlgorithm() == ic)
+        else if (getChargeAlgorithm() == pulse)
             chargerControlPulse(battery);
 
     }

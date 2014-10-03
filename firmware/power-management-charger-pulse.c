@@ -60,7 +60,7 @@ Initial 2 October 2014
 
 static uint32_t offTime[NUM_BATS];  /* Battery time in rest */
 static uint32_t onTime[NUM_BATS];   /* Battery time in charge */
-static int64_t cumulatedOffTime[NUM_BATS];
+static uint64_t cumulatedOffTime[NUM_BATS];
 static int64_t cumulatedCurrent[NUM_BATS];
 static uint8_t batteryUnderCharge;
 
@@ -124,6 +124,7 @@ current over the last full cycle. */
                 (getVoltageAv(index) >
                  voltageLimit(getAbsorptionVoltage(index))))
             {
+dataMessageSend("Db-rT",offTime[index],onTime[index]);
                 setBatteryChargingPhase(index,restC);
                 batteryUnderCharge = 0;
                 uint32_t totalTime = (offTime[index] + onTime[index]);
@@ -134,14 +135,18 @@ the total time. If the latter is zero, set average to avoid triggering float. */
                     averageCurrent = cumulatedCurrent[index]/totalTime;
 /* Update cumulated off time to check against charging time limit */
                 cumulatedOffTime[index] += offTime[index];
+dataMessageSend("Db-rC",averageCurrent,cumulatedCurrent[index]);
 /* If average current is below float threshold, or time exceeded, go to float */
-                if ((averageCurrent < getFloatStageCurrent(index)) ||
+                if ((-averageCurrent < getFloatStageCurrent(index)) ||
                     (cumulatedOffTime[index] > (uint32_t)(FLOAT_DELAY*1024)/getChargerDelay()))
                 {
-                    cumulatedCurrent[index] = 0;
                     cumulatedOffTime[index] = 0;
                     setBatteryChargingPhase(index,floatC);
                 }
+/* Now that the cycle is finished, reset times to start next cycle. */
+                offTime[index] = 0;
+                onTime[index] = 0;
+                cumulatedCurrent[index] = 0;
             }
         }
 /* If the charger isn't allocated, check all batteries, starting at designated,
@@ -161,6 +166,7 @@ is in rest phase and off time exceeds the minimum. */
                 {
                     batteryUnderCharge = j;
                     setBatteryChargingPhase(j-1,bulkC);
+dataMessageSend("Dchg",batteryUnderCharge,getBatteryChargingPhase(j-1));
                     break;
                 }
             }

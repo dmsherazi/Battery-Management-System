@@ -1289,7 +1289,7 @@
        <string>Three Phase</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="icButton">
+     <widget class="QRadioButton" name="pulseButton">
       <property name="geometry">
        <rect>
         <x>24</x>
@@ -1304,7 +1304,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Intermittent Charge</string>
+       <string>Pulse Charge</string>
       </property>
      </widget>
      <widget class="QRadioButton" name="iccButton">
@@ -1360,7 +1360,7 @@
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
-       <string>After the voltage reaches the gassing limit, the charger is turned off until the voltage falls below a preset threshold. The charger cycles through this process until the average current falls to a specified trigger point.</string>
+       <string>After the voltage reaches the gassing limit, the battery is placed in rest phase and another battery is allocated. Each battery is placed on the charger in turn but must remain in rest phase for a minimum time.</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

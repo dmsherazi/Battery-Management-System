@@ -214,7 +214,7 @@ void PowerManagementConfigGui::on_threePhaseButton_clicked()
 }
 
 /* 1 Intermittent Charge Algorithm. */
-void PowerManagementConfigGui::on_icButton_clicked()
+void PowerManagementConfigGui::on_pulseButton_clicked()
 {
     QString command = "pS1";
     socket->write(command.append(QString("%1")).append("\n\r")
@@ -549,7 +549,7 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
             }
             if (chargeAlgorithm == 1)
             {
-                PowerManagementConfigUi.icButton->setChecked(true);
+                PowerManagementConfigUi.pulseButton->setChecked(true);
                 PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
                 PowerManagementConfigUi.chargeParameterSpinBox_1->
                     setToolTip("Low voltage threshold ending the charging phase and starting the rest phase, in percent of OCV");
@@ -621,7 +621,7 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
         {
             if (size < 1) break;
             int voltage = breakdown[1].simplified().toInt();
-            if ((PowerManagementConfigUi.icButton->isChecked()) ||
+            if ((PowerManagementConfigUi.pulseButton->isChecked()) ||
                 (PowerManagementConfigUi.iccButton->isChecked()))
                 PowerManagementConfigUi.chargeParameterSpinBox_1->setValue(voltage);
             break;

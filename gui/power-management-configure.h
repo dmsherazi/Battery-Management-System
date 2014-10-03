@@ -62,7 +62,7 @@ private slots:
     void displayErrorMessage(const QString message);
     void on_setTrackOptionButton_clicked();
     void on_threePhaseButton_clicked();
-    void on_icButton_clicked();
+    void on_pulseButton_clicked();
     void on_iccButton_clicked();
     void on_debugMessageCheckbox_clicked();
     void on_dataMessageCheckbox_clicked();

@@ -42,7 +42,7 @@ typedef enum {normalF=0, lowF=1, criticalF=2, faultyF=3} battery_Fl_States;
 typedef enum {loadedO=0, chargingO=1, isolatedO=2} battery_Op_States;
 typedef enum {bulkC=0, absorptionC=1, floatC=2, restC=3, equalizationC=4} battery_Ch_States;
 typedef enum {goodH=0, faultyH=1, missingH=2} battery_Hl_States;
-typedef enum {threePH=0, ic=1, icc=2} charge_algorithm;
+typedef enum {threePH=0, pulse=1, icc=2, ic=3} charge_algorithm;
 
 /* Represent the measured data arrays in a union as separate or combined */
 struct Interface
