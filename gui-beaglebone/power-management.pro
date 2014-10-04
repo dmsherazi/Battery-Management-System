@@ -12,8 +12,6 @@ LANGUAGE        = C++
 CONFIG          += qt warn_on release
 QT              += network
 
-LIBS            += -lqextserialport
-
 RESOURCES       = power-management-gui.qrc
 # Input
 FORMS           += power-management.ui
