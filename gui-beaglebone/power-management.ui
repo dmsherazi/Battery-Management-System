@@ -833,9 +833,9 @@
     <widget class="QPushButton" name="closeFileButton">
      <property name="geometry">
       <rect>
-       <x>188</x>
+       <x>506</x>
        <y>360</y>
-       <width>113</width>
+       <width>74</width>
        <height>27</height>
       </rect>
      </property>
@@ -884,6 +884,9 @@
      </property>
      <property name="title">
       <string/>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
      </property>
      <widget class="QRadioButton" name="panelBattery2">
       <property name="geometry">
@@ -1064,7 +1067,7 @@
     <widget class="QCheckBox" name="autoTrackCheckBox">
      <property name="geometry">
       <rect>
-       <x>604</x>
+       <x>598</x>
        <y>365</y>
        <width>99</width>
        <height>22</height>
@@ -1294,6 +1297,9 @@
      <property name="title">
       <string/>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <widget class="QRadioButton" name="load2Battery2">
       <property name="geometry">
        <rect>
@@ -1398,6 +1404,9 @@
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <widget class="QRadioButton" name="load1Battery2">
       <property name="geometry">
        <rect>
@@ -1487,9 +1496,9 @@
     <widget class="QLabel" name="temperature">
      <property name="geometry">
       <rect>
-       <x>350</x>
+       <x>348</x>
        <y>365</y>
-       <width>77</width>
+       <width>74</width>
        <height>24</height>
       </rect>
      </property>
@@ -1743,9 +1752,9 @@
     <widget class="QPushButton" name="saveFileButton">
      <property name="geometry">
       <rect>
-       <x>68</x>
+       <x>188</x>
        <y>360</y>
-       <width>113</width>
+       <width>74</width>
        <height>27</height>
       </rect>
      </property>
@@ -3545,7 +3554,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Intermittent Charge</string>
+       <string>Pulse Charge</string>
       </property>
      </widget>
      <widget class="QRadioButton" name="iccButton">
@@ -3601,7 +3610,7 @@
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
-       <string>After the voltage reaches the gassing limit, the charger is turned off until the voltage falls below a preset threshold. The charger cycles through this process until the average current falls to a specified trigger point.</string>
+       <string>After the voltage reaches the gassing limit, the battery is placed in rest phase and another battery is allocated. Each battery is placed on the charger in turn but must remain in rest phase for a minimum time.</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -3752,7 +3761,7 @@
   <widget class="QLabel" name="errorLabel">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>160</x>
      <y>450</y>
      <width>511</width>
      <height>20</height>
@@ -3979,14 +3988,27 @@
   <widget class="QPushButton" name="keypadButton">
    <property name="geometry">
     <rect>
-     <x>28</x>
-     <y>445</y>
+     <x>690</x>
+     <y>450</y>
      <width>91</width>
      <height>27</height>
     </rect>
    </property>
    <property name="text">
     <string>Keypad</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="closeButton">
+   <property name="geometry">
+    <rect>
+     <x>6</x>
+     <y>450</y>
+     <width>91</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Exit</string>
    </property>
   </widget>
  </widget>

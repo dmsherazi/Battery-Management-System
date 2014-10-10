@@ -104,6 +104,7 @@ private slots:
     void on_saveFileButton_clicked();
     void on_closeFileButton_clicked();
     void on_autoTrackCheckBox_clicked();
+    void on_closeButton_clicked();
     void closeEvent(QCloseEvent*);
     void disableRadioButtons(bool enable);
 // Configuration
@@ -115,7 +116,7 @@ private slots:
     void on_setBatteryButton_clicked();
     void on_setTrackOptionButton_clicked();
     void on_threePhaseButton_clicked();
-    void on_icButton_clicked();
+    void on_pulseButton_clicked();
     void on_iccButton_clicked();
     void on_debugMessageCheckbox_clicked();
     void on_dataMessageCheckbox_clicked();

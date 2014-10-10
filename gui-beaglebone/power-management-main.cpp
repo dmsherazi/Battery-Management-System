@@ -151,12 +151,12 @@ void PowerManagementGui::initGui()
     PowerManagementMainUi.load2Voltage->clear();
     PowerManagementMainUi.panelCurrent->clear();
     PowerManagementMainUi.panelVoltage->clear();
-    PowerManagementMainUi.battery1CheckBox->setChecked(false);
-    PowerManagementMainUi.battery2CheckBox->setChecked(false);
-    PowerManagementMainUi.battery3CheckBox->setChecked(false);
-    PowerManagementMainUi.load1CheckBox->setChecked(false);
-    PowerManagementMainUi.load2CheckBox->setChecked(false);
-    PowerManagementMainUi.panelCheckBox->setChecked(false);
+    PowerManagementMainUi.battery1CheckBox->setChecked(true);
+    PowerManagementMainUi.battery2CheckBox->setChecked(true);
+    PowerManagementMainUi.battery3CheckBox->setChecked(true);
+    PowerManagementMainUi.load1CheckBox->setChecked(true);
+    PowerManagementMainUi.load2CheckBox->setChecked(true);
+    PowerManagementMainUi.panelCheckBox->setChecked(true);
 
     PowerManagementMainUi.battery1SoCReset->
         setStyleSheet("background-color:lightpink;");
@@ -1715,6 +1715,16 @@ bool PowerManagementGui::success()
 }
 
 //-----------------------------------------------------------------------------
+/** @brief Close Window
+
+*/
+
+void PowerManagementGui::on_closeButton_clicked()
+{
+    accept();
+}
+
+//-----------------------------------------------------------------------------
 /** @brief Close off the window and deallocate resources
 
 This may not be necessary as QT may implement it implicitly.
@@ -1889,7 +1899,7 @@ void PowerManagementGui::on_threePhaseButton_clicked()
 }
 
 /* 1 Intermittent Charge Algorithm. */
-void PowerManagementGui::on_icButton_clicked()
+void PowerManagementGui::on_pulseButton_clicked()
 {
     QString command = "pS1";
     socket->write(command.append(QString("%1")).append("\n\r")
@@ -2215,13 +2225,9 @@ void PowerManagementGui::configureMessageReceived(const QString response)
             }
             if (chargeAlgorithm == 1)
             {
-                PowerManagementMainUi.icButton->setChecked(true);
+                PowerManagementMainUi.pulseButton->setChecked(true);
                 PowerManagementMainUi.chargeParameterEdit_1->setVisible(true);
-                PowerManagementMainUi.chargeParameterEdit_1->
-                    setToolTip("Low voltage threshold ending the charging phase and starting the rest phase, in percent of OCV");
                 PowerManagementMainUi.chargeParameterText_1->setVisible(true);
-                PowerManagementMainUi.chargeParameterText_1->
-                    setText("Rest Phase Voltage %OCV");
                 PowerManagementMainUi.chargeParameterEdit_2->setVisible(false);
                 PowerManagementMainUi.chargeParameterText_2->setVisible(false);
                 PowerManagementMainUi.chargeParameterEdit_3->setVisible(false);
@@ -2290,7 +2296,7 @@ void PowerManagementGui::configureMessageReceived(const QString response)
         {
             if (size < 1) break;
             int voltage = breakdown[1].simplified().toInt();
-            if ((PowerManagementMainUi.icButton->isChecked()) ||
+            if ((PowerManagementMainUi.pulseButton->isChecked()) ||
                 (PowerManagementMainUi.iccButton->isChecked()))
                 PowerManagementMainUi.chargeParameterEdit_1->
                     setText(QString("%1").arg(voltage,-1));

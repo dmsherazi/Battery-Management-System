@@ -140,12 +140,12 @@ PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
     PowerManagementMainUi.load2Voltage->clear();
     PowerManagementMainUi.panelCurrent->clear();
     PowerManagementMainUi.panelVoltage->clear();
-    PowerManagementMainUi.battery1CheckBox->setChecked(false);
-    PowerManagementMainUi.battery2CheckBox->setChecked(false);
-    PowerManagementMainUi.battery3CheckBox->setChecked(false);
-    PowerManagementMainUi.load1CheckBox->setChecked(false);
-    PowerManagementMainUi.load2CheckBox->setChecked(false);
-    PowerManagementMainUi.panelCheckBox->setChecked(false);
+    PowerManagementMainUi.battery1CheckBox->setChecked(true);
+    PowerManagementMainUi.battery2CheckBox->setChecked(true);
+    PowerManagementMainUi.battery3CheckBox->setChecked(true);
+    PowerManagementMainUi.load1CheckBox->setChecked(true);
+    PowerManagementMainUi.load2CheckBox->setChecked(true);
+    PowerManagementMainUi.panelCheckBox->setChecked(true);
 
     PowerManagementMainUi.battery1SoCReset->
         setStyleSheet("background-color:lightpink;");

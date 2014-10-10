@@ -550,12 +550,8 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
             if (chargeAlgorithm == 1)
             {
                 PowerManagementConfigUi.pulseButton->setChecked(true);
-                PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
-                PowerManagementConfigUi.chargeParameterSpinBox_1->
-                    setToolTip("Low voltage threshold ending the charging phase and starting the rest phase, in percent of OCV");
-                PowerManagementConfigUi.chargeParameterText_1->setVisible(true);
-                PowerManagementConfigUi.chargeParameterText_1->
-                    setText("Rest Phase Voltage %OCV");
+                PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(false);
+                PowerManagementConfigUi.chargeParameterText_1->setVisible(false);
                 PowerManagementConfigUi.chargeParameterSpinBox_2->setVisible(false);
                 PowerManagementConfigUi.chargeParameterText_2->setVisible(false);
                 PowerManagementConfigUi.chargeParameterSpinBox_3->setVisible(false);
