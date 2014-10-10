@@ -361,7 +361,8 @@ released. The command is followed by an interface number 0-5 being batteries
                     configData.config.recording = true;
                 break;
             }
-/* sn Set monitor strategy byte n */
+/* sn Set monitor strategy byte n for keeping isolation or avoiding loading
+the battery under charge. */
         case 's':
             {
                 configData.config.monitorStrategy = asciiToInt((char*)line+3);
