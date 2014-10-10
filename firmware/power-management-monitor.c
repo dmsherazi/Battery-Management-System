@@ -84,7 +84,7 @@ static uint8_t batteryUnderLoad;
 /* State of Charge is in percentage (times 256) */
 static uint16_t batterySoC[NUM_BATS];
 /* Battery charge is in Coulombs (times 256) */
-static uint32_t batteryCharge[NUM_BATS];
+static int32_t batteryCharge[NUM_BATS];
 /* Time that a battery is in the isolation state */
 static uint32_t batteryIsolationTime[NUM_BATS];
 
@@ -105,15 +105,6 @@ void prvMonitorTask(void *pvParameters)
 
 /* Short delay to allow measurement task to produce results */
 	vTaskDelay(MONITOR_STARTUP_DELAY );
-
-/* Determine SoC and capacity to start. */
-    uint8_t i;
-    for (i=0; i<NUM_BATS; i++)
-    {
-        batterySoC[i] = computeSoC(getBatteryVoltage(i),getTemperature(),
-                                   getBatteryType(i));
-        batteryCharge[i] = getBatteryCapacity(i)*36*batterySoC[i];
-    }
 
 /* Main loop */
 	while (1)
@@ -154,7 +145,7 @@ some currents. */
                     if (((getIndicators() >> 2*i) & 0x02) == 0)
                     {
                         batteryHealthState[i] = missingH;
-                        batterySoC[i] = 0;
+                        setBatterySoC(i,0);
                     }
                 }
 /* Reset watchdog counter */
@@ -220,9 +211,8 @@ accurate estimate of SoC. */
             {
                 if (batteryHealthState[i] != missingH)
                 {
-                    batterySoC[i] = computeSoC(getBatteryVoltage(i),
-                                               getTemperature(),getBatteryType(i));
-                    batteryCharge[i] = getBatteryCapacity(i)*36*batterySoC[i];
+                    setBatterySoC(i,computeSoC(getBatteryVoltage(i),
+                                               getTemperature(),getBatteryType(i)));
                     batteryCurrentSteady[i] = 0;
                     batteryIsolationTime[i] = 0;
                     batteryOpState[i] = isolatedO;
@@ -247,6 +237,7 @@ accurate estimate of SoC. */
         putTimeToString(timeString);
         sendString("pH",timeString);
         recordString("pH",timeString);
+        uint8_t i;
         for (i=0; i<NUM_BATS; i++)
         {
             id[2] = '1'+i;
@@ -326,7 +317,7 @@ removed here; this must be done externally. */
                 ((getIndicators() >> 2*i) & 0x02) == 0)
             {
                 batteryHealthState[i] = missingH;
-                batterySoC[i] = 0;
+                setBatterySoC(i,0);
                 if (batteryUnderLoad == i+1)
                     batteryUnderLoad = 0;
                 if (batteryUnderCharge == i+1)
@@ -344,9 +335,10 @@ removed here; this must be done externally. */
             if (batteryHealthState[i] != missingH)
             {
 /* Access each battery charge accumulated since the last time, and update
-the SoC. */
+the SoC. Maximum charge is the battery capacity in ampere seconds. */
                 batteryCharge[i] += getBatteryAccumulatedCharge(i);
-                uint32_t chargeMax = getBatteryCapacity(i)*36*100*256;
+                uint32_t chargeMax = getBatteryCapacity(i)*3600*256;
+                if (batteryCharge[i] < 0) batteryCharge[i] = 0;
                 if (batteryCharge[i] > chargeMax) batteryCharge[i] = chargeMax;
                 batterySoC[i] = batteryCharge[i]/(getBatteryCapacity(i)*36);
 /* Collect battery charge fill state estimations. */
@@ -642,8 +634,8 @@ isolated for over 2 hours */
                     (batteryOpState[i] != isolatedO) &&
                     (batteryIsolationTime[i] > (uint32_t)(2*3600*1024)/getMonitorDelay()))
                 {
-                    batterySoC[i] = computeSoC(getBatteryVoltage(i),
-                                               getTemperature(),getBatteryType(i));
+                    setBatterySoC(i,computeSoC(getBatteryVoltage(i),
+                                               getTemperature(),getBatteryType(i)));
                     batteryIsolationTime[i] = 0;
                 }
 /* Restart isolation timer if not isolated or if charger and loads on same
@@ -688,8 +680,8 @@ below a threshold of about 80mA. */
                     batteryCurrentSteady[i] = 0;
                 if (batteryCurrentSteady[i] > monitorHour)
                 {
-                    batterySoC[i] = computeSoC(getBatteryVoltage(i),
-                                               getTemperature(),getBatteryType(i));
+                    setBatterySoC(i,computeSoC(getBatteryVoltage(i),
+                                               getTemperature(),getBatteryType(i)));
                     batteryCurrentSteady[i] = 0;
                 }
 /* Update the isolation time of each battery. If a battery has been isolated for
@@ -698,8 +690,8 @@ batteries to go isolated. */
                 batteryIsolationTime[i]++;
                 if (batteryIsolationTime[i] > 8*monitorHour)
                 {
-                    batterySoC[i] = computeSoC(getBatteryVoltage(i),
-                                               getTemperature(),getBatteryType(i));
+                    setBatterySoC(i,computeSoC(getBatteryVoltage(i),
+                                               getTemperature(),getBatteryType(i)));
                     batteryIsolationTime[i] = 0;
                 }
             }
@@ -724,9 +716,8 @@ static void initGlobals(void)
     for (i=0; i<NUM_BATS; i++)
     {
 /* Determine capacity */
-        batterySoC[i] = computeSoC(getBatteryVoltage(i),getTemperature(),
-                                   getBatteryType(i));
-        batteryCharge[i] = getBatteryCapacity(i)*36*batterySoC[i];
+        setBatterySoC(i,computeSoC(getBatteryVoltage(i),getTemperature(),
+                                   getBatteryType(i)));
         batteryCurrentSteady[i] = 0;
         batteryIsolationTime[i] = 0;
 /* Start with all batteries isolated */
@@ -814,14 +805,14 @@ If the current SoC is less than 100%, report the battery as faulty.
 void resetBatterySoC(int battery)
 {
     if (batterySoC[battery] < 25600) batteryFillState[battery] = faultyF;
-/* SoC is computed from the charge so this is the quantity changed. */
-    batteryCharge[battery] = 25600*getBatteryCapacity(battery)*36;
+    setBatterySoC(battery,25600);
 }
 
 /*--------------------------------------------------------------------------*/
 /** @brief Set the Battery State of Charge
 
-State of charge is percentage times 256.
+State of charge is percentage times 256. The accumulated charge is also computed
+here in ampere seconds.
 
 @param[in] battery: 0..NUM_BATS-1
 @param[in] soc: int16_t 0..25600
@@ -829,7 +820,8 @@ State of charge is percentage times 256.
 
 void setBatterySoC(int battery,int16_t soc)
 {
-    batterySoC[battery] = soc;
+    if (batterySoC[battery] > 25600) batterySoC[battery] = 25600;
+    else batterySoC[battery] = soc;
 /* SoC is computed from the charge so this is the quantity changed. */
     batteryCharge[battery] = soc*getBatteryCapacity(battery)*36;
 }
