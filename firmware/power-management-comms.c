@@ -339,18 +339,18 @@ released. The command is followed by an interface number 0-5 being batteries
                         asciiToInt((char*)line+3);
                 break;
             }
-/* M-, M+ Turn on/off data messaging (mainly for debug) */
-        case 'M':
-            {
-                if (line[2] == '-') configData.config.measurementSend = false;
-                else if (line[2] == '+') configData.config.measurementSend = true;
-                break;
-            }
 /* M-, M+ Turn on/off battery missing */
         case 'm':
             {
                 if (line[3] == '-') setBatteryMissing(battery,false);
                 else if (line[3] == '+') setBatteryMissing(battery,true);
+                break;
+            }
+/* M-, M+ Turn on/off data messaging (mainly for debug) */
+        case 'M':
+            {
+                if (line[2] == '-') configData.config.measurementSend = false;
+                else if (line[2] == '+') configData.config.measurementSend = true;
                 break;
             }
 /* r-, r+ Turn recording on or off */
@@ -582,7 +582,8 @@ sent, the rest remains in the buffer until the next request. */
 type,size and name, each group separated by commas. */
             case 'D':
             {
-                if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_TIMEOUT)) break;
+                if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_TIMEOUT))
+                    break;
                 uint8_t fileStatus = FR_INT_ERR;
                 if (xSemaphoreTake(fileSendSemaphore,COMMS_FILE_TIMEOUT))
                 {
@@ -635,6 +636,72 @@ type,size and name, each group separated by commas. */
                 sendResponse("fE",(uint8_t)fileStatus);
                 break;
             }
+/* Return an next entry in the directory listing. If a directory name is sent,
+then return the first entry, otherwise the next entry in the directory listing.
+Returns the type, size and name. If there are no further entries, then an
+empty string is sent. */
+            case 'd':
+            {
+                if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_TIMEOUT))
+                    break;
+                uint8_t fileStatus = FR_INT_ERR;
+                if (xSemaphoreTake(fileSendSemaphore,COMMS_FILE_TIMEOUT))
+                {
+                    char character,firstCharacter,type;
+                    sendFileCommand('D',13,line+2);
+                    commsPrintString("fD");
+                    type = 0;
+/* Single character entry type */
+                    xQueueReceive(fileReceiveQueue,&type,portMAX_DELAY);
+/* Four bytes of file size */
+                    uint32_t fileSize = 0;
+                    uint8_t i;
+                    for (i=0; i<4; i++)
+                    {
+                        character = 0;
+                        xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
+                        fileSize = (fileSize << 8) + character;
+                    }
+/* If the first character of name is zero then the listing is ended */
+                    character = 0;
+                    xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
+                    firstCharacter = character;
+                    if (firstCharacter > 0)
+                    {
+                        commsPrintString(",");
+                        commsPrintChar(&type);
+                        commsPrintHex(fileSize >> 16);
+                        commsPrintHex(fileSize & 0xFFFF);
+                        while (character > 0)
+                        {
+                            commsPrintChar(&character);
+                            character = 0;
+                            xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
+                        }
+/* Discard the status byte */
+                        xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
+                    }
+                    commsPrintString("\r\n");
+                    xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
+                    xSemaphoreGive(fileSendSemaphore);
+                }
+                xSemaphoreGive(commsSendSemaphore);
+                sendResponse("fE",(uint8_t)fileStatus);
+                break;
+            }
+/* Register (mount) the SD card. */
+            case 'M':
+            {
+                uint8_t fileStatus = FR_INT_ERR;
+                if (xSemaphoreTake(fileSendSemaphore,COMMS_FILE_TIMEOUT))
+                {
+                    sendFileCommand('M',0,line+2);
+                    xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
+                    xSemaphoreGive(fileSendSemaphore);
+                }
+                sendResponse("fE",(uint8_t)fileStatus);
+                break;
+            }
 /* Send a status message containing: software switches
 (configData.config.recording), names of open files. */
             case 's':
@@ -670,19 +737,6 @@ A status is returned to signal a directory refresh. */
                 if (xSemaphoreTake(fileSendSemaphore,COMMS_FILE_TIMEOUT))
                 {
                     sendFileCommand('X',13,line+2);
-                    xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
-                    xSemaphoreGive(fileSendSemaphore);
-                }
-                sendResponse("fE",(uint8_t)fileStatus);
-                break;
-            }
-/* Register (mount) the SD card. */
-            case 'M':
-            {
-                uint8_t fileStatus = FR_INT_ERR;
-                if (xSemaphoreTake(fileSendSemaphore,COMMS_FILE_TIMEOUT))
-                {
-                    sendFileCommand('M',0,line+2);
                     xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
                     xSemaphoreGive(fileSendSemaphore);
                 }
