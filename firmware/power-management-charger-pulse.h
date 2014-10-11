@@ -33,7 +33,7 @@ Initial 2 September 2014
 #include <stdbool.h>
 
 /* Minimum time that the battery is in a rest phase, in seconds. */
-#define MINIMUM_OFF_TIME 50
+#define MINIMUM_OFF_TIME 30
 
 /*--------------------------------------------------------------------------*/
 /* Prototypes */

@@ -87,7 +87,7 @@ void initLocalsICC(void)
     uint8_t i=0;
     for (i=0; i<NUM_BATS; i++)
     {
-/* Set battery state if inappropriate. If in absorption phase from the 3PH
+/* Change battery state if inappropriate. If in absorption phase from the 3PH
 algorithm then move to rest phase. */
         if (getBatteryChargingPhase(i) == absorptionC)
             setBatteryChargingPhase(i,restC);

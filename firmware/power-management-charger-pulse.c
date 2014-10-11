@@ -97,11 +97,13 @@ void chargerControlPulse(uint8_t battery)
 /* Compute the average current and voltage */
     calculateAverageMeasures();
 
+    uint32_t minimumOffTime = (uint32_t)(MINIMUM_OFF_TIME*1024)/getChargerDelay();
+    uint32_t floatDelay = (uint32_t)(FLOAT_DELAY*1024)/getChargerDelay();
 /* Battery will only be zero if power source is absent or manually
 disconnected. */
     if (battery > 0)
     {
-/* If a battery is in rest phase, increment its off-time counter,
+/* If a battery is in a rest phase, increment its off-time counter,
 or if in bulk phase, its on-time counter and add to the cumulated current. */
         uint8_t i = 0;
         for (i=0; i < NUM_BATS; i++)
@@ -115,7 +117,7 @@ or if in bulk phase, its on-time counter and add to the cumulated current. */
             }
         }
 /* Manage change from bulk to rest phase. Set battery on charge to none.
-As the battery has now finished its charging phase, compute the average
+As the battery has now finished a charge-rest cycle, compute the average
 current over the last full cycle. */
         if (batteryUnderCharge > 0)
         {
@@ -129,16 +131,25 @@ dataMessageSend("Db-rT",offTime[index],onTime[index]);
                 batteryUnderCharge = 0;
                 uint32_t totalTime = (offTime[index] + onTime[index]);
 /* Average current over the cycle is the cumulation over the on-time, divided by
-the total time. If the latter is zero, set average to avoid triggering float. */
-                int32_t averageCurrent = getFloatStageCurrent(index);;
-                if (totalTime > 0)
+the total time. If the latter is zero, set average to avoid triggering float.
+Set an arbitrary maximum on-time equal to the minimum off-time to avoid
+situations near the start where the on-time is large due to bulk charging. */
+                int32_t averageCurrent;
+                if ((totalTime > 0) &&
+                    (onTime[index] < minimumOffTime))
+                {
                     averageCurrent = cumulatedCurrent[index]/totalTime;
+                }
+                else
+                {
+                    averageCurrent = -getFloatStageCurrent(index);    
+                }
 /* Update cumulated off time to check against charging time limit */
                 cumulatedOffTime[index] += offTime[index];
 dataMessageSend("Db-rC",averageCurrent,cumulatedCurrent[index]);
-/* If average current is below float threshold, or time exceeded, go to float */
+/* If average current below float threshold, or time exceeded, go to float. */
                 if ((-averageCurrent < getFloatStageCurrent(index)) ||
-                    (cumulatedOffTime[index] > (uint32_t)(FLOAT_DELAY*1024)/getChargerDelay()))
+                    (cumulatedOffTime[index] > floatDelay))
                 {
                     cumulatedOffTime[index] = 0;
                     setBatteryChargingPhase(index,floatC);
@@ -150,7 +161,7 @@ dataMessageSend("Db-rC",averageCurrent,cumulatedCurrent[index]);
             }
         }
 /* If the charger isn't allocated, check all batteries, starting at designated,
-to locate one in bulk phase. */
+to find one still in bulk phase. */
         if (batteryUnderCharge == 0)
         {
             uint8_t i = 0;
@@ -158,11 +169,11 @@ to locate one in bulk phase. */
             {
                 uint8_t j = i + battery;
                 if (j > NUM_BATS) j -= NUM_BATS;
-/* Allocate the charger to the battery if it is in bulk phase, or if it
-is in rest phase and off time exceeds the minimum. */
+/* Allocate the charger to the battery if it is in bulk phase, or if it is in
+rest phase and off time exceeds the minimum. */
                 if ((getBatteryChargingPhase(j-1) == bulkC) ||
                    ((getBatteryChargingPhase(j-1) == restC) &&
-                    (offTime[j-1] > (uint32_t)(MINIMUM_OFF_TIME*1024)/getChargerDelay())))
+                    (offTime[j-1] > minimumOffTime)))
                 {
                     batteryUnderCharge = j;
                     setBatteryChargingPhase(j-1,bulkC);
