@@ -28,18 +28,6 @@
 #ifndef POWER_MANAGEMENT_MAIN_H
 #define POWER_MANAGEMENT_MAIN_H
 
-// Parameters of the voltage and current amplifiers
-#define R9 20
-#define R7 10
-#define R4 10
-#define R5 2.2
-#define Vref 2.5
-#define Ioffset 3.3/2
-#define Iscale 10
-
-#define Voffset R9*Vref/R5
-#define Vscale (1+R4/R5)/(1+R9/R7)
-
 #include "ui_power-management-main.h"
 #include "power-management.h"
 #include "serialport.h"
@@ -68,7 +56,7 @@ class PowerManagementGui : public QDialog
 {
     Q_OBJECT
 public:
-    PowerManagementGui(QWidget* parent = 0);
+    PowerManagementGui(QString inPort, uint baudrate, QWidget* parent = 0);
     ~PowerManagementGui();
     bool success();
     QString error();
@@ -117,6 +105,9 @@ signals:
 private:
 // User Interface object instance
     Ui::PowerManagementMainDialog PowerManagementMainUi;
+// Common code
+    void initMainWindow(Ui::PowerManagementMainDialog);
+// Variables
     uint baudrate;
     bool synchronized;
     QString connectAddress;

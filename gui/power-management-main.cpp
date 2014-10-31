@@ -65,21 +65,22 @@ socat /dev/ttyUSB0,echo=0,ispeed=115200,ospeed=115200,raw tcp-l:6666,reuseaddr,f
 @param[in] parent Parent widget.
 */
 
-PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
+PowerManagementGui::PowerManagementGui(QString inPort, uint baudrate,
+                                       QWidget* parent) : QDialog(parent)
 {
-// Build the User Interface display from the Ui class in ui_mainwindowform.h
     PowerManagementMainUi.setupUi(this);
-    PowerManagementMainUi.sourceComboBox->addItem("Serial");
-    PowerManagementMainUi.sourceComboBox->addItem("TCP/IP");
-    PowerManagementMainUi.sourceComboBox->setCurrentIndex(0);    //Serial Default
-    PowerManagementMainUi.sourceLineEdit->setText("/dev/ttyUSB0");
+    initMainWindow(PowerManagementMainUi);
+
+    saveFile.clear();
+    response.clear();
+
 #ifdef SERIAL
+/* Create serial port */
+    socket = new SerialPort(inPort);
     PowerManagementMainUi.connectButton->setEnabled(false);
-    socket = new SerialPort(SERIAL_PORT);
     connect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
 // Attempt to initialise the serial port with the default setting
     synchronized = false;
-    baudrate = 6;
     if (socket->initPort(baudrate,100))
         synchronized = true;
     else
@@ -93,73 +94,6 @@ PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
     socket = NULL;
     on_connectButton_clicked();
 #endif
-
-    saveFile.clear();
-    response.clear();
-
-// Uncheck all buttons in case the microcontroller doesn't respond.
-    PowerManagementMainUi.load1Battery1->setAutoExclusive(false);
-    PowerManagementMainUi.load1Battery1->setChecked(false);
-    PowerManagementMainUi.load1Battery1->setAutoExclusive(true);
-    PowerManagementMainUi.load1Battery1->setEnabled(false);
-    PowerManagementMainUi.load2Battery1->setAutoExclusive(false);
-    PowerManagementMainUi.load2Battery1->setChecked(false);
-    PowerManagementMainUi.load2Battery1->setAutoExclusive(true);
-    PowerManagementMainUi.load2Battery1->setEnabled(false);
-    PowerManagementMainUi.panelBattery1->setAutoExclusive(false);
-    PowerManagementMainUi.panelBattery1->setChecked(false);
-    PowerManagementMainUi.panelBattery1->setAutoExclusive(true);
-    PowerManagementMainUi.panelBattery1->setEnabled(false);
-    PowerManagementMainUi.load1Battery2->setAutoExclusive(false);
-    PowerManagementMainUi.load1Battery2->setChecked(false);
-    PowerManagementMainUi.load1Battery2->setAutoExclusive(true);
-    PowerManagementMainUi.load1Battery2->setEnabled(false);
-    PowerManagementMainUi.load2Battery2->setAutoExclusive(false);
-    PowerManagementMainUi.load2Battery2->setChecked(false);
-    PowerManagementMainUi.load2Battery2->setAutoExclusive(true);
-    PowerManagementMainUi.load2Battery2->setEnabled(false);
-    PowerManagementMainUi.panelBattery2->setAutoExclusive(false);
-    PowerManagementMainUi.panelBattery2->setChecked(false);
-    PowerManagementMainUi.panelBattery2->setAutoExclusive(true);
-    PowerManagementMainUi.panelBattery2->setEnabled(false);
-    PowerManagementMainUi.load1Battery3->setAutoExclusive(false);
-    PowerManagementMainUi.load1Battery3->setChecked(false);
-    PowerManagementMainUi.load1Battery3->setAutoExclusive(true);
-    PowerManagementMainUi.load1Battery3->setEnabled(false);
-    PowerManagementMainUi.load2Battery3->setAutoExclusive(false);
-    PowerManagementMainUi.load2Battery3->setChecked(false);
-    PowerManagementMainUi.load2Battery3->setAutoExclusive(true);
-    PowerManagementMainUi.load2Battery3->setEnabled(false);
-    PowerManagementMainUi.panelBattery3->setAutoExclusive(false);
-    PowerManagementMainUi.panelBattery3->setChecked(false);
-    PowerManagementMainUi.panelBattery3->setAutoExclusive(true);
-    PowerManagementMainUi.panelBattery3->setEnabled(false);
-    PowerManagementMainUi.load1Current->clear();
-    PowerManagementMainUi.load1Voltage->clear();
-    PowerManagementMainUi.load2Current->clear();
-    PowerManagementMainUi.load2Voltage->clear();
-    PowerManagementMainUi.panelCurrent->clear();
-    PowerManagementMainUi.panelVoltage->clear();
-    PowerManagementMainUi.battery1CheckBox->setChecked(true);
-    PowerManagementMainUi.battery2CheckBox->setChecked(true);
-    PowerManagementMainUi.battery3CheckBox->setChecked(true);
-    PowerManagementMainUi.load1CheckBox->setChecked(true);
-    PowerManagementMainUi.load2CheckBox->setChecked(true);
-    PowerManagementMainUi.panelCheckBox->setChecked(true);
-
-    PowerManagementMainUi.battery1SoCReset->
-        setStyleSheet("background-color:lightpink;");
-    PowerManagementMainUi.battery1SoCReset->
-        setText("R");
-    PowerManagementMainUi.battery2SoCReset->
-        setStyleSheet("background-color:lightpink;");
-    PowerManagementMainUi.battery2SoCReset->
-        setText("R");
-    PowerManagementMainUi.battery3SoCReset->
-        setStyleSheet("background-color:lightpink;");
-    PowerManagementMainUi.battery3SoCReset->
-        setText("R");
-
 /* Turn on microcontroller communications */
     socket->write("pc+\n\r");
 /* This should cause the microcontroller to respond with all data */
@@ -170,10 +104,82 @@ PowerManagementGui::~PowerManagementGui()
 {
 /* Turn off microcontroller communications */
     socket->write("pc-\n\r");
-#ifndef SERIAL
-    if (socket != NULL) socket->close();
-#endif
-    if (socket != NULL) delete socket;
+    delete socket;
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Initialize the main window */
+
+void PowerManagementGui::initMainWindow(Ui::PowerManagementMainDialog mainWindow)
+{
+// Build the User Interface display from the Ui class in ui_mainwindowform.h
+    mainWindow.sourceComboBox->addItem("Serial");
+    mainWindow.sourceComboBox->addItem("TCP/IP");
+    mainWindow.sourceComboBox->setCurrentIndex(0);    //Serial Default
+    mainWindow.sourceLineEdit->setText("/dev/ttyUSB0");
+
+// Uncheck all buttons in case the microcontroller doesn't respond.
+    mainWindow.load1Battery1->setAutoExclusive(false);
+    mainWindow.load1Battery1->setChecked(false);
+    mainWindow.load1Battery1->setAutoExclusive(true);
+    mainWindow.load1Battery1->setEnabled(false);
+    mainWindow.load2Battery1->setAutoExclusive(false);
+    mainWindow.load2Battery1->setChecked(false);
+    mainWindow.load2Battery1->setAutoExclusive(true);
+    mainWindow.load2Battery1->setEnabled(false);
+    mainWindow.panelBattery1->setAutoExclusive(false);
+    mainWindow.panelBattery1->setChecked(false);
+    mainWindow.panelBattery1->setAutoExclusive(true);
+    mainWindow.panelBattery1->setEnabled(false);
+    mainWindow.load1Battery2->setAutoExclusive(false);
+    mainWindow.load1Battery2->setChecked(false);
+    mainWindow.load1Battery2->setAutoExclusive(true);
+    mainWindow.load1Battery2->setEnabled(false);
+    mainWindow.load2Battery2->setAutoExclusive(false);
+    mainWindow.load2Battery2->setChecked(false);
+    mainWindow.load2Battery2->setAutoExclusive(true);
+    mainWindow.load2Battery2->setEnabled(false);
+    mainWindow.panelBattery2->setAutoExclusive(false);
+    mainWindow.panelBattery2->setChecked(false);
+    mainWindow.panelBattery2->setAutoExclusive(true);
+    mainWindow.panelBattery2->setEnabled(false);
+    mainWindow.load1Battery3->setAutoExclusive(false);
+    mainWindow.load1Battery3->setChecked(false);
+    mainWindow.load1Battery3->setAutoExclusive(true);
+    mainWindow.load1Battery3->setEnabled(false);
+    mainWindow.load2Battery3->setAutoExclusive(false);
+    mainWindow.load2Battery3->setChecked(false);
+    mainWindow.load2Battery3->setAutoExclusive(true);
+    mainWindow.load2Battery3->setEnabled(false);
+    mainWindow.panelBattery3->setAutoExclusive(false);
+    mainWindow.panelBattery3->setChecked(false);
+    mainWindow.panelBattery3->setAutoExclusive(true);
+    mainWindow.panelBattery3->setEnabled(false);
+    mainWindow.load1Current->clear();
+    mainWindow.load1Voltage->clear();
+    mainWindow.load2Current->clear();
+    mainWindow.load2Voltage->clear();
+    mainWindow.panelCurrent->clear();
+    mainWindow.panelVoltage->clear();
+    mainWindow.battery1CheckBox->setChecked(true);
+    mainWindow.battery2CheckBox->setChecked(true);
+    mainWindow.battery3CheckBox->setChecked(true);
+    mainWindow.load1CheckBox->setChecked(true);
+    mainWindow.load2CheckBox->setChecked(true);
+    mainWindow.panelCheckBox->setChecked(true);
+
+    mainWindow.battery1SoCReset->
+        setStyleSheet("background-color:lightpink;");
+    mainWindow.battery1SoCReset->
+        setText("R");
+    mainWindow.battery2SoCReset->
+        setStyleSheet("background-color:lightpink;");
+    mainWindow.battery2SoCReset->
+        setText("R");
+    mainWindow.battery3SoCReset->
+        setStyleSheet("background-color:lightpink;");
+    mainWindow.battery3SoCReset->
+        setText("R");
 }
 
 //-----------------------------------------------------------------------------
