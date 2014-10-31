@@ -245,6 +245,42 @@ The response will be a comma separated list of items preceded by a type
             }
             break;
         }
+/* Directory listing incremental.
+Fill a predefined model with a string from the response breakdown. A series of
+responses will give each entry in the listing, terminated by an empty filename.
+*/
+        case 'd':
+        {
+            model->clear();
+            if (breakdown.size() <= 1) break;
+            for (int i=1; i<breakdown.size(); i++)
+            {
+                QChar type = breakdown[i][0];
+                bool ok;
+                QString fileSize = QString("%1")
+                    .arg((float)breakdown[i].mid(1,8).toInt(&ok,16)/1000000,8,'f',3);
+                if (type == 'd')
+                    fileSize = "";
+                if ((type == 'f') || (type == 'd'))
+                {
+                    QString fileName = breakdown[i].mid(9,breakdown[i].length()-1);
+                    QFont font;
+                    if (type == 'd') font.setBold(true);
+                    QStandardItem *nameItem = new QStandardItem(fileName);
+                    QStandardItem *sizeItem = new QStandardItem(fileSize);
+                    QList<QStandardItem *> row;
+                    nameItem->setFont(font);
+                    nameItem->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
+                    sizeItem->setData(Qt::AlignRight, Qt::TextAlignmentRole);
+                    row.append(nameItem);
+                    row.append(sizeItem);
+                    nameItem->setData(QVariant(type));
+//                    item->setIcon(...);
+                    model->appendRow(row);
+                }
+            }
+            break;
+        }
 // Status of recording and open files.
 // The write and read file handles are retrieved from this
         case 's':
