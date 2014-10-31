@@ -740,15 +740,19 @@ bool DataProcessingGui::combineRecords(QDateTime startTime, QDateTime endTime,
             {
                 temperature = secondField;
             }
-// A = autotrack, R = recording, X = switch avoidance, M = send measurements,
-// D = debug
+// A = autotrack, R = recording, M = send measurements,
+// D = debug, Charger algorithm, X = load avoidance, I = maintain isolation
             if (firstText == "dD")
             {
                 if ((secondField & (1 << 0)) > 0) controls[0] = 'A';
                 if ((secondField & (1 << 1)) > 0) controls[1] = 'R';
-                if ((secondField & (1 << 2)) > 0) controls[2] = 'X';
-                if ((secondField & (1 << 3)) > 0) controls[3] = 'M';
-                if ((secondField & (1 << 4)) > 0) controls[4] = 'D';
+                if ((secondField & (1 << 3)) > 0) controls[2] = 'M';
+                if ((secondField & (1 << 4)) > 0) controls[3] = 'D';
+                if (((secondField >> 5) & 3) == 0) controls[4] = '1';
+                if (((secondField >> 5) & 3) == 1) controls[4] = '2';
+                if (((secondField >> 5) & 3) == 2) controls[4] = '3';
+                if ((secondField & (1 << 7)) > 0) controls[5] = 'X';
+                if ((secondField & (1 << 8)) > 0) controls[6] = 'I';
             }
 // Switch control bits - three 2-bit fields: battery number for each of
 // load1, load2 and panel.
