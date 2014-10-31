@@ -794,6 +794,27 @@ int16_t getBatterySoC(int battery)
 }
 
 /*--------------------------------------------------------------------------*/
+/** @brief Get the Battery Under Load
+
+*/
+
+int16_t getBatteryUnderLoad(void)
+{
+    return batteryUnderLoad;
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Set the Battery Under Load
+
+@param[in] battery: 0..NUM_BATS-1
+*/
+
+void setBatteryUnderLoad(int battery)
+{
+    batteryUnderLoad = battery;
+}
+
+/*--------------------------------------------------------------------------*/
 /** @brief Reset the Battery State of Charge to 100%
 
 This is done by the charging task when the battery enters float phase.

@@ -34,14 +34,18 @@ charge voltages as low as possible.
 
 (c) K. Sarkies 11/09/2014
 
+BUGS
+
+1. File - find causes of recording failure and fix.
+2. Firmware pulse charger. Move load to other batteries.
+
 TODO
 
 1. Firmware upload - from within the program. Base on stm32flash.
 2. Comms - test queue space available for each data message to send.
 3. Charger 3PH - add acceleration to pull overvoltage back quickly.
 4. File - add file info (date) to GUI.
-5. GUI - download feature (may cause saturation of the comms interface).
-6. Measurement - Increase switching speed to 25kHz. May need hardware changes.
+5. Measurement - Increase switching speed to 25kHz. May need hardware changes.
 
 BUGS
 

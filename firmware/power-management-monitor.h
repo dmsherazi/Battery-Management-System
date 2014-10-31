@@ -71,6 +71,8 @@ interface, the result is maximum negative, around -4000) */
 void prvMonitorTask(void *pvParameters);
 int16_t getBatteryCurrentOffset(int battery);
 int16_t getBatterySoC(int battery);
+int16_t getBatteryUnderLoad(void);
+void setBatteryUnderLoad(int battery);
 void setBatterySoC(int battery,int16_t soc);
 void resetBatterySoC(int battery);
 void startCalibration();

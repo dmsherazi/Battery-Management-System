@@ -62,6 +62,8 @@ times 256 times 4096 */
 
 #define VOLTAGE_SCALE 1523
 
+#warning "Version 1 Selected"
+
 #elif (VERSION==2)
 
 /* Voltage offset: 5 (2 times local ref 2.5V) times the gain 1.833
@@ -73,6 +75,8 @@ times 256 times 4096 */
 
 #define VOLTAGE_SCALE 1548
 
+#warning "Version 2 Selected"
+
 #elif (VERSION==3)
 
 /* Voltage offset: 5 (2 times local ref 2.5V) times the gain 1.679
@@ -83,6 +87,8 @@ times 256 times 4096 */
 /* Voltage scale: amplifier gain 1.679 times ref voltage 3.3 times 256 */
 
 #define VOLTAGE_SCALE 1418
+
+#warning "Version 3 Selected"
 
 #else
 #error "Version is not defined"

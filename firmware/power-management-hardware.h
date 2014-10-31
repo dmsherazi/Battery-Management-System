@@ -41,7 +41,7 @@ Initial 29 September 2013
 #define PWM_PERIOD      14400
 
 /* USART */
-#define BAUDRATE        115200
+#define BAUDRATE        38400
 
 /* Watchdog Timer Timeout Period in ms */
 #define IWDG_TIMEOUT_MS 1500

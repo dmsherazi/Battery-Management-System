@@ -285,7 +285,7 @@ is full. */
                 if (fileStatus == FR_OK) f_sync(&file[fileHandle]);
             }
             else fileStatus = FR_INVALID_PARAMETER;
-/* Send a denied status if the disk fills. The program probably won't use this. */
+/* Send a denied status if the disk fills. The caller probably won't use this. */
             if (numWritten != length) fileStatus = FR_DENIED;
             break;
         }
@@ -444,6 +444,11 @@ Checks the filename and handle for the write and read files, if they are open. *
     }
 /* Return the file status */
     xQueueSendToBack(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
+/* Debug*/
+if (fileStatus != FR_OK)
+{
+dataMessageSend("DFile",line[0],fileStatus);
+}
 }
 
 /*--------------------------------------------------------------------------*/

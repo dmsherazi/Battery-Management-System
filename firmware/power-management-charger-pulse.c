@@ -71,6 +71,7 @@ static uint8_t batteryUnderCharge;
 
 void initLocalsPulse(void)
 {
+    batteryUnderCharge = 0;
     uint8_t i=0;
     for (i=0; i<NUM_BATS; i++)
     {
@@ -147,12 +148,14 @@ situations near the start where the on-time is large due to bulk charging. */
 /* Update cumulated off time to check against charging time limit */
                 cumulatedOffTime[index] += offTime[index];
 dataMessageSend("Db-rC",averageCurrent,cumulatedCurrent[index]);
-/* If average current below float threshold, or time exceeded, go to float. */
+/* If average current below float threshold, or time exceeded, go to float.
+Set the SoC to 100% onm the assumption it was underestimated. */
                 if ((-averageCurrent < getFloatStageCurrent(index)) ||
                     (cumulatedOffTime[index] > floatDelay))
                 {
                     cumulatedOffTime[index] = 0;
                     setBatteryChargingPhase(index,floatC);
+                    setBatterySoC(index,25600);
                 }
 /* Now that the cycle is finished, reset times to start next cycle. */
                 offTime[index] = 0;
