@@ -168,15 +168,7 @@ in turn. */
                     break;
                 }
             }
-/* If no battery found to take the slot, turn off charger. */
-            if (i >= NUM_BATS) batteryUnderCharge = 0;
         }
-/* Set the switches to connect the panel to the selected battery if it
-is in an active charging phase, otherwise turn it off. */
-        uint8_t index = batteryUnderCharge-1;
-        if (getBatteryChargingPhase(index) == bulkC)
-            setSwitch(batteryUnderCharge,PANEL);
-        else setSwitch(0,PANEL);
     }
 
     for (index=0; index < NUM_BATS; index++)

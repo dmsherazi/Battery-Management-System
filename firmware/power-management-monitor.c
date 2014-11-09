@@ -407,17 +407,29 @@ panel. */
 /* decisionStatus is a variable used to record the reason for any decision */
         decisionStatus = 0;
 
+/* If the currently allocated charging battery is in float and higher than 95%,
+or in rest phase, deallocate battery to allow algorithms to find another. */
+        bool floatState = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
+                 && (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC));
+        bool restState = (getBatteryChargingPhase(batteryUnderCharge-1) == restC);
+        if (floatState || restState)
+        {
+            batteryUnderCharge = 0;
+        }
+
 /*### One battery: just allocate load and charger to it */
         if (numBats == 1)
         {
             decisionStatus = 0x100;
             batteryUnderCharge = batteryFillStateSort[0];
             batteryUnderLoad = batteryFillStateSort[0];
-/* If the battery is in float and higher than 95%, stop charging */
-            if ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC) &&
-                (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC))
+/* If the battery is in float and higher than 95%, or in rest phase, stop charging */
+            bool floatState = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
+                     && (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC));
+            bool restState = (getBatteryChargingPhase(batteryUnderCharge-1) == restC);
+            if (floatState || restState)
             {
-                decisionStatus |= 0x01;
+                decisionStatus |= 0x02;
                 batteryUnderCharge = 0;
             }
         }
@@ -425,27 +437,21 @@ panel. */
         else if (numBats == 2)
         {
             decisionStatus = 0x200;
-/* Deallocate the charger if the battery has reached float stage */
-            if (getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
-                batteryUnderCharge = 0;
 /* (1) If the charger is unallocated, set to the lowest SoC battery, if this
-battery is not in float state with SoC > 95%. If no suitable battery is found
-leave the charger unallocated. */
+battery is not in float state with SoC > 95%, nor in rest phase. If no suitable
+battery is found leave the charger unallocated. */
             if (batteryUnderCharge == 0)
             {
                 decisionStatus |= 0x01;
                 for (i=0; i<numBats; i++)
                 {
                     uint8_t battery = batteryFillStateSort[numBats-i-1];
-                    if (getBatteryChargingPhase(battery-1) != floatC)
+                    bool floatState = ((getBatteryChargingPhase(battery-1) == floatC)
+                             && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
+                    bool restState = (getBatteryChargingPhase(battery-1) == restC);
+                    if (!(floatState || restState))
                     {
                         decisionStatus |= 0x02;
-                        batteryUnderCharge = battery;
-                        break;
-                    }
-                    if (batterySoC[battery-1] < FLOAT_CHARGE_SOC)
-                    {
-                        decisionStatus |= 0x04;
                         batteryUnderCharge = battery;
                         break;
                     }
@@ -488,12 +494,9 @@ charging battery regardless. */
 /*--- All batteries normal fill state. Isolated battery already allocated. ---*/
             if (batteryFillState[lowestBattery-1] == normalF)
             {
-/* Deallocate the charger if the battery has reached float stage */
-                if (getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
-                    batteryUnderCharge = 0;
 /* (1) If the charger is unallocated, set to the lowest SoC battery, if this
-battery is not in float state with SoC > 95%. If no suitable battery is found
-leave the charger unallocated. */
+battery is not in float with SoC > 95%, nor in rest phase. If no suitable
+battery is found leave the charger unallocated. */
                 decisionStatus = 0x300;
                 if (batteryUnderCharge == 0)
                 {
@@ -501,13 +504,10 @@ leave the charger unallocated. */
                     for (i=0; i<numBats; i++)
                     {
                         uint8_t battery = batteryFillStateSort[numBats-i-1];
-                        if (getBatteryChargingPhase(battery-1) != floatC)
-                        {
-                            decisionStatus |= 0x02;
-                            batteryUnderCharge = battery;
-                            break;
-                        }
-                        if (batterySoC[battery-1] < FLOAT_CHARGE_SOC)
+                        bool floatState = ((getBatteryChargingPhase(battery-1) == floatC)
+                                 && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
+                        bool restState = (getBatteryChargingPhase(battery-1) == restC);
+                        if (!(floatState || restState))
                         {
                             decisionStatus |= 0x04;
                             batteryUnderCharge = battery;
@@ -550,23 +550,31 @@ under charge if the strategies require it. */
             else if (batteryFillState[highestBattery-1] == normalF)
             {
                 decisionStatus = 0x400;
-/* (1) If the charger is unallocated or is allocated to a normal battery,
-set to the lowest SoC unallocated battery regardless if it is isolated. */
+/* (1) If the charger is unallocated, set to the lowest SoC battery, if this
+battery is not in float with SoC > 95%, nor in rest phase, regardless if it is
+isolated. Also reallocate unconditionally if the weakest battery is critical.
+If no suitable battery is found leave the charger unallocated. */
                 uint8_t weakestBattery = batteryFillStateSort[numBats-1];                
                 if ((batteryUnderCharge == 0) || 
-                    (batteryFillState[batteryUnderCharge-1] == normalF))
+                    (batteryFillState[batteryUnderCharge-1] == normalF) ||
+                    (batteryFillState[weakestBattery-1] == criticalF))
                 {
                     decisionStatus |= 0x01;
-                    batteryUnderCharge = weakestBattery;
+                    for (i=0; i<numBats; i++)
+                    {
+                        uint8_t battery = batteryFillStateSort[numBats-i-1];
+                        bool floatState = ((getBatteryChargingPhase(battery-1) == floatC)
+                                 && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
+                        bool restState = (getBatteryChargingPhase(battery-1) == restC);
+                        if (!(floatState || restState))
+                        {
+                            decisionStatus |= 0x04;
+                            batteryUnderCharge = battery;
+                            break;
+                        }
+                    }
                 }
-/* (2) But if the lowest battery is critical we'd better work on that
-regardless. */
-                if (batteryFillState[weakestBattery-1] == criticalF)
-                {
-                    decisionStatus |= 0x02;
-                    batteryUnderCharge = weakestBattery;
-                }
-/* (3) If the loads are unallocated or if the battery under load is low or
+/* (2) If the loads are unallocated or if the battery under load is low or
 critical, set to the highest SoC unallocated battery ... */
                 if ((batteryUnderLoad == 0) ||
                     (batteryFillState[batteryUnderLoad-1] != normalF))
@@ -594,12 +602,28 @@ not the battery under charge if our logic is correct so far). */
             }
 /*--- Otherwise all batteries are low or critical. ---*/
 /* Allocate charger and loads as best we can. If the battery under load is
-critical we must turn off the low priority loads. */
+critical we must turn off the low priority loads (see below).
+Expect that at least one battery will be in bulk phase but check out float and
+rest phases regardless in case the algorithm got the charge states wrong. */
             else
             {
                 decisionStatus = 0x500;
                 batteryUnderLoad = batteryFillStateSort[0];
-                batteryUnderCharge = batteryFillStateSort[numBats-1];
+                batteryUnderCharge = 0;
+                uint8_t i=0;
+                for (i=0; i<numBats; i++)
+                {
+                    uint8_t battery = batteryFillStateSort[numBats-i-1];
+                    bool floatState = ((getBatteryChargingPhase(battery-1) == floatC)
+                             && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
+                    bool restState = (getBatteryChargingPhase(battery-1) == restC);
+                    if (!(floatState || restState))
+                    {
+                        decisionStatus |= 0x04;
+                        batteryUnderCharge = battery;
+                        break;
+                    }
+                }
             }
         }
 
@@ -660,6 +684,8 @@ later. */
             {
                 setSwitch(batteryUnderLoad,LOAD_1);
             }
+/* Connect the battery under charge to the charger */
+            setSwitch(batteryUnderCharge,PANEL);
 /* Set the battery selected for charge as the preferred battery so that it is
 used if autotrack is turned off. */
             setPanelSwitchSetting(batteryUnderCharge);

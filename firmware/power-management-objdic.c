@@ -93,7 +93,7 @@ void setGlobalDefaults(void)
     configData.config.monitorStrategy = 0xFF;   /* All strategies on */
     configData.config.panelSwitchSetting = 0;
 /* Set default charging control variables */
-    configData.config.chargeAlgorithm = icc;
+    configData.config.chargeAlgorithm = pulse;
 /* Set default system control variables */
     configData.config.watchdogDelay = WATCHDOG_DELAY;
     configData.config.chargerDelay = CHARGER_DELAY;

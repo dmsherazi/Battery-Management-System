@@ -282,11 +282,15 @@ is full. */
             if (length < 82)
             {
                 fileStatus = f_write(&file[fileHandle],line+3,length,&numWritten);
+                if (numWritten != length)
+                {
+dataMessageSend("DF1",fileStatus,numWritten);
+                    fileStatus = FR_DENIED;
+                }
                 if (fileStatus == FR_OK) f_sync(&file[fileHandle]);
             }
             else fileStatus = FR_INVALID_PARAMETER;
 /* Send a denied status if the disk fills. The caller probably won't use this. */
-            if (numWritten != length) fileStatus = FR_DENIED;
             break;
         }
 /* Get data from a file from the last position that data was read after opening. */

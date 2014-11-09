@@ -106,10 +106,6 @@ and reset the duty cycle. Nothing should happen if no charger is allocated. */
         if (batteryUnderCharge > 0) dutyCycle = 50*256;
     }
 
-/* Set the Switches to connect the panel to the selected battery if in
-autotrack mode, otherwise leave settings on manual. */
-    if (isAutoTrack()) setSwitch(batteryUnderCharge,PANEL);
-
     if (batteryUnderCharge > 0)
     {
 

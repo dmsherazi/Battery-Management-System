@@ -186,11 +186,6 @@ dataMessageSend("Dchg",batteryUnderCharge,getBatteryChargingPhase(j-1));
             }
         }
 
-/* Set the switches to connect the panel to the selected battery if it
-is in an active charging phase, otherwise turn it off. */
-        if (getBatteryChargingPhase(batteryUnderCharge-1) == bulkC)
-            setSwitch(batteryUnderCharge,PANEL);
-        else setSwitch(0,PANEL);
     }
 }
 
