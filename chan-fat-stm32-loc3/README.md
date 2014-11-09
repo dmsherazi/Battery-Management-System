@@ -1,4 +1,4 @@
-This is an adaptation of ChaN'v FAT filesystem library based on v0.10.
+This is an adaptation of ChaN'v FAT filesystem library based on v0.10b.
 
 Common files are ff.c, ff.h, ffconf.h, integer.h, diskio.h. These should be
 updated when a new version of ChaN FAT library is released.
