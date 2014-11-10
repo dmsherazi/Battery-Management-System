@@ -1307,24 +1307,6 @@
        <string>Pulse Charge</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="iccButton">
-      <property name="geometry">
-       <rect>
-        <x>22</x>
-        <y>175</y>
-        <width>211</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>Interrupted Charge Control</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="threePhaseText">
       <property name="geometry">
        <rect>
@@ -1361,28 +1343,6 @@
       </property>
       <property name="text">
        <string>After the voltage reaches the gassing limit, the battery is placed in rest phase and another battery is allocated. Each battery is placed on the charger in turn but must remain in rest phase for a minimum time.</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="threePhaseText_3">
-      <property name="geometry">
-       <rect>
-        <x>44</x>
-        <y>200</y>
-        <width>507</width>
-        <height>66</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string>After the voltage reaches the gassing limit, the charger is turned off until the voltage falls below the battery's fully charged open circuit voltage. The charger then cycles with a 90 second period and a 33% duty cycle until the voltage again reaches the gassing limit.</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

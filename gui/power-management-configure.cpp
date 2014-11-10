@@ -223,15 +223,6 @@ void PowerManagementConfigGui::on_pulseButton_clicked()
     socket->write("dC\n\r");
 }
 
-/* 2 Interrupted Charge Control Algorithm. */
-void PowerManagementConfigGui::on_iccButton_clicked()
-{
-    QString command = "pS2";
-    socket->write(command.append(QString("%1")).append("\n\r")
-                         .toAscii().constData());
-/* Ask for charge parameter settings */
-    socket->write("dC\n\r");
-}
 
 //-----------------------------------------------------------------------------
 /** @brief Set the Time
@@ -537,6 +528,7 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
             {
                 PowerManagementConfigUi.threePhaseButton->setChecked(true);
                 PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
+                PowerManagementConfigUi.chargeParameterSpinBox_1->setValue(10);
                 PowerManagementConfigUi.chargeParameterSpinBox_1->
                     setToolTip("Lowest duty cycle allowed to prevent it crashing to zero");
                 PowerManagementConfigUi.chargeParameterText_1->setVisible(true);
@@ -556,28 +548,6 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.chargeParameterText_2->setVisible(false);
                 PowerManagementConfigUi.chargeParameterSpinBox_3->setVisible(false);
                 PowerManagementConfigUi.chargeParameterText_3->setVisible(false);
-            }
-            if (chargeAlgorithm == 2)
-            {
-                PowerManagementConfigUi.iccButton->setChecked(true);
-                PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
-                PowerManagementConfigUi.chargeParameterSpinBox_1->
-                    setToolTip("Low voltage threshold ending the rest phase and starting the absorption phase, in percent of OCV");
-                PowerManagementConfigUi.chargeParameterText_1->setVisible(true);
-                PowerManagementConfigUi.chargeParameterText_1->
-                    setText("Rest Phase Voltage %OCV");
-                PowerManagementConfigUi.chargeParameterSpinBox_2->setVisible(true);
-                PowerManagementConfigUi.chargeParameterSpinBox_2->
-                    setToolTip("Length of a slot in a cycle of the absorption phase");
-                PowerManagementConfigUi.chargeParameterText_2->setVisible(true);
-                PowerManagementConfigUi.chargeParameterText_2->
-                    setText("Slot Length (secs)");
-                PowerManagementConfigUi.chargeParameterSpinBox_3->setVisible(true);
-                PowerManagementConfigUi.chargeParameterSpinBox_3->
-                    setToolTip("Number of slots in a cycle of the absorption phase");
-                PowerManagementConfigUi.chargeParameterText_3->setVisible(true);
-                PowerManagementConfigUi.chargeParameterText_3->
-                    setText("Number of Slots");
             }
             bool avoidLoad = (((controlByte >> 7) & 0x01) > 0);
             if (avoidLoad)
@@ -600,25 +570,12 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.chargeParameterSpinBox_1->setValue(dutyCycle);
             break;
         }
-// Show charger ICC parameters
-        case 'P':
-        {
-            if (size < 2) break;
-            int slotLength = breakdown[1].simplified().toInt();
-            if (PowerManagementConfigUi.iccButton->isChecked())
-                PowerManagementConfigUi.chargeParameterSpinBox_2->setValue(slotLength);
-            int slotNumber = breakdown[2].simplified().toInt();
-            if (PowerManagementConfigUi.iccButton->isChecked())
-                PowerManagementConfigUi.chargeParameterSpinBox_3->setValue(slotNumber);
-            break;
-        }
 // Show charger voltage threshold parameter
         case 'V':
         {
             if (size < 1) break;
             int voltage = breakdown[1].simplified().toInt();
-            if ((PowerManagementConfigUi.pulseButton->isChecked()) ||
-                (PowerManagementConfigUi.iccButton->isChecked()))
+            if (PowerManagementConfigUi.pulseButton->isChecked())
                 PowerManagementConfigUi.chargeParameterSpinBox_1->setValue(voltage);
             break;
         }
