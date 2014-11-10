@@ -97,9 +97,7 @@ terminal voltage drops below a charging restart threshold (95%). */
 /* get battery under charge from the manual panel switch settings. */
         uint8_t battery = getPanelSwitchSetting();
 
-        if (getChargeAlgorithm() == icc)
-            chargerControlICC(battery);
-        else if (getChargeAlgorithm() == threePH)
+        if (getChargeAlgorithm() == threePH)
             chargerControl3PH(battery);
         else if (getChargeAlgorithm() == pulse)
             chargerControlPulse(battery);

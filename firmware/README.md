@@ -27,17 +27,24 @@ Three versions are here represented. Each refers to slightly different
 voltage and current scales in the measurement header for the PCB version.
 It is compiled with 'make VERSION=x' where x = 2 or 3. Version 1 is obsolete.
 
-Three charger algorithms are provided: Three Phase, Intermittent Charge and
-Interrupted Charge Control. the latter two avoid EMI problems caused by PWM
-switching in Three Phase, and also reduce overcharging by keeping the battery
-charge voltages as low as possible.
+Two charger algorithms are provided: Three Phase and Pulse Charge. The latter
+avoids the PWM switching needed to maintain a constant absorption phase voltage,
+which reduces EMI problems and also reduces overcharging by keeping the battery
+charge voltages as low as possible. The pulse charge algorithm was developed
+from the Interrupted Charge Control and Intermittent Charge algorithms reported
+in the literature, and adapted to the efficient charging of multiple batteries
+from an uncontrolled variable power source such as that found in solar and
+aeolian systems.
 
-(c) K. Sarkies 11/09/2014
+More information is available on:
+
+http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-software.html
+
+(c) K. Sarkies 10/11/2014
 
 BUGS
 
-1. File - find causes of recording failure and fix.
-2. Firmware pulse charger. Move load to other batteries.
+1. File - fix causes of recording failure.
 
 TODO
 

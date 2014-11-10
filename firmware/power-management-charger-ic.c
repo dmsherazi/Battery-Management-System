@@ -92,7 +92,7 @@ algorithm then move to rest phase. */
 }
 
 /*--------------------------------------------------------------------------*/
-/* @brief Execute one cycle of the ICC Algorithm
+/* @brief Execute one cycle of the IC Algorithm
 
 */
 
