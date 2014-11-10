@@ -763,17 +763,17 @@ bool DataProcessingGui::combineRecords(QDateTime startTime, QDateTime endTime,
                 QString load1BatteryText;
                 load1BatteryText.setNum(load1Battery);
                 if (load1Battery > 0) switches.append(" ").append(load1BatteryText);
-                else switches.append("  ");
+                else switches.append(" 0");
                 uint load2Battery = (secondField >> 2) & 0x03;
                 QString load2BatteryText;
                 load2BatteryText.setNum(load2Battery);
                 if (load2Battery > 0) switches.append(" ").append(load2BatteryText);
-                else switches.append("  ");
+                else switches.append(" 0");
                 uint panelBattery = (secondField >> 4) & 0x03;
                 QString panelBatteryText;
                 panelBatteryText.setNum(panelBattery);
                 if (panelBattery > 0) switches.append(" ").append(panelBatteryText);
-                else switches.append("  ");
+                else switches.append(" 0");
             }
             if (firstText == "dd")
             {
