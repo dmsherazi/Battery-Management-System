@@ -61,7 +61,7 @@ Initial 2 October 2014
 static uint32_t offTime[NUM_BATS];  /* Battery time in rest */
 static uint32_t onTime[NUM_BATS];   /* Battery time in charge */
 static uint64_t cumulatedOffTime[NUM_BATS];
-static int64_t cumulatedCurrent[NUM_BATS];
+static int64_t accumulatedCharge[NUM_BATS];
 static uint8_t batteryUnderCharge;
 
 /*--------------------------------------------------------------------------*/
@@ -77,7 +77,7 @@ void initLocalsPulse(void)
     {
         offTime[i] = 0;
         onTime[i] = 0;
-        cumulatedCurrent[i] = 0;
+        accumulatedCharge[i] = 0;
         cumulatedOffTime[i] = 0;
 /* Set battery state if inappropriate. If in absorption phase from the 3PH
 algorithm then move to rest phase. */
@@ -106,14 +106,12 @@ void chargerControlPulse(uint8_t battery)
     for (i=0; i < NUM_BATS; i++)
     {
 /* If a battery is in a rest phase, increment its off-time counter,
-or if in bulk phase, its on-time counter and add to the cumulated current. */
+or if in bulk phase, its on-time counter. Add to the cumulated current. */
         if (getBatteryChargingPhase(i) == restC)
             offTime[i]++;
         else if (getBatteryChargingPhase(i) == bulkC)
-        {
             onTime[i]++;
-            cumulatedCurrent[i] += getCurrentAv(i);
-        }
+        accumulatedCharge[i] += getCurrentAv(i);
 /* Change to bulk phase if a battery is in rest phase and off time exceeds the
 minimum. */
         if ((getBatteryChargingPhase(i) == restC) &&
@@ -137,7 +135,7 @@ current over the last full cycle. */
         {
             setBatteryChargingPhase(index,restC);
             uint32_t totalTime = (offTime[index] + onTime[index]);
-/* Average current over the cycle is the cumulation over the on-time, divided by
+/* Average current over the cycle is the cumulated current divided by
 the total time. If the latter is zero, set average to avoid triggering float.
 Set an arbitrary maximum on-time equal to the minimum off-time to avoid
 situations near the start where the on-time is large due to bulk charging. */
@@ -145,7 +143,7 @@ situations near the start where the on-time is large due to bulk charging. */
             if ((totalTime > 0) &&
                 (onTime[index] < minimumOffTime))
             {
-                averageCurrent = cumulatedCurrent[index]/totalTime;
+                averageCurrent = accumulatedCharge[index]/totalTime;
             }
             else
             {
@@ -154,7 +152,7 @@ situations near the start where the on-time is large due to bulk charging. */
 /* Update cumulated off time to check against charging time limit */
             cumulatedOffTime[index] += offTime[index];
 /* If average current below float threshold, or time exceeded, go to float.
-Set the SoC to 100% onm the assumption it was underestimated. */
+Set the SoC to 100% on the assumption it was underestimated. */
             if ((-averageCurrent < getFloatStageCurrent(index)) ||
                 (cumulatedOffTime[index] > floatDelay))
             {
@@ -165,7 +163,7 @@ Set the SoC to 100% onm the assumption it was underestimated. */
 /* Now that the cycle is finished, reset times to start next cycle. */
             offTime[index] = 0;
             onTime[index] = 0;
-            cumulatedCurrent[index] = 0;
+            accumulatedCharge[index] = 0;
         }
     }
 
