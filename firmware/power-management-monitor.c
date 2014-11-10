@@ -409,12 +409,15 @@ panel. */
 
 /* If the currently allocated charging battery is in float and higher than 95%,
 or in rest phase, deallocate battery to allow algorithms to find another. */
-        bool floatState = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
-                 && (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC));
-        bool restState = (getBatteryChargingPhase(batteryUnderCharge-1) == restC);
-        if (floatState || restState)
+        if (batteryUnderCharge > 0)
         {
-            batteryUnderCharge = 0;
+            bool floatState = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
+                     && (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC));
+            bool restState = (getBatteryChargingPhase(batteryUnderCharge-1) == restC);
+            if (floatState || restState)
+            {
+                batteryUnderCharge = 0;
+            }
         }
 
 /*### One battery: just allocate load and charger to it */
@@ -458,10 +461,12 @@ battery is found leave the charger unallocated. */
                 }
             }
 /* If the charger has been allocated to the loaded battery, then
-reallocate the loaded battery. This will allow the charger to swap back and
+deallocate the loaded battery. This will allow the charger to swap back and
 forth as the loaded battery droops and the charging battery completes charge. */
-            if (batteryUnderLoad == chargingBattery)
-                batteryUnderLoad = 0;
+                if ((getMonitorStrategy() & SEPARATE_LOAD) &&
+                    (batteryUnderLoad == batteryUnderCharge))
+                    batteryUnderLoad = 0;
+
 /* (2) If the loads are unallocated, set to the highest SoC unallocated battery.
 Avoid the battery that has been idle for the longest time, and also the battery
 under charge if the strategies require it. */
@@ -516,10 +521,12 @@ battery is found leave the charger unallocated. */
                     }
                 }
 /* If the charger has been allocated to the loaded battery, then
-reallocate the loaded battery. This will allow the charger to swap back and
+deallocate the loaded battery. This will allow the charger to swap back and
 forth as the loaded battery droops and the charging battery completes charge. */
-                if (batteryUnderLoad == chargingBattery)
+                if ((getMonitorStrategy() & SEPARATE_LOAD) &&
+                    (batteryUnderLoad == batteryUnderCharge))
                     batteryUnderLoad = 0;
+
 /* (2) If the loads are unallocated, set to the highest SoC unallocated battery.
 Avoid the battery that has been idle for the longest time, and also the battery
 under charge if the strategies require it. */
@@ -574,6 +581,13 @@ If no suitable battery is found leave the charger unallocated. */
                         }
                     }
                 }
+
+/* If the battery under load is the same as the chosen battery to charge,
+deallocate it. */
+                if ((getMonitorStrategy() & SEPARATE_LOAD) &&
+                    (batteryUnderLoad == batteryUnderCharge))
+                    batteryUnderLoad = 0;
+
 /* (2) If the loads are unallocated or if the battery under load is low or
 critical, set to the highest SoC unallocated battery ... */
                 if ((batteryUnderLoad == 0) ||
@@ -687,7 +701,7 @@ later. */
 /* Connect the battery under charge to the charger */
             setSwitch(batteryUnderCharge,PANEL);
 /* Set the battery selected for charge as the preferred battery so that it is
-used if autotrack is turned off. */
+used if autotrack is turned off. This is passed to the charger task. */
             setPanelSwitchSetting(batteryUnderCharge);
         }
 
