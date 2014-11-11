@@ -60,7 +60,7 @@ Initial 2 October 2014
 
 static uint32_t offTime[NUM_BATS];  /* Battery time in rest */
 static uint32_t onTime[NUM_BATS];   /* Battery time in charge */
-static uint64_t cumulatedOffTime[NUM_BATS];
+static uint64_t accumulatedOffTime[NUM_BATS];
 static int64_t accumulatedCharge[NUM_BATS];
 static uint8_t batteryUnderCharge;
 
@@ -78,7 +78,7 @@ void initLocalsPulse(void)
         offTime[i] = 0;
         onTime[i] = 0;
         accumulatedCharge[i] = 0;
-        cumulatedOffTime[i] = 0;
+        accumulatedOffTime[i] = 0;
 /* Set battery state if inappropriate. If in absorption phase from the 3PH
 algorithm then move to rest phase. */
         if (getBatteryChargingPhase(i) == absorptionC)
@@ -106,14 +106,12 @@ void chargerControlPulse(uint8_t battery)
     for (i=0; i < NUM_BATS; i++)
     {
 /* If a battery is in a rest phase, increment its off-time counter,
-or if in bulk phase, its on-time counter. Add to the cumulated current. */
-        if (getBatteryChargingPhase(i) == restC)
-            offTime[i]++;
-        else if (getBatteryChargingPhase(i) == bulkC)
-            onTime[i]++;
+or if in bulk phase, its on-time counter. Add to the accumulated charge. */
+        if (getBatteryChargingPhase(i) == restC) offTime[i]++;
+        else if (getBatteryChargingPhase(i) == bulkC) onTime[i]++;
         accumulatedCharge[i] += getCurrentAv(i);
 /* Change to bulk phase if a battery is in rest phase and off time exceeds the
-minimum. */
+minimum. Charging will not start until the charger is allocated. */
         if ((getBatteryChargingPhase(i) == restC) &&
             (offTime[i] > minimumOffTime))
         {
@@ -125,9 +123,7 @@ minimum. */
 charger, if any. */
     if (battery > 0)
     {
-/* Manage change from bulk to rest phase. Set battery on charge to none.
-As the battery has now finished a charge-rest cycle, compute the average
-current over the last full cycle. */
+/* Manage change from bulk to rest phase. */
         uint8_t index = battery-1;
         if ((getBatteryChargingPhase(index) == bulkC) &&
             (getVoltageAv(index) >
@@ -135,7 +131,8 @@ current over the last full cycle. */
         {
             setBatteryChargingPhase(index,restC);
             uint32_t totalTime = (offTime[index] + onTime[index]);
-/* Average current over the cycle is the cumulated current divided by
+/* As the battery has now finished a charge-rest cycle, compute the average
+current over the last full cycle. This is the accumulated charge divided by
 the total time. If the latter is zero, set average to avoid triggering float.
 Set an arbitrary maximum on-time equal to the minimum off-time to avoid
 situations near the start where the on-time is large due to bulk charging. */
@@ -149,14 +146,20 @@ situations near the start where the on-time is large due to bulk charging. */
             {
                 averageCurrent = -getFloatStageCurrent(index);    
             }
-/* Update cumulated off time to check against charging time limit */
-            cumulatedOffTime[index] += offTime[index];
+/* Update accumulated off time to check against charging time limit.
+This is counted as the total time elapsed since the first cycle began. */
+            accumulatedOffTime[index] += totalTime;
+dataMessageSendLowPriority("Dbat",index,accumulatedCharge[index]);
+dataMessageSendLowPriority("Dchg",-averageCurrent,getFloatStageCurrent(index));
+dataMessageSendLowPriority("Dtms",offTime[index],onTime[index]);
+dataMessageSendLowPriority("Dtim",totalTime,minimumOffTime);
+dataMessageSendLowPriority("Dacc",accumulatedOffTime[index],floatDelay);
 /* If average current below float threshold, or time exceeded, go to float.
 Set the SoC to 100% on the assumption it was underestimated. */
             if ((-averageCurrent < getFloatStageCurrent(index)) ||
-                (cumulatedOffTime[index] > floatDelay))
+                (accumulatedOffTime[index] > floatDelay))
             {
-                cumulatedOffTime[index] = 0;
+                accumulatedOffTime[index] = 0;
                 setBatteryChargingPhase(index,floatC);
                 setBatterySoC(index,25600);
             }

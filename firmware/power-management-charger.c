@@ -48,7 +48,6 @@ Initial 14 June 2014
 #include "power-management-measurement.h"
 #include "power-management-monitor.h"
 #include "power-management-charger.h"
-#include "power-management-charger-icc.h"
 #include "power-management-charger-3ph.h"
 #include "power-management-charger-pulse.h"
 #include "power-management-objdic.h"
@@ -74,7 +73,6 @@ void prvChargerTask(void *pvParameters)
 
     initGlobals();
     initLocals3PH();
-    initLocalsICC();
     initLocalsPulse();
 
 	while (1)
@@ -140,10 +138,6 @@ void resetChargeAlgorithm(charge_algorithm chargeAlgorithm)
     if (chargeAlgorithm == threePH)
     {
         initLocals3PH();
-    }
-    else if (chargeAlgorithm == icc)
-    {
-        initLocalsICC();
     }
     else if (chargeAlgorithm == ic)
     {

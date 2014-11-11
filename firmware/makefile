@@ -53,8 +53,7 @@ CFILES     += $(PROJECT)-lib.c $(PROJECT)-time.c $(PROJECT)-objdic.c
 CFILES     += $(PROJECT)-measurement.c $(PROJECT)-watchdog.c
 CFILES     += ff.c sd_spi_loc3_stm32_freertos.c fattime.c rtc.c freertos.c
 CFILES     += tasks.c list.c queue.c timers.c port.c heap_1.c
-CFILES     += $(PROJECT)-charger-3ph.c $(PROJECT)-charger.c
-CFILES     += $(PROJECT)-charger-icc.c $(PROJECT)-charger-pulse.c
+CFILES     += $(PROJECT)-charger.c $(PROJECT)-charger-3ph.c $(PROJECT)-charger-pulse.c
 
 OBJS		= $(CFILES:.c=.o)
 
