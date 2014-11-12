@@ -62,7 +62,6 @@ static uint32_t offTime[NUM_BATS];  /* Battery time in rest */
 static uint32_t onTime[NUM_BATS];   /* Battery time in charge */
 static uint64_t accumulatedOffTime[NUM_BATS];
 static int64_t accumulatedCharge[NUM_BATS];
-static uint8_t batteryUnderCharge;
 
 /*--------------------------------------------------------------------------*/
 /* @brief Initialise Local Variables
@@ -71,7 +70,6 @@ static uint8_t batteryUnderCharge;
 
 void initLocalsPulse(void)
 {
-    batteryUnderCharge = 0;
     uint8_t i=0;
     for (i=0; i<NUM_BATS; i++)
     {
@@ -95,6 +93,11 @@ algorithm then move to rest phase. */
 
 void chargerControlPulse(uint8_t battery)
 {
+/* Initialize the algorithm if the panel voltage has fallen below 10V, which
+would almost certainly indicate night time. This will prevent the algorithm from
+carrying over unfinished charging states from the pervious day. */
+    if (getPanelVoltage(0) < 10*256) initLocalsPulse();
+
 /* Compute the average current and voltage */
     calculateAverageMeasures();
 
@@ -149,11 +152,11 @@ situations near the start where the on-time is large due to bulk charging. */
 /* Update accumulated off time to check against charging time limit.
 This is counted as the total time elapsed since the first cycle began. */
             accumulatedOffTime[index] += totalTime;
-dataMessageSendLowPriority("Dbat",index,accumulatedCharge[index]);
-dataMessageSendLowPriority("Dchg",-averageCurrent,getFloatStageCurrent(index));
-dataMessageSendLowPriority("Dtms",offTime[index],onTime[index]);
-dataMessageSendLowPriority("Dtim",totalTime,minimumOffTime);
-dataMessageSendLowPriority("Dacc",accumulatedOffTime[index],floatDelay);
+dataMessageSend("Dbat",index,accumulatedCharge[index]);
+dataMessageSend("Dacc",accumulatedOffTime[index],floatDelay);
+dataMessageSend("Dchg",-averageCurrent,getFloatStageCurrent(index));
+dataMessageSend("Dtms",offTime[index],onTime[index]);
+dataMessageSend("Dtim",totalTime,minimumOffTime);
 /* If average current below float threshold, or time exceeded, go to float.
 Set the SoC to 100% on the assumption it was underestimated. */
             if ((-averageCurrent < getFloatStageCurrent(index)) ||
