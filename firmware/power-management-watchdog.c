@@ -66,11 +66,11 @@ timeout has occurred.
 
 void prvWatchdogTask(void *pvParameters)
 {
-	while (1)
-	{
+    while (1)
+    {
 /* Reset the hardware independent watchdog timer */
         iwdgReset();
-		vTaskDelay(getWatchdogDelay());
+        vTaskDelay(getWatchdogDelay());
         checkChargerWatchdog();
         checkMeasurementWatchdog();
         checkMonitorWatchdog();

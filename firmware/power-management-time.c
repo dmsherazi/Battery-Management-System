@@ -55,30 +55,30 @@ void putTimeToString(char* timeString)
     uint8_t minute = (timeCounter/60) % 60;
     uint8_t hour = (timeCounter/3600) % 24;
     uint16_t day = (uint16_t)(timeCounter/86400);
-	uint16_t year = 0;
+    uint16_t year = 0;
     uint16_t dayOfYear = 365;
     uint16_t dayOfLastYear = 365;
 
 /* Break down into years since 2000 and number of days left in the month */
-	for(;;)
+    for(;;)
     {
         dayOfLastYear = dayOfYear;
-		if ((year & 0x03) == 0) dayOfYear = 366;
+        if ((year & 0x03) == 0) dayOfYear = 366;
         else  dayOfYear = 365;
-		if (day < dayOfYear) break;
-		day -= dayOfYear;
-		year++;
-	}
-	year += 2000;
+        if (day < dayOfYear) break;
+        day -= dayOfYear;
+        year++;
+    }
+    year += 2000;
 
 /* Add back Feb 29 if the last year was a leap year (quirk of above loop) */
-	if((dayOfLastYear == 366) && (day > 58)) day++;
+    if((dayOfLastYear == 366) && (day > 58)) day++;
 
-	uint8_t month;
-	for(month = 1; day >= DaysInMonth[month-1]; month++)
-		day -= DaysInMonth[month-1];
+    uint8_t month;
+    for(month = 1; day >= DaysInMonth[month-1]; month++)
+        day -= DaysInMonth[month-1];
 
-	uint8_t dayOfMonth = day + 1;
+    uint8_t dayOfMonth = day + 1;
     char buffer[10];
     intToAscii(year, timeString);
     stringAppend(timeString,"-");
@@ -115,8 +115,8 @@ Based on code from LalaDumm found in the mikrocontroller.net forum.
 void setTimeFromString(char* timeString)
 {
     char buffer[5];
-	uint8_t i;
-	uint32_t days = 0;
+    uint8_t i;
+    uint32_t days = 0;
 
     for (i=0; i<4; i++) buffer[i] = timeString[i];
     buffer[4] = 0;
@@ -133,24 +133,24 @@ void setTimeFromString(char* timeString)
     for (i=0; i<2; i++) buffer[i] = timeString[i+17];
     uint16_t second = asciiToInt(buffer);
 
-	/* Calculate days of years after 2000 */
+    /* Calculate days of years after 2000 */
     year -= 2000;
-	days = (uint32_t)year * 365;
+    days = (uint32_t)year * 365;
     days += (year+3)/4;
 
-	/* Loop thru each month, adding the days */
-	for (i = 0; i < month - 1; i++) days += DaysInMonth[i];
+    /* Loop thru each month, adding the days */
+    for (i = 0; i < month - 1; i++) days += DaysInMonth[i];
 
-	/* Leap year? adjust February */
-	if (((year & 0x03) == 0) && (month > 2)) days++;
+    /* Leap year? adjust February */
+    if (((year & 0x03) == 0) && (month > 2)) days++;
 
-	/* Add remaining days */
-	days += dayOfMonth;
+    /* Add remaining days */
+    days += dayOfMonth;
 
-	/* Convert to seconds, add all the other stuff */
-	uint32_t seconds = (days-1) * 86400L + (uint32_t)hour * 3600 +
-		(uint32_t)minute * 60 + second;
+    /* Convert to seconds, add all the other stuff */
+    uint32_t seconds = (days-1) * 86400L + (uint32_t)hour * 3600 +
+        (uint32_t)minute * 60 + second;
 
-	setTimeCounter(seconds);
+    setTimeCounter(seconds);
 }
 

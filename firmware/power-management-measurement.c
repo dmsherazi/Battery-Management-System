@@ -92,34 +92,34 @@ void prvMeasurementTask(void *pvParameters)
 {
     uint8_t i,j;
     int32_t av[N_CONV];
-	uint8_t channel_array[N_CONV];
+    uint8_t channel_array[N_CONV];
     initGlobals();
 
 /* Setup the array of selected channels for conversion */
-	channel_array[0] = ADC_CHANNEL_BATTERY1_CURRENT;    /* Battery 1 */
-	channel_array[1] = ADC_CHANNEL_BATTERY1_VOLTAGE;
-	channel_array[2] = ADC_CHANNEL_BATTERY2_CURRENT;    /* Battery 2 */
-	channel_array[3] = ADC_CHANNEL_BATTERY2_VOLTAGE;
-	channel_array[4] = ADC_CHANNEL_BATTERY3_CURRENT;    /* Battery 3 */
-	channel_array[5] = ADC_CHANNEL_BATTERY3_VOLTAGE;
-	channel_array[6] = ADC_CHANNEL_LOAD1_CURRENT;       /* Load 1 */
-	channel_array[7] = ADC_CHANNEL_LOAD1_VOLTAGE;
-	channel_array[8] = ADC_CHANNEL_LOAD2_CURRENT;       /* Load 2 */
-	channel_array[9] = ADC_CHANNEL_LOAD2_VOLTAGE;
-	channel_array[10] = ADC_CHANNEL_PANEL_CURRENT;      /* Panel */
-	channel_array[11] = ADC_CHANNEL_PANEL_VOLTAGE;
-	channel_array[12] = ADC_CHANNEL_TEMPERATURE;        /* Temperature */
-	adc_set_regular_sequence(ADC1, N_CONV, channel_array);
+    channel_array[0] = ADC_CHANNEL_BATTERY1_CURRENT;    /* Battery 1 */
+    channel_array[1] = ADC_CHANNEL_BATTERY1_VOLTAGE;
+    channel_array[2] = ADC_CHANNEL_BATTERY2_CURRENT;    /* Battery 2 */
+    channel_array[3] = ADC_CHANNEL_BATTERY2_VOLTAGE;
+    channel_array[4] = ADC_CHANNEL_BATTERY3_CURRENT;    /* Battery 3 */
+    channel_array[5] = ADC_CHANNEL_BATTERY3_VOLTAGE;
+    channel_array[6] = ADC_CHANNEL_LOAD1_CURRENT;       /* Load 1 */
+    channel_array[7] = ADC_CHANNEL_LOAD1_VOLTAGE;
+    channel_array[8] = ADC_CHANNEL_LOAD2_CURRENT;       /* Load 2 */
+    channel_array[9] = ADC_CHANNEL_LOAD2_VOLTAGE;
+    channel_array[10] = ADC_CHANNEL_PANEL_CURRENT;      /* Panel */
+    channel_array[11] = ADC_CHANNEL_PANEL_VOLTAGE;
+    channel_array[12] = ADC_CHANNEL_TEMPERATURE;        /* Temperature */
+    adc_set_regular_sequence(ADC1, N_CONV, channel_array);
 
 /* Reset averages for first run */
-	for (j = 0; j < N_CONV; j++) av[j] = 0;
+    for (j = 0; j < N_CONV; j++) av[j] = 0;
 
-	while (1)
-	{
+    while (1)
+    {
         iwdgReset();
 /* A/D conversions */
 /* Wait until the next tick cycle */
-		vTaskDelay(getMeasurementDelay() );
+        vTaskDelay(getMeasurementDelay() );
 /* Reset watchdog counter */
         measurementWatchdogCount = 0;
 /* Fire off a burst of conversions and average the results.
@@ -132,7 +132,7 @@ This averages out variations due to PWM provided they are not high frequency. */
             while (adcEOC() == 0) taskYIELD();
 /* Sum over the sample set with scaling and offset for the interfaces and
 temperature */
-        	for (j = 0; j < N_CONV-1; j+=2)
+            for (j = 0; j < N_CONV-1; j+=2)
             {
                 av[j] += adcValue(j);
                 av[j+1] += adcValue(j+1);
@@ -354,7 +354,7 @@ void checkMeasurementWatchdog(void)
     if (measurementWatchdogCount++ > 10*getMeasurementDelay()/getWatchdogDelay())
     {
         vTaskDelete(prvMeasurementTask);
-    	xTaskCreate(prvMeasurementTask, (signed portCHAR * ) "Measurement", \
+        xTaskCreate(prvMeasurementTask, (signed portCHAR * ) "Measurement", \
                 configMINIMAL_STACK_SIZE, NULL, MEASUREMENT_TASK_PRIORITY, NULL);
         sendStringLowPriority("D","Measurement Restarted");
         recordString("D","Measurement Restarted");

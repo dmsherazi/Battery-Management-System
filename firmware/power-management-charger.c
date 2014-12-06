@@ -75,8 +75,8 @@ void prvChargerTask(void *pvParameters)
     initLocals3PH();
     initLocalsPulse();
 
-	while (1)
-	{
+    while (1)
+    {
 /* Wait until the next tick cycle */
         vTaskDelay(getChargerDelay());
 /* Reset watchdog counter */
@@ -200,7 +200,7 @@ void checkChargerWatchdog(void)
     if (chargerWatchdogCount++ > 10*getChargerDelay()/getWatchdogDelay())
     {
         vTaskDelete(prvChargerTask);
-	    xTaskCreate(prvChargerTask, (signed portCHAR * ) "Charger", \
+        xTaskCreate(prvChargerTask, (signed portCHAR * ) "Charger", \
                     configMINIMAL_STACK_SIZE, NULL, CHARGER_TASK_PRIORITY, NULL);
         sendStringLowPriority("D","Charger Restarted");
         recordString("D","Charger Restarted");

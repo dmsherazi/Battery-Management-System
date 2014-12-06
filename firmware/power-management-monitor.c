@@ -104,11 +104,11 @@ void prvMonitorTask(void *pvParameters)
     uint16_t decisionStatus = 0;    
 
 /* Short delay to allow measurement task to produce results */
-	vTaskDelay(MONITOR_STARTUP_DELAY );
+    vTaskDelay(MONITOR_STARTUP_DELAY );
 
 /* Main loop */
-	while (1)
-	{
+    while (1)
+    {
 /*------------- CALIBRATION -----------------------*/
 /* Perform a calibration sequence to zero the currents (see docs).
 Also the State of Charge is estimated from the Open Circuit Voltages, so the
@@ -738,7 +738,7 @@ batteries to go isolated. */
         }
 
 /* Wait until the next tick cycle */
-		vTaskDelay(getMonitorDelay());
+        vTaskDelay(getMonitorDelay());
 /* Reset watchdog counter */
         monitorWatchdogCount = 0;
     }
@@ -921,7 +921,7 @@ void checkMonitorWatchdog(void)
     if (monitorWatchdogCount++ > 10*getMonitorDelay()/getWatchdogDelay())
     {
         vTaskDelete(prvMonitorTask);
-	    xTaskCreate(prvMonitorTask, (signed portCHAR * ) "Monitor", \
+        xTaskCreate(prvMonitorTask, (signed portCHAR * ) "Monitor", \
                     configMINIMAL_STACK_SIZE, NULL, MONITOR_TASK_PRIORITY, NULL);
         sendStringLowPriority("D","Monitor Restarted");
         recordString("D","Monitor Restarted");

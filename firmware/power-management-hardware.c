@@ -100,14 +100,14 @@ extern void disk_timerproc();
 
 void prvSetupHardware(void)
 {
-	clockSetup();
-	gpioSetup();
-	usartSetup();
+    clockSetup();
+    gpioSetup();
+    usartSetup();
     pwmSetup();
-	dmaAdcSetup();
-	adcSetup();
+    dmaAdcSetup();
+    adcSetup();
     systickSetup();
-	rtc_auto_awake(LSE, 0x7fff);
+    rtc_auto_awake(LSE, 0x7fff);
     iwdgSetup();
 }
 
@@ -328,8 +328,8 @@ void setSwitchControlBits(uint8_t settings)
 void pwmSetDutyCycle(uint16_t dutyCycle)
 {
     uint32_t threshold = ((PWM_PERIOD*dutyCycle)/100)>>8;
-	timer_set_oc_value(TIM1, TIM_OC1, threshold);
-	timer_generate_event(TIM1, TIM_EGR_UG);
+    timer_set_oc_value(TIM1, TIM_OC1, threshold);
+    timer_generate_event(TIM1, TIM_EGR_UG);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -353,7 +353,7 @@ clocks are turned on.
 
 static void clockSetup(void)
 {
-	rcc_clock_setup_in_hse_8mhz_out_72mhz();
+    rcc_clock_setup_in_hse_8mhz_out_72mhz();
 }
 
 /*--------------------------------------------------------------------------*/
@@ -369,25 +369,25 @@ static void usartSetup(void)
     rcc_periph_clock_enable(RCC_AFIO);
     rcc_periph_clock_enable(RCC_USART1);
 /* Enable the USART1 interrupt. */
-	nvic_enable_irq(NVIC_USART1_IRQ);
+    nvic_enable_irq(NVIC_USART1_IRQ);
 /* Setup GPIO pin GPIO_USART1_RE_TX on GPIO port A for transmit. */
-	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-		      GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
+    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+              GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
 /* Setup GPIO pin GPIO_USART1_RE_RX on GPIO port A for receive. */
-	gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
-		      GPIO_CNF_INPUT_FLOAT, GPIO_USART1_RX);
+    gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
+              GPIO_CNF_INPUT_FLOAT, GPIO_USART1_RX);
 /* Setup UART parameters. */
-	usart_set_baudrate(USART1, BAUDRATE);
-	usart_set_databits(USART1, 8);
-	usart_set_stopbits(USART1, USART_STOPBITS_1);
-	usart_set_parity(USART1, USART_PARITY_NONE);
-	usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
-	usart_set_mode(USART1, USART_MODE_TX_RX);
+    usart_set_baudrate(USART1, BAUDRATE);
+    usart_set_databits(USART1, 8);
+    usart_set_stopbits(USART1, USART_STOPBITS_1);
+    usart_set_parity(USART1, USART_PARITY_NONE);
+    usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
+    usart_set_mode(USART1, USART_MODE_TX_RX);
 /* Enable USART1 receive interrupts. */
-	usart_enable_rx_interrupt(USART1);
-	usart_disable_tx_interrupt(USART1);
+    usart_enable_rx_interrupt(USART1);
+    usart_disable_tx_interrupt(USART1);
 /* Finally enable the USART. */
-	usart_enable(USART1);
+    usart_enable(USART1);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -402,39 +402,39 @@ static void pwmSetup(void)
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_AFIO);
     rcc_periph_clock_enable(RCC_TIM1);
-	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
-		      GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO8);
+    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+              GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO8);
 
 /* Reset TIM1 peripheral. */
-	timer_reset(TIM1);
+    timer_reset(TIM1);
 
 /* Set Timer global mode:
  - No division
  - Alignment centre (up/down counting), mode 1 (interrupt on downcount only).
  - Direction up (when centre mode is set it is read only, changes by hardware)
 */
-	timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_CENTER_1, TIM_CR1_DIR_UP);
+    timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_CENTER_1, TIM_CR1_DIR_UP);
 
 /* Set Timer output compare mode:
  - Channel 1, PWM mode 2 (output low when CNT <= CCR1, high otherwise)
 */
-	timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
-	timer_enable_oc_output(TIM1, TIM_OC1);
-	timer_enable_break_main_output(TIM1);
+    timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
+    timer_enable_oc_output(TIM1, TIM_OC1);
+    timer_enable_break_main_output(TIM1);
 
 /* The ARR (auto-preload register) sets the PWM period to 50 microseconds from
 the 72 MHz clock.*/
-	timer_enable_preload(TIM1);
-	timer_set_period(TIM1, PWM_PERIOD);
+    timer_enable_preload(TIM1);
+    timer_set_period(TIM1, PWM_PERIOD);
 
 /* The CCR1 (capture/compare register) sets the PWM duty cycle to default 50% */
     pwmSetDutyCycle(50);
 
 /* Force an update to load the shadow registers */
-	timer_generate_event(TIM1, TIM_EGR_UG);
+    timer_generate_event(TIM1, TIM_EGR_UG);
 
 /* Start the Counter. */
-	timer_enable_counter(TIM1);
+    timer_enable_counter(TIM1);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -481,47 +481,47 @@ static void gpioSetup(void)
 /* PA inputs analogue for currents, voltages and ambient temperature */
 #ifdef PA_ANALOGUE_INPUTS
     gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG,
-			    PA_ANALOGUE_INPUTS);
+                PA_ANALOGUE_INPUTS);
 #endif
 /* PA inputs analogue for currents, voltages and ambient temperature */
 #ifdef PA_ANALOGUE_INPUTS
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG,
-			    PC_ANALOGUE_INPUTS);
+                PC_ANALOGUE_INPUTS);
 #endif
 /* PA outputs digital */
 #ifdef PA_DIGITAL_OUTPUTS
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-			    PA_DIGITAL_OUTPUTS);
+                PA_DIGITAL_OUTPUTS);
     gpio_clear(GPIOA, PA_DIGITAL_OUTPUTS);
 #endif
 /* PB outputs digital */
 #ifdef PB_DIGITAL_OUTPUTS
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-			    PB_DIGITAL_OUTPUTS);
+                PB_DIGITAL_OUTPUTS);
     gpio_clear(GPIOB, PB_DIGITAL_OUTPUTS);
 #endif
 /* PC outputs digital */
 #ifdef PC_DIGITAL_OUTPUTS
     gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-			    PC_DIGITAL_OUTPUTS);
+                PC_DIGITAL_OUTPUTS);
     gpio_clear(GPIOC, PC_DIGITAL_OUTPUTS);
 #endif
 /* PA inputs digital. Set pull up/down configuration to pull up. */
 #ifdef PA_DIGITAL_INPUTS
     gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-			    PA_DIGITAL_INPUTS);
+                PA_DIGITAL_INPUTS);
     gpio_set(GPIOA,PA_DIGITAL_INPUTS);
 #endif
 /* PB inputs digital. Set pull up/down configuration to pull up. */
 #ifdef PB_DIGITAL_INPUTS
     gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-			    PB_DIGITAL_INPUTS);
+                PB_DIGITAL_INPUTS);
     gpio_set(GPIOB,PB_DIGITAL_INPUTS);
 #endif
 /* PC inputs digital. Set pull up/down configuration to pull up. */
 #ifdef PC_DIGITAL_INPUTS
     gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-			    PC_DIGITAL_INPUTS);
+                PC_DIGITAL_INPUTS);
     gpio_set(GPIOC,PC_DIGITAL_INPUTS);
 #endif
 }
@@ -537,21 +537,21 @@ called after each transfer to reset the memory buffer to the beginning.
 
 static void dmaAdcSetup(void)
 {
-	/* Enable DMA1 Clock */
+    /* Enable DMA1 Clock */
     rcc_periph_clock_enable(RCC_DMA1);
-	dma_channel_reset(DMA1,DMA_CHANNEL1);
-	dma_set_priority(DMA1,DMA_CHANNEL1,DMA_CCR_PL_LOW);
+    dma_channel_reset(DMA1,DMA_CHANNEL1);
+    dma_set_priority(DMA1,DMA_CHANNEL1,DMA_CCR_PL_LOW);
 /* We want all 32 bits from the ADC to include ADC2 data */
-	dma_set_memory_size(DMA1,DMA_CHANNEL1,DMA_CCR_MSIZE_32BIT);
-	dma_set_peripheral_size(DMA1,DMA_CHANNEL1,DMA_CCR_PSIZE_32BIT);
-	dma_enable_memory_increment_mode(DMA1,DMA_CHANNEL1);
-	dma_set_read_from_peripheral(DMA1,DMA_CHANNEL1);
+    dma_set_memory_size(DMA1,DMA_CHANNEL1,DMA_CCR_MSIZE_32BIT);
+    dma_set_peripheral_size(DMA1,DMA_CHANNEL1,DMA_CCR_PSIZE_32BIT);
+    dma_enable_memory_increment_mode(DMA1,DMA_CHANNEL1);
+    dma_set_read_from_peripheral(DMA1,DMA_CHANNEL1);
 /* The register to target is the ADC1 regular data register */
-	dma_set_peripheral_address(DMA1,DMA_CHANNEL1,(uint32_t) &ADC_DR(ADC1));
+    dma_set_peripheral_address(DMA1,DMA_CHANNEL1,(uint32_t) &ADC_DR(ADC1));
 /* The array v[] receives the converted output */
-	dma_set_memory_address(DMA1,DMA_CHANNEL1,(uint32_t) v);
-	dma_set_number_of_data(DMA1,DMA_CHANNEL1,NUM_CHANNEL);
-	dma_enable_channel(DMA1,DMA_CHANNEL1);
+    dma_set_memory_address(DMA1,DMA_CHANNEL1,(uint32_t) v);
+    dma_set_number_of_data(DMA1,DMA_CHANNEL1,NUM_CHANNEL);
+    dma_enable_channel(DMA1,DMA_CHANNEL1);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -563,31 +563,31 @@ channels once through then stops. DMA enabled to collect data.
 
 static void adcSetup(void)
 {
-	/* Enable clocks for ADCs */
+    /* Enable clocks for ADCs */
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_AFIO);
     rcc_periph_clock_enable(RCC_ADC1);
 /* ADC clock should be maximum 14MHz, so divide by 8 from 72MHz. */
     rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV8);
-	nvic_enable_irq(NVIC_ADC1_2_IRQ);
-	/* Make sure the ADC doesn't run during config. */
-	adc_off(ADC1);
-	/* Configure ADC1 for multiple conversion. */
-	adc_enable_scan_mode(ADC1);
-	adc_set_single_conversion_mode(ADC1);
-	adc_enable_external_trigger_regular(ADC1, ADC_CR2_EXTSEL_SWSTART);
-	adc_set_right_aligned(ADC1);
-	adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_28DOT5CYC);
-	adc_enable_dma(ADC1);
-	adc_enable_eoc_interrupt(ADC1);
+    nvic_enable_irq(NVIC_ADC1_2_IRQ);
+    /* Make sure the ADC doesn't run during config. */
+    adc_off(ADC1);
+    /* Configure ADC1 for multiple conversion. */
+    adc_enable_scan_mode(ADC1);
+    adc_set_single_conversion_mode(ADC1);
+    adc_enable_external_trigger_regular(ADC1, ADC_CR2_EXTSEL_SWSTART);
+    adc_set_right_aligned(ADC1);
+    adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_28DOT5CYC);
+    adc_enable_dma(ADC1);
+    adc_enable_eoc_interrupt(ADC1);
 /* Power on and calibrate */
-	adc_power_on(ADC1);
-	/* Wait for ADC starting up. */
-	uint32_t i;
-	for (i = 0; i < 800000; i++)    /* Wait a bit. */
-		__asm__("nop");
-	adc_reset_calibration(ADC1);
-	adc_calibration(ADC1);
+    adc_power_on(ADC1);
+    /* Wait for ADC starting up. */
+    uint32_t i;
+    for (i = 0; i < 800000; i++)    /* Wait a bit. */
+        __asm__("nop");
+    adc_reset_calibration(ADC1);
+    adc_calibration(ADC1);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -599,17 +599,17 @@ Systick-Interrupt
 
 static void systickSetup()
 {
-	/* 72MHz / 8 => 9,000,000 counts per second */
-	systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
+    /* 72MHz / 8 => 9,000,000 counts per second */
+    systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
 
-	/* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
-	/* SysTick interrupt every N clock pulses: set reload to N-1 */
-	systick_set_reload(8999);
+    /* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
+    /* SysTick interrupt every N clock pulses: set reload to N-1 */
+    systick_set_reload(8999);
 
-	systick_interrupt_enable();
+    systick_interrupt_enable();
 
-	/* Start counting. */
-	systick_counter_enable();
+    /* Start counting. */
+    systick_counter_enable();
 }
 /*--------------------------------------------------------------------------*/
 /** @brief Read a data block from Flash memory
@@ -623,14 +623,14 @@ Adapted from code by Damian Miller.
 
 void flashReadData(uint32_t *flashBlock, uint8_t *dataBlock, uint16_t size)
 {
-	uint16_t n;
-	uint32_t *flashAddress= flashBlock;
+    uint16_t n;
+    uint32_t *flashAddress= flashBlock;
 
-	for(n=0; n<size; n += 4)
-	{
-		*(uint32_t*)dataBlock = *(flashAddress++);
-		dataBlock += 4;
-	}
+    for(n=0; n<size; n += 4)
+    {
+        *(uint32_t*)dataBlock = *(flashAddress++);
+        dataBlock += 4;
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -647,44 +647,44 @@ bit 2: programming error, bit 4: write protect error, bit 7 compare fail.
 
 uint32_t flashWriteData(uint32_t *flashBlock, uint8_t *data, uint16_t size)
 {
-	uint16_t n;
+    uint16_t n;
 
-	uint32_t pageStart = (uint32_t)flashBlock;
-	uint32_t flashAddress = pageStart;
-	uint32_t pageAddress = pageStart;
-	uint32_t flashStatus = 0;
+    uint32_t pageStart = (uint32_t)flashBlock;
+    uint32_t flashAddress = pageStart;
+    uint32_t pageAddress = pageStart;
+    uint32_t flashStatus = 0;
 
-	/*check if pageStart is in proper range*/
-	if((pageStart < __configBlockStart) || (pageStart >= __configBlockEnd))
-		return 1;
+    /*check if pageStart is in proper range*/
+    if((pageStart < __configBlockStart) || (pageStart >= __configBlockEnd))
+        return 1;
 
-	/*calculate current page address*/
-	if(pageStart % FLASH_PAGE_SIZE)
-		pageAddress -= (pageStart % FLASH_PAGE_SIZE);
+    /*calculate current page address*/
+    if(pageStart % FLASH_PAGE_SIZE)
+        pageAddress -= (pageStart % FLASH_PAGE_SIZE);
 
-	flash_unlock();
+    flash_unlock();
 
-	/*Erasing page*/
-	flash_erase_page(pageAddress);
-	flashStatus = flash_get_status_flags();
-	if(flashStatus != FLASH_SR_EOP)
-		return flashStatus;
+    /*Erasing page*/
+    flash_erase_page(pageAddress);
+    flashStatus = flash_get_status_flags();
+    if(flashStatus != FLASH_SR_EOP)
+        return flashStatus;
 
-	/*programming flash memory*/
-	for(n=0; n<size; n += 4)
-	{
-		/*programming word data*/
-		flash_program_word(flashAddress+n, *((uint32_t*)(data + n)));
-		flashStatus = flash_get_status_flags();
-		if(flashStatus != FLASH_SR_EOP)
-			return flashStatus;
+    /*programming flash memory*/
+    for(n=0; n<size; n += 4)
+    {
+        /*programming word data*/
+        flash_program_word(flashAddress+n, *((uint32_t*)(data + n)));
+        flashStatus = flash_get_status_flags();
+        if(flashStatus != FLASH_SR_EOP)
+            return flashStatus;
 
-		/*verify if correct data is programmed*/
-		if(*((uint32_t*)(flashAddress+n)) != *((uint32_t*)(data + n)))
-			return 0x80;
-	}
+        /*verify if correct data is programmed*/
+        if(*((uint32_t*)(flashAddress+n)) != *((uint32_t*)(data + n)))
+            return 0x80;
+    }
 
-	return 0;
+    return 0;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -731,27 +731,27 @@ void usart1_isr(void)
 {
 
 /* Check if we were called because of RXNE. */
-	if (usart_get_flag(USART1,USART_SR_RXNE))
-	{
+    if (usart_get_flag(USART1,USART_SR_RXNE))
+    {
 /* Pull in received character. If buffer full we'll just drop it */
         char inCharacter = (char) usart_recv(USART1);
         if (xQueueSendToBackFromISR(commsReceiveQueue,&inCharacter,NULL) == errQUEUE_FULL)
             lostCharacters++;
-	}
+    }
 /* Check if we were called because of TXE. */
-	if (usart_get_flag(USART1,USART_SR_TXE))
-	{
+    if (usart_get_flag(USART1,USART_SR_TXE))
+    {
 /* If the queue is empty, disable the tx interrupt until something is sent. */
-    	char data;
-		if (xQueueReceiveFromISR(commsSendQueue,&data,NULL))
+        char data;
+        if (xQueueReceiveFromISR(commsSendQueue,&data,NULL))
             usart_send(USART1, data);
-		else
+        else
         {
             int wokenTask;
             usart_disable_tx_interrupt(USART1);
             xSemaphoreGiveFromISR(commsEmptySemaphore,&wokenTask);    /* Flag as empty */
         }
-	}
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -817,14 +817,14 @@ extern void vPortSVCHandler( void );
 /*-----------------------------------------------------------*/
 void sv_call_handler(void)
 {
-  	vPortSVCHandler();
+    vPortSVCHandler();
 }
 
 /*-----------------------------------------------------------*/
 
 void pend_sv_handler(void)
 {
-  	xPortPendSVHandler();
+    xPortPendSVHandler();
 }
 
 /*-----------------------------------------------------------*/
@@ -842,18 +842,18 @@ Can be used to provide a RTC.
 void sys_tick_handler(void)
 {
 
-	disk_timerproc();
+    disk_timerproc();
 
 /* updated every 1s if systick is used for real-time clock. */
 /*
-	static uint16_t cnttime=0;
-	cnttime++;
-	if (cnttime >= 100)
+    static uint16_t cnttime=0;
+    cnttime++;
+    if (cnttime >= 100)
     {
-		cnttime = 0;
-		updateTimeCount();
-	}
+        cnttime = 0;
+        updateTimeCount();
+    }
 */
-  	xPortSysTickHandler();
+    xPortSysTickHandler();
 }
 

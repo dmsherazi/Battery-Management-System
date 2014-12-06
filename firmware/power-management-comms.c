@@ -124,8 +124,8 @@ This initializes the queues and semaphores used by the task.
 void initComms(void)
 {
 /* Setup the queues to use */
-	commsSendQueue = xQueueCreate(COMMS_QUEUE_SIZE,1);
-	commsReceiveQueue = xQueueCreate(COMMS_QUEUE_SIZE,1);
+    commsSendQueue = xQueueCreate(COMMS_QUEUE_SIZE,1);
+    commsReceiveQueue = xQueueCreate(COMMS_QUEUE_SIZE,1);
     commsSendSemaphore = xSemaphoreCreateBinary();
     xSemaphoreGive(commsSendSemaphore);
     commsEmptySemaphore = xSemaphoreCreateBinary();
@@ -916,9 +916,9 @@ void commsPrintRegister(uint32_t reg)
 {
     if (uxQueueSpacesAvailable(commsSendQueue) >= 11)
     {
-	    commsPrintHex((reg >> 16) & 0xFFFF);
-	    commsPrintHex((reg >> 00) & 0xFFFF);
-	    commsPrintChar(" ");
+        commsPrintHex((reg >> 16) & 0xFFFF);
+        commsPrintHex((reg >> 00) & 0xFFFF);
+        commsPrintChar(" ");
     }
 }
 
@@ -930,15 +930,15 @@ void commsPrintRegister(uint32_t reg)
 
 void commsPrintInt(int32_t value)
 {
-	uint8_t i=0;
-	char buffer[25];
+    uint8_t i=0;
+    char buffer[25];
     intToAscii(value, buffer);
     if (uxQueueSpacesAvailable(commsSendQueue) >= stringLength(buffer))
-	    while (buffer[i] > 0)
-	    {
-	        commsPrintChar(&buffer[i]);
+        while (buffer[i] > 0)
+        {
+            commsPrintChar(&buffer[i]);
             i++;
-	    }
+        }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -949,20 +949,20 @@ void commsPrintInt(int32_t value)
 
 void commsPrintHex(uint32_t value)
 {
-	uint8_t i;
-	char buffer[25];
+    uint8_t i;
+    char buffer[25];
 
-	for (i = 0; i < 4; i++)
-	{
-		buffer[i] = "0123456789ABCDEF"[value & 0xF];
-		value >>= 4;
-	}
+    for (i = 0; i < 4; i++)
+    {
+        buffer[i] = "0123456789ABCDEF"[value & 0xF];
+        value >>= 4;
+    }
     if (uxQueueSpacesAvailable(commsSendQueue) >= 5)
     {
-	    for (i = 4; i > 0; i--)
-	    {
-	        commsPrintChar(&buffer[i-1]);
-	    }
+        for (i = 4; i > 0; i--)
+        {
+            commsPrintChar(&buffer[i-1]);
+        }
 /*    commsPrintChar(" "); */
     }
 }
@@ -976,7 +976,7 @@ void commsPrintHex(uint32_t value)
 void commsPrintString(char *ch)
 {
     if (uxQueueSpacesAvailable(commsSendQueue) >= stringLength(ch))
-  	    while(*ch) commsPrintChar(ch++);
+        while(*ch) commsPrintChar(ch++);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1002,7 +1002,7 @@ void commsPrintChar(char *ch)
     if (configData.config.enableSend)
     {
         commsEnableTxInterrupt(false);
-      	while (xQueueSendToBack(commsSendQueue,ch,COMMS_SEND_TIMEOUT) != pdTRUE)
+        while (xQueueSendToBack(commsSendQueue,ch,COMMS_SEND_TIMEOUT) != pdTRUE)
         {
             xQueueReset(commsSendQueue);
             commsEnableTxInterrupt(true);

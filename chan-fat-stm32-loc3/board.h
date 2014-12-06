@@ -1,5 +1,7 @@
 /* ChaN's FAT Disk I/O library.
 
+MODIFIED FILE
+
 Defines for the microcontroller board used.
 
 The file is substantially that provided by Martin Thomas in his STM driver

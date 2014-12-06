@@ -57,26 +57,26 @@ int32_t asciiToInt(char* buffer)
 
 void intToAscii(int32_t value, char* buffer)
 {
-	uint8_t nr_digits = 0;
+    uint8_t nr_digits = 0;
     uint8_t i = 0;
     char temp_buffer[25];
 
 /* Add minus sign if negative, and form absolute */
-	if (value < 0)
-	{
-		buffer[nr_digits++] = '-';
-		value = value * -1;
-	}
+    if (value < 0)
+    {
+        buffer[nr_digits++] = '-';
+        value = value * -1;
+    }
 /* Stop if value is zero */
-	if (value == 0) buffer[nr_digits++] = '0';
-	else
+    if (value == 0) buffer[nr_digits++] = '0';
+    else
     {
 /* Build string in reverse */
         while (value > 0)
-	    {
-		    temp_buffer[i++] = "0123456789"[value % 10];
-		    value /= 10;
-	    }
+        {
+            temp_buffer[i++] = "0123456789"[value % 10];
+            value /= 10;
+        }
 /* Copy across correcting the order */
         while (i > 0)
         {
