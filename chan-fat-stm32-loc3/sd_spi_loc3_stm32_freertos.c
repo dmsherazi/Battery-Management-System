@@ -83,6 +83,8 @@ typedef bool BOOL;
 #include "task.h"
 #endif
 
+#define STM32_SD_USE_DMA
+
 #ifdef STM32_SD_USE_DMA
 // #warning "Information only: using DMA"
 #pragma message "*** Using DMA ***"
@@ -116,6 +118,13 @@ typedef bool BOOL;
 #else
 #define STM32_SD_DISK_IOCTRL   0
 #endif
+
+/* MMC card type flags (MMC_GET_TYPE) */
+#define CT_MMC        0x01        /* MMC ver 3 */
+#define CT_SD1        0x02        /* SD ver 1 */
+#define CT_SD2        0x04        /* SD ver 2 */
+#define CT_SDC        (CT_SD1|CT_SD2)    /* SD */
+#define CT_BLOCK      0x08        /* Block addressing */
 
 /* Temporary Debug Variables */
 
@@ -374,6 +383,9 @@ static BYTE rcvr_spi(void)
 /*---------------------------------------------------------------------------*/
 /** @brief Wait for the Card to become Ready
 
+A card that is ready will return 0xFF in response to the same value sent to it.
+Keep trying for 50 timer ticks.
+
 @returns BYTE value of a status result. 0xFF means success, otherwise timeout.
 */
 
@@ -381,11 +393,11 @@ static BYTE wait_ready(void)
 {
     BYTE response;
 
-    DWORD timer = Timer1;            /* Wait for ready in timeout of 500ms */
-    rcvr_spi();
+    DWORD timer = Timer1;           /* Wait for ready in timeout of 500ms */
+    rcvr_spi();                     /* Initial transmission */
     do
     {
-        response = rcvr_spi();
+        response = rcvr_spi();      /* Get back the response */
     }
     while ((response != 0xFF) && !timeout(timer,50));
 
@@ -597,6 +609,7 @@ static void power_off (void)
 /** @brief Receive a Data Block from the Card
 
 Can be done with DMA or programmed.
+This is in response to a previously sent read command.
 
 @param *buff: BYTE 512 byte data block to store received data 
 @param btr: UINT Byte count (must be multiple of 4)
