@@ -78,11 +78,16 @@ typedef bool BOOL;
 
 #include "power-management-comms.h"
 
-#if _FS_REENTRANT
+/* Regardless of the FreeRtos config, force re-entrancy for this file.
+#ifdef _FS_REENTRANT
+#undef _FS_REENTRANT
+#endif
+#define _FS_REENTRANT       1
+
 #include "FreeRTOS.h"
 #include "task.h"
-#endif
 
+/* We can use DMA to free the processor a bit */
 #define STM32_SD_USE_DMA
 
 #ifdef STM32_SD_USE_DMA
@@ -156,7 +161,7 @@ In FreeRTOS relinquish the task temporarily for 1ms rather than wasting time.
 @param[in] DWORD timer: Original Time
 @param[in] DWORD delay: Delay desired.
 
-Globals Timer1: DWORD incremented in the systick ISR by (configurable) 1ms.
+Globals Timer1: DWORD incremented in the systick ISR by 10ms.
 */
 
 BOOL timeout(DWORD timer, DWORD delay)
@@ -367,14 +372,15 @@ static BYTE stm32_spi_rw( BYTE out )
 /*---------------------------------------------------------------------------*/
 /** @brief Receive a byte from MMC via SPI
 
-Sends a byte 0xFF and picks up whatever returns.
+Force the output high and pick up whatever comes. This is used to wait for a
+data byte or a response to a previously sent command.
 
-@returns BYTE value received.
+@returns BYTE value received. This will be 0xFF if no data has come.
 */
 
 static BYTE rcvr_spi(void)
 {
-    return stm32_spi_rw(0xff);
+    return stm32_spi_rw(0xff);	    /* Dummy clock (force DO high) */
 }
 
 /* Alternative macro to receive data fast */
@@ -383,8 +389,8 @@ static BYTE rcvr_spi(void)
 /*---------------------------------------------------------------------------*/
 /** @brief Wait for the Card to become Ready
 
-A card that is ready will return 0xFF in response to the same value sent to it.
-Keep trying for 50 timer ticks.
+A card that is ready will return 0xFF in response to the same value sent to it,
+that is, it is no longer sending any data. Keep trying for 50 timer ticks.
 
 @returns BYTE value of a status result. 0xFF means success, otherwise timeout.
 */
@@ -393,10 +399,13 @@ static BYTE wait_ready(void)
 {
     BYTE response;
 
-    DWORD timer = Timer1;           /* Wait for ready in timeout of 500ms */
+    DWORD timer = Timer1;           /* Wait for ready timeout of 500ms */
     rcvr_spi();                     /* Initial transmission */
     do
     {
+#if _FS_REENTRANT
+        vTaskDelay(1);              /* Cause a relinquish during the wait */
+#endif
         response = rcvr_spi();      /* Get back the response */
     }
     while ((response != 0xFF) && !timeout(timer,50));
@@ -621,11 +630,15 @@ static BOOL rcvr_datablock (BYTE *buff,UINT numBytes)
     BYTE token;
 
     DWORD timer = Timer1;
+/* Wait for a valid data packet (token), timeout of 200ms */
     do
-    {                           /* Wait for data packet in timeout of 100ms */
+    {
+#if _FS_REENTRANT
+        vTaskDelay(1);          /* relinquish for 1 tick */
+#endif
         token = rcvr_spi();
     }
-    while ((token == 0xFF) && !timeout(timer,10));
+    while ((token == 0xFF) && !timeout(timer,20));
     if(token != 0xFE) return FALSE;    /* If not valid data token, return with error */
 
 #ifdef STM32_SD_USE_DMA
@@ -916,7 +929,7 @@ DRESULT disk_read(BYTE drv,BYTE *buff,DWORD sector,UINT count)
         release_spi();
         if (count > 0) res = RES_ERROR;
     }
-    if (res != RES_OK) dataMessageSend("DREAD",res,error);
+//    if (res != RES_OK) dataMessageSend("DREAD",res,error);
 
     return res;
 }
@@ -987,7 +1000,7 @@ DRESULT disk_write(BYTE drv,const BYTE *buff,DWORD sector,UINT count)
         release_spi();
         if (count > 0) res = RES_ERROR;
     }
-    if (res != RES_OK) dataMessageSend("DWRITE",res,error);
+//    if (res != RES_OK) dataMessageSend("DWRITE",res,error);
 
     return res;
 }
@@ -1165,7 +1178,7 @@ DRESULT disk_ioctl(BYTE drv,BYTE ctrl,void *buff)
 
         release_spi();
     }
-    if ((ctrl != 0) && (res != RES_OK)) dataMessageSend("DIOCTL",res,ctrl);
+//    if ((ctrl != 0) && (res != RES_OK)) dataMessageSend("DIOCTL",res,ctrl);
 
     return res;
 }
@@ -1175,7 +1188,7 @@ DRESULT disk_ioctl(BYTE drv,BYTE ctrl,void *buff)
 /** @brief Device Timer Interrupt Procedure
 
 This function must be called in period of 10ms, generally by the systick ISR.
-It counts up a timer and checks for write protect and card presence
+It counts up a timer and checks for write protect and card presence.
 
 Globals Stat: DSTATUS disk status.
         Timer1: DWORD a real-time variable used to trigger events.

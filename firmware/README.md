@@ -42,11 +42,9 @@ More information is available on:
 
 http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-software.html
 
-(c) K. Sarkies 14/11/2014
+(c) K. Sarkies 8/12/2014
 
 BUGS
-
-1. File - fix causes of recording failure.
 
 TODO
 

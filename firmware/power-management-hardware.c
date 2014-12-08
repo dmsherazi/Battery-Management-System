@@ -835,14 +835,20 @@ This provides a link to the FreeRTOS systick interrupt handler.
 Systick is setup in FreeRTOS according to the tick rate specified in
 FreeRTOSConfig.h. That rate is set at 100Hz.
 
-This also updates the status of any inserted SD card.
+This also updates the status of any inserted SD card every 10 ms.
 
 Can be used to provide a RTC.
 */
 void sys_tick_handler(void)
 {
 
-    disk_timerproc();
+    static uint16_t timer=0;
+    timer++;
+    if (timer >= 10)
+    {
+        timer=0;
+        disk_timerproc();
+    }
 
 /* updated every 1s if systick is used for real-time clock. */
 /*
