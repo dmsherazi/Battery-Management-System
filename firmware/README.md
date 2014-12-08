@@ -6,7 +6,9 @@ The firmware is written for an STM32F103 ARM Cortex M3 microcontroller and uses
 specific hardware published here.
 
 The firmware uses libopencm3 for hardware drivers, FreeRTOS for task management
-and ChaN FAT for managing the local storage filesystem.
+and ChaN FatFs for managing the local storage filesystem along with an
+adaption of the code by Martin Thomas for SDSC/MMC SPI drivers to incorporate
+libopencm3 and FreeRTOS.
 
 Several tasks are defined to manage:
 
@@ -40,7 +42,7 @@ More information is available on:
 
 http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-software.html
 
-(c) K. Sarkies 10/11/2014
+(c) K. Sarkies 14/11/2014
 
 BUGS
 
