@@ -92,8 +92,6 @@ void setGlobalDefaults(void)
     configData.config.autoTrack = false;    /* Don't track unless instructed */
     configData.config.monitorStrategy = 0xFF;   /* All strategies on */
     configData.config.panelSwitchSetting = 0;
-/* Set default charging control variables */
-    configData.config.chargeAlgorithm = pulse;
 /* Set default system control variables */
     configData.config.watchdogDelay = WATCHDOG_DELAY;
     configData.config.chargerDelay = CHARGER_DELAY;
@@ -366,17 +364,6 @@ bool isAutoTrack(void)
 }
 
 /*--------------------------------------------------------------------------*/
-/** @brief  Charging Algorithm
-
-@returns the charging algorithm, 0 = 3 phase, 1 = IC, 2 = ICC.
-*/
-
-charge_algorithm getChargeAlgorithm(void)
-{
-    return configData.config.chargeAlgorithm;
-}
-
-/*--------------------------------------------------------------------------*/
 /** @brief Automatic Tracking switch
 
 True if automatic tracking has been requested, false otherwise.
@@ -394,7 +381,7 @@ bit  0   if autoTrack,
 bit  1   if recording,
 bit  3   if measurements are being sent
 bit  4   if debug messages are being sent
-bits 5,6 charge algorithm
+bits 5,6
 bit  7   avoid load on charging battery
 bit  8   maintain battery under isolation
 
@@ -407,7 +394,6 @@ uint16_t getControls(void)
     if (configData.config.recording) controls |= 1<<1;
     if (configData.config.measurementSend) controls |= 1<<3;
     if (configData.config.debugMessageSend) controls |= 1<<4;
-    controls |= (configData.config.chargeAlgorithm & 0x03) << 5;
     controls |= (configData.config.monitorStrategy & 0x03) << 7;
     return controls;
 }

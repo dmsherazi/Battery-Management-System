@@ -368,17 +368,10 @@ the battery under charge. */
                 configData.config.monitorStrategy = asciiToInt((char*)line+3);
                 break;
             }
-/* Sn Set charging algorithm and reset the algorithm if different to current one */
+/* Sn Set charging algorithm and reset the algorithm if different to current one
+(now obsolete as only one algorithm is used). */
         case 'S':
             {
-                uint8_t chargeAlgorithm = line[2]-'0';
-                if (chargeAlgorithm < 3)
-                {
-                    configData.config.chargeAlgorithm =
-                        (charge_algorithm)chargeAlgorithm;
-                    if (getChargeAlgorithm() != chargeAlgorithm)
-                        resetChargeAlgorithm(chargeAlgorithm);
-                }
                 break;
             }
 /* Tntxx Set battery type and capacity, n is battery, t is type, xx is capacity */

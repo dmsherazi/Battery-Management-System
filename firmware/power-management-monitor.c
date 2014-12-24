@@ -4,7 +4,8 @@ Monitoring Task
 
 This task accesses the various measured and estimated parameters of the
 batteries, loads and panel to make decisions about switch settings and
-load disconnect/reconnect.
+load disconnect/reconnect. The decisions made here involve the set of batteries
+as a whole rather than individual batteries.
 
 The decisions determine how to connect loads and solar panel to the different
 batteries in order to ensure continuous service and long battery life. The
@@ -407,14 +408,23 @@ panel. */
 /* decisionStatus is a variable used to record the reason for any decision */
         decisionStatus = 0;
 
+        for (i=0; i<NUM_BATS; i++)
+        {
+/* Change each battery to bulk phase if it is in float phase and the SoC drops
+below a charging restart threshold (nominally 95%). */
+            if ((getBatteryChargingPhase(i) == floatC) &&
+                (getBatterySoC(i) < FLOAT_BULK_SOC))
+                setBatteryChargingPhase(i,bulkC);
+        }
+
 /* If the currently allocated charging battery is in float and higher than 95%,
 or in rest phase, deallocate battery to allow algorithms to find another. */
         if (batteryUnderCharge > 0)
         {
-            bool floatState = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
+            bool floatPhase = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
                      && (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC));
-            bool restState = (getBatteryChargingPhase(batteryUnderCharge-1) == restC);
-            if (floatState || restState)
+            bool restPhase = (getBatteryChargingPhase(batteryUnderCharge-1) == restC);
+            if (floatPhase || restPhase)
             {
                 batteryUnderCharge = 0;
             }
@@ -426,11 +436,13 @@ or in rest phase, deallocate battery to allow algorithms to find another. */
             decisionStatus = 0x100;
             batteryUnderCharge = batteryFillStateSort[0];
             batteryUnderLoad = batteryFillStateSort[0];
-/* If the battery is in float and higher than 95%, or in rest phase, stop charging */
-            bool floatState = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
+/* If the battery is in float and higher than 95%, stop charging */
+            bool floatPhase = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
                      && (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC));
-            bool restState = (getBatteryChargingPhase(batteryUnderCharge-1) == restC);
-            if (floatState || restState)
+/* If the battery has been put in rest phase, change to absorption phase */
+            if(getBatteryChargingPhase(batteryUnderCharge-1) == restC)
+                setBatteryChargingPhase(batteryUnderCharge-1,absorptionC);
+            if (floatPhase)
             {
                 decisionStatus |= 0x02;
                 batteryUnderCharge = 0;
@@ -440,22 +452,37 @@ or in rest phase, deallocate battery to allow algorithms to find another. */
         else if (numBats == 2)
         {
             decisionStatus = 0x200;
-/* (1) If the charger is unallocated, set to the lowest SoC battery, if this
-battery is not in float state with SoC > 95%, nor in rest phase. If no suitable
-battery is found leave the charger unallocated. */
+/* (1) If the charger is unallocated, set to the lowest SoC battery if it is
+not in float state with SoC > 95%, nor in rest phase. If no suitable battery is
+found leave the charger unallocated. */
             if (batteryUnderCharge == 0)
             {
                 decisionStatus |= 0x01;
                 for (i=0; i<numBats; i++)
                 {
                     uint8_t battery = batteryFillStateSort[numBats-i-1];
-                    bool floatState = ((getBatteryChargingPhase(battery-1) == floatC)
+                    bool floatPhase = ((getBatteryChargingPhase(battery-1) == floatC)
                              && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
-                    bool restState = (getBatteryChargingPhase(battery-1) == restC);
-                    if (!(floatState || restState))
+                    bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
+                    if (!(floatPhase || restPhase))
                     {
                         decisionStatus |= 0x02;
                         batteryUnderCharge = battery;
+                        break;
+                    }
+                }
+/* If still no battery allocated, see if one is in rest phase and change to
+absorption phase */
+                if (batteryUnderCharge == 0)
+                for (i=0; i<numBats; i++)
+                {
+                    uint8_t battery = batteryFillStateSort[numBats-i-1];
+                    bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
+                    if (restPhase)
+                    {
+                        decisionStatus |= 0x04;
+                        batteryUnderCharge = battery;
+                        setBatteryChargingPhase(battery-1,absorptionC);
                         break;
                     }
                 }
@@ -509,17 +536,33 @@ battery is found leave the charger unallocated. */
                     for (i=0; i<numBats; i++)
                     {
                         uint8_t battery = batteryFillStateSort[numBats-i-1];
-                        bool floatState = ((getBatteryChargingPhase(battery-1) == floatC)
+                        bool floatPhase = ((getBatteryChargingPhase(battery-1) == floatC)
                                  && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
-                        bool restState = (getBatteryChargingPhase(battery-1) == restC);
-                        if (!(floatState || restState))
+                        bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
+                        if (!(floatPhase || restPhase))
                         {
-                            decisionStatus |= 0x04;
+                            decisionStatus |= 0x02;
                             batteryUnderCharge = battery;
                             break;
                         }
                     }
                 }
+/* If still no battery allocated, see if one is in rest phase and change to
+absorption phase. */
+                if (batteryUnderCharge == 0)
+                for (i=0; i<numBats; i++)
+                {
+                    uint8_t battery = batteryFillStateSort[numBats-i-1];
+                    bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
+                    if (restPhase)
+                    {
+                        decisionStatus |= 0x04;
+                        batteryUnderCharge = battery;
+                        setBatteryChargingPhase(battery-1,absorptionC);
+                        break;
+                    }
+                }
+
 /* If the charger has been allocated to the loaded battery, then
 deallocate the loaded battery. This will allow the charger to swap back and
 forth as the loaded battery droops and the charging battery completes charge. */
@@ -570,15 +613,31 @@ If no suitable battery is found leave the charger unallocated. */
                     for (i=0; i<numBats; i++)
                     {
                         uint8_t battery = batteryFillStateSort[numBats-i-1];
-                        bool floatState = ((getBatteryChargingPhase(battery-1) == floatC)
+                        bool floatPhase = ((getBatteryChargingPhase(battery-1) == floatC)
                                  && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
-                        bool restState = (getBatteryChargingPhase(battery-1) == restC);
-                        if (!(floatState || restState))
+                        bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
+                        if (!(floatPhase || restPhase))
                         {
-                            decisionStatus |= 0x04;
+                            decisionStatus |= 0x02;
                             batteryUnderCharge = battery;
                             break;
                         }
+                    }
+                }
+
+/* If still no battery allocated, see if one is in rest phase and change to
+absorption phase. */
+                if (batteryUnderCharge == 0)
+                for (i=0; i<numBats; i++)
+                {
+                    uint8_t battery = batteryFillStateSort[numBats-i-1];
+                    bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
+                    if (restPhase)
+                    {
+                        decisionStatus |= 0x04;
+                        batteryUnderCharge = battery;
+                        setBatteryChargingPhase(battery-1,absorptionC);
+                        break;
                     }
                 }
 
@@ -622,22 +681,37 @@ rest phases regardless in case the algorithm got the charge states wrong. */
             else
             {
                 decisionStatus = 0x500;
-                batteryUnderLoad = batteryFillStateSort[0];
                 batteryUnderCharge = 0;
                 uint8_t i=0;
                 for (i=0; i<numBats; i++)
                 {
                     uint8_t battery = batteryFillStateSort[numBats-i-1];
-                    bool floatState = ((getBatteryChargingPhase(battery-1) == floatC)
+                    bool floatPhase = ((getBatteryChargingPhase(battery-1) == floatC)
                              && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
-                    bool restState = (getBatteryChargingPhase(battery-1) == restC);
-                    if (!(floatState || restState))
+                    bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
+                    if (!(floatPhase || restPhase))
                     {
                         decisionStatus |= 0x04;
                         batteryUnderCharge = battery;
                         break;
                     }
                 }
+/* If still no battery allocated, see if one is in rest phase and change to
+absorption phase. */
+                if (batteryUnderCharge == 0)
+                for (i=0; i<numBats; i++)
+                {
+                    uint8_t battery = batteryFillStateSort[numBats-i-1];
+                    bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
+                    if (restPhase)
+                    {
+                        decisionStatus |= 0x04;
+                        batteryUnderCharge = battery;
+                        setBatteryChargingPhase(battery-1,absorptionC);
+                        break;
+                    }
+                }
+                batteryUnderLoad = batteryFillStateSort[0];
             }
         }
 

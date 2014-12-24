@@ -31,8 +31,18 @@ Initial 18 October 2013
 
 /* SoC above which charging is stopped in float phase */
 #define FLOAT_BULK_SOC  95*256
+
 /* Time to wait before passing to float. 2 hours, in seconds. */
 #define FLOAT_DELAY     7200
+
+/* Minimum time that the battery is in a rest phase, in seconds. */
+#define MINIMUM_OFF_TIME 30
+
+/* This defines the lowest the duty cycle is allowed to go as it may not recover
+when it needs to be raised. Check that the duty cycle reduction doesn't
+cause duty cycle to go to zero at any time. The lower this is, the longer
+it will take the duty cycle to rise in response to changes. */
+#define MIN_DUTYCYCLE   256
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -41,16 +51,12 @@ Initial 18 October 2013
 /* Prototypes */
 /*--------------------------------------------------------------------------*/
 void prvChargerTask(void *pvParameters);
-
-void resetChargeAlgorithm(charge_algorithm chargeAlgorithm);
-battery_Ch_States getBatteryChargingPhase(int battery);
-void setBatteryChargingPhase(int battery, battery_Ch_States chargePhase);
 void checkChargerWatchdog(void);
-void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle);
-void calculateAverageMeasures(void);
-int16_t voltageLimit(uint16_t limitV);
-int16_t getVoltageAv(int battery);
-int16_t getCurrentAv(int battery);
+int16_t getVoltageAv(int index);
+int16_t getCurrentAv(int index);
+battery_Ch_States getBatteryChargingPhase(int index);
+void resetChargeAlgorithm();
+void setBatteryChargingPhase(int index, battery_Ch_States chargePhase);
 
 #endif
 

@@ -94,8 +94,6 @@ times 256 times 4096 */
 #error "Version is not defined"
 #endif
 
-#define VOLTAGE_MAX (4096*VOLTAGE_SCALE+VOLTAGE_OFFSET)/4096
-
 /* Temperature measurement via LM335 for reference voltage 3.280V.
 Scale is 3.28V over 10mV per degree C times 256.
 Offset is 2.732V at 0 degrees C over 3.280 times 4096. */
