@@ -43,7 +43,7 @@ Note these definitions cannot be placed in the header file.
 #define CHARGER_DELAY               ((portTickType)512/portTICK_RATE_MS)
 
 /* The rate at which the monitoring is updated (1ms ticks) */
-#define MONITOR_DELAY               ((portTickType)1024/portTICK_RATE_MS)
+#define MONITOR_DELAY               ((portTickType)512/portTICK_RATE_MS)
 
 /* The default rate at which the samples are taken (1ms ticks) */
 #define MEASUREMENT_DELAY           ((portTickType)512/portTICK_RATE_MS)
