@@ -99,7 +99,7 @@ void prvChargerTask(void *pvParameters)
 
     initGlobals();
 
-    uint32_t minimumOffTime = (uint32_t)(REST_OFF_TIME*1024)/getChargerDelay();
+    uint32_t minimumOffTime = (uint32_t)(REST_TIME*1024)/getChargerDelay();
     uint32_t floatDelay = (uint32_t)(FLOAT_DELAY*1024)/getChargerDelay();
 
     while (1)
@@ -164,18 +164,18 @@ absorption phase, to test if the current is falling. */
 /* Manage the change from bulk phase at the gassing limit. */
                 if (getVoltageAv(index) > voltageLimit(getAbsorptionVoltage(index)))
                 {
-/* If all other batteries are in rest phase, change to absorption phase,
-otherwise change to rest phase. */
+/* If no other battery is in bulk phase, change this battery to absorption
+phase, otherwise change to rest phase. */
                     setBatteryChargingPhase(index,absorptionC);
                     for (i=0; i<NUM_BATS; i++)
                     {
-                        if (getBatteryChargingPhase(i) != restC)
+                        if (getBatteryChargingPhase(i) == bulkC)
                         {
                             setBatteryChargingPhase(index,restC);
                             break;
                         }
                     }
-dataMessageSend("Dchg",getFloatStageCurrent(index),0);
+dataMessageSend("Dalg",getBatteryChargingPhase(index),0);
 dataMessageSend("Dtms",offTime[index],onTime[index]);
 /* Now that the cycle is finished, reset times to start next cycle. */
                     offTime[index] = 0;
@@ -190,10 +190,10 @@ charging */
             {
                 offTime[index] = 0;
                 onTime[index] = 0;
-/* If another battery has changed to bulk phase, pass to rest phase to allow
-some other battery to have its turn. This will take effect on the next cycle of
-the monitor task. */
-                if (absorptionPhaseTime[index] > ABSORPTION_OFF_TIME)
+/* At the end of the absorption period, if another battery has changed to bulk
+phase, pass to rest phase to allow some other battery to have its turn. This
+will take effect on the next cycle of the monitor task. */
+                if (absorptionPhaseTime[index] > ABSORPTION_TIME)
                 {
                     for (i=0; i<NUM_BATS; i++)
                     {
@@ -207,7 +207,7 @@ the monitor task. */
                 }
 /* Check if current is above the last recorded value slightly reduced, to detect
 if the current has stopped falling. Change to float phase if time exceeded. */
-                if ((absorptionPhaseCurrent[index]*240)/256 > getCurrentAv(index))
+                if ((240*absorptionPhaseCurrent[index])/256 > getCurrentAv(index))
                 {
                     absorptionPhaseTime[index]++;
                     if (absorptionPhaseTime[index] > floatDelay)
@@ -230,6 +230,7 @@ by the resetBattery function. */
                 if (-getCurrentAv(index) < getFloatStageCurrent(index))
                 {
                     setBatteryChargingPhase(index,floatC);
+                    absorptionPhaseTime[index] = 0;
                     resetBatterySoC(battery-1);
                 }
 
@@ -240,7 +241,7 @@ by the resetBattery function. */
 /* If the source voltage drops causing the battery voltage and current to fall,
 switch to bulk phase to avoid a premature change to float that may not recover
 very soon. */
-                if (getVoltageAv(index) < 245*voltageLimit(getAbsorptionVoltage(index))/256)
+                if (getVoltageAv(index) < (245*voltageLimit(getAbsorptionVoltage(index)))/256)
                 {
                     setBatteryChargingPhase(index,bulkC);
                     dutyCycle[index] = 100*256;
@@ -267,7 +268,7 @@ value that will allow it to grow again if needed (round-off error problem). */
 /* If the voltage drifts much above absorption voltage in any phase, turn off
 charging altogether.*/
             uint16_t dutyCycleActual = dutyCycle[index];
-            if (getVoltageAv(index) > voltageLimit(getAbsorptionVoltage(index))*260/256)
+            if (getVoltageAv(index) > (268*voltageLimit(getAbsorptionVoltage(index)))/256)
                 dutyCycleActual = 0;
 
 /* If the panel voltage is too low, turn off charging. */
@@ -275,7 +276,7 @@ charging altogether.*/
                 dutyCycleActual = 0;
 
 /* If in rest or float phase, turn off charging as a precaution. */
-            if ((getBatteryChargingPhase(index) == restC) &&
+            if ((getBatteryChargingPhase(index) == restC) ||
                 (getBatteryChargingPhase(index) == floatC))
                 dutyCycleActual = 0;
 

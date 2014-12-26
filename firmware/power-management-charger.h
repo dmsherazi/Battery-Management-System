@@ -36,10 +36,10 @@ Initial 18 October 2013
 #define FLOAT_DELAY     7200
 
 /* Minimum time that the battery is in a rest phase, in seconds. */
-#define REST_OFF_TIME 30
+#define REST_TIME 30
 
 /* Minimum time that the battery is in the absorption phase, in seconds. */
-#define ABSORPTION_OFF_TIME 90
+#define ABSORPTION_TIME 90
 
 /* This defines the lowest the duty cycle is allowed to go as it may not recover
 when it needs to be raised. Check that the duty cycle reduction doesn't
