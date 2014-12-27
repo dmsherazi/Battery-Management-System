@@ -79,9 +79,9 @@ static uint8_t chargerWatchdogCount;
 static int16_t voltageAv[NUM_BATS];
 static int16_t currentAv[NUM_BATS];
 
-static uint32_t offTime[NUM_BATS];  /* Battery time in rest */
+static uint32_t restPhaseTime[NUM_BATS];  /* Battery time in rest */
 static uint32_t onTime[NUM_BATS];   /* Battery time in charge */
-static uint64_t accumulatedOffTime[NUM_BATS];
+static uint64_t accumulatedrestPhaseTime[NUM_BATS];
 static uint16_t dutyCycle[NUM_BATS];
 static uint16_t dutyCycleMax;
 static uint32_t absorptionPhaseTime[NUM_BATS];   /* time in absorption */
@@ -99,7 +99,7 @@ void prvChargerTask(void *pvParameters)
 
     initGlobals();
 
-    uint32_t minimumOffTime = (uint32_t)(REST_TIME*1024)/getChargerDelay();
+    uint32_t minimumRestTime = (uint32_t)(REST_TIME*1024)/getChargerDelay();
     uint32_t floatDelay = (uint32_t)(FLOAT_DELAY*1024)/getChargerDelay();
 
     while (1)
@@ -120,13 +120,13 @@ void prvChargerTask(void *pvParameters)
         {
 /* If a battery is in a rest phase, increment its off-time counter,
 or if in bulk phase, its on-time counter. */
-            if (getBatteryChargingPhase(i) == restC) offTime[i]++;
+            if (getBatteryChargingPhase(i) == restC) restPhaseTime[i]++;
             else if (getBatteryChargingPhase(i) == bulkC) onTime[i]++;
 
 /* Change to bulk phase if a battery is in rest phase and its off time exceeds
 the minimum. Charging will not start until the charger is allocated. */
             if ((getBatteryChargingPhase(i) == restC) &&
-                (offTime[i] > minimumOffTime))
+                (restPhaseTime[i] > minimumRestTime))
             {
                 setBatteryChargingPhase(i,bulkC);
             }
@@ -175,10 +175,12 @@ phase, otherwise change to rest phase. */
                             break;
                         }
                     }
-dataMessageSend("Dalg",getBatteryChargingPhase(index),0);
-dataMessageSend("Dtms",offTime[index],onTime[index]);
+/* On entering absorption phase, set duty cycle to 50% to reduce overshoot
+problems. */
+                    if (getBatteryChargingPhase(index) == absorptionC)
+                        dutyCycle[index] = 50*256;
 /* Now that the cycle is finished, reset times to start next cycle. */
-                    offTime[index] = 0;
+                    restPhaseTime[index] = 0;
                     onTime[index] = 0;
                 }
             }
@@ -188,7 +190,7 @@ dataMessageSend("Dtms",offTime[index],onTime[index]);
 charging */
             else if (getBatteryChargingPhase(index) == absorptionC)
             {
-                offTime[index] = 0;
+                restPhaseTime[index] = 0;
                 onTime[index] = 0;
 /* At the end of the absorption period, if another battery has changed to bulk
 phase, pass to rest phase to allow some other battery to have its turn. This
@@ -314,9 +316,9 @@ void resetChargeAlgorithm()
     uint8_t i=0;
     for (i=0; i<NUM_BATS; i++)
     {
-        offTime[i] = 0;
+        restPhaseTime[i] = 0;
         onTime[i] = 0;
-        accumulatedOffTime[i] = 0;
+        accumulatedrestPhaseTime[i] = 0;
 /* Set battery state to rest if left in absorption pahse. */
         if (getBatteryChargingPhase(i) == absorptionC)
             setBatteryChargingPhase(i,restC);
