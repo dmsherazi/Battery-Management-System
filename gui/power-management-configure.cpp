@@ -81,13 +81,6 @@ PowerManagementConfigGui::PowerManagementConfigGui(QTcpSocket* tcpSocket, QWidge
     PowerManagementConfigUi.battery3TypeCombo->addItem("Gel Cell");
     PowerManagementConfigUi.battery3TypeCombo->addItem("AGM Cell");
     PowerManagementConfigUi.battery3TypeCombo->setCurrentIndex(1);
-// Hide the charging algorithm parameter spinboxes and text.
-    PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(false);
-    PowerManagementConfigUi.chargeParameterText_1->setVisible(false);
-    PowerManagementConfigUi.chargeParameterSpinBox_2->setVisible(false);
-    PowerManagementConfigUi.chargeParameterText_2->setVisible(false);
-    PowerManagementConfigUi.chargeParameterSpinBox_3->setVisible(false);
-    PowerManagementConfigUi.chargeParameterText_3->setVisible(false);
 // Set the resistance display default (with Unicode Omega)
     PowerManagementConfigUi.battery1Resistance
             ->setText(QString("0 m").append(QChar(0x03A9)));
@@ -203,26 +196,31 @@ void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
 
 */
 
-/* 0 Three Phase Algorithm. */
-void PowerManagementConfigGui::on_threePhaseButton_clicked()
+void PowerManagementConfigGui::on_setChargeOptionButton_clicked()
 {
-    QString command = "pS0";
-    socket->write(command.append(QString("%1")).append("\n\r")
-                         .toAscii().constData());
-/* Ask for charge parameter settings */
-    socket->write("dC\n\r");
+    int restTime = PowerManagementConfigUi.restTimerSpinBox->value();
+    int absorptionTime = PowerManagementConfigUi.absorptionTimeSpinBox->value();
+    int dutyCycleMin = PowerManagementConfigUi.minimumDutyCycleSpinBox->value();
+    int floatTime = PowerManagementConfigUi.floatDelaySpinBox->value();
+    int floatSoC = PowerManagementConfigUi.floatBulkSoCSpinBox->value();
 }
 
-/* 1 Intermittent Charge Algorithm. */
-void PowerManagementConfigGui::on_pulseButton_clicked()
-{
-    QString command = "pS1";
-    socket->write(command.append(QString("%1")).append("\n\r")
-                         .toAscii().constData());
-/* Ask for charge parameter settings */
-    socket->write("dC\n\r");
-}
+//-----------------------------------------------------------------------------
+/** @brief Set Absorption Phase Muted
 
+This stops the charge algorithm from entering absorption phase for the purpose
+of reducing EMI.
+*/
+
+void PowerManagementConfigGui::on_absorptionMuteCheckbox_clicked()
+{
+    if (PowerManagementConfigUi.absorptionMuteCheckbox->isChecked())
+    {
+    }
+    else
+    {
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** @brief Set the Time
@@ -523,32 +521,6 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.debugMessageCheckbox->setChecked(true);
             else
                 PowerManagementConfigUi.debugMessageCheckbox->setChecked(false);
-            int chargeAlgorithm = (controlByte >> 5) & 0x03;
-            if (chargeAlgorithm == 0)
-            {
-                PowerManagementConfigUi.threePhaseButton->setChecked(true);
-                PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(true);
-                PowerManagementConfigUi.chargeParameterSpinBox_1->setValue(10);
-                PowerManagementConfigUi.chargeParameterSpinBox_1->
-                    setToolTip("Lowest duty cycle allowed to prevent it crashing to zero");
-                PowerManagementConfigUi.chargeParameterText_1->setVisible(true);
-                PowerManagementConfigUi.chargeParameterText_1->
-                    setText("Minimum Duty Cycle (%)");
-                PowerManagementConfigUi.chargeParameterSpinBox_2->setVisible(false);
-                PowerManagementConfigUi.chargeParameterText_2->setVisible(false);
-                PowerManagementConfigUi.chargeParameterSpinBox_3->setVisible(false);
-                PowerManagementConfigUi.chargeParameterText_3->setVisible(false);
-            }
-            if (chargeAlgorithm == 1)
-            {
-                PowerManagementConfigUi.pulseButton->setChecked(true);
-                PowerManagementConfigUi.chargeParameterSpinBox_1->setVisible(false);
-                PowerManagementConfigUi.chargeParameterText_1->setVisible(false);
-                PowerManagementConfigUi.chargeParameterSpinBox_2->setVisible(false);
-                PowerManagementConfigUi.chargeParameterText_2->setVisible(false);
-                PowerManagementConfigUi.chargeParameterSpinBox_3->setVisible(false);
-                PowerManagementConfigUi.chargeParameterText_3->setVisible(false);
-            }
             bool avoidLoad = (((controlByte >> 7) & 0x01) > 0);
             if (avoidLoad)
                 PowerManagementConfigUi.loadChargeCheckBox->setChecked(true);
@@ -559,24 +531,6 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.isolationMaintainCheckBox->setChecked(true);
             else
                 PowerManagementConfigUi.isolationMaintainCheckBox->setChecked(false);
-            break;
-        }
-// Show charger minimum duty cycle parameter
-        case '3':
-        {
-            if (size < 1) break;
-            int dutyCycle = breakdown[1].simplified().toInt();
-            if (PowerManagementConfigUi.threePhaseButton->isChecked())
-                PowerManagementConfigUi.chargeParameterSpinBox_1->setValue(dutyCycle);
-            break;
-        }
-// Show charger voltage threshold parameter
-        case 'V':
-        {
-            if (size < 1) break;
-            int voltage = breakdown[1].simplified().toInt();
-            if (PowerManagementConfigUi.pulseButton->isChecked())
-                PowerManagementConfigUi.chargeParameterSpinBox_1->setValue(voltage);
             break;
         }
 // Show current time settings from the system

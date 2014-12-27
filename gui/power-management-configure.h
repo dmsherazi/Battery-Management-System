@@ -61,8 +61,8 @@ private slots:
     void on_setBatteryButton_clicked();
     void displayErrorMessage(const QString message);
     void on_setTrackOptionButton_clicked();
-    void on_threePhaseButton_clicked();
-    void on_pulseButton_clicked();
+    void on_setChargeOptionButton_clicked();
+    void on_absorptionMuteCheckbox_clicked();
     void on_debugMessageCheckbox_clicked();
     void on_dataMessageCheckbox_clicked();
     void on_echoTestButton_clicked();

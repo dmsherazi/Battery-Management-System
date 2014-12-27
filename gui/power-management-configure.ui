@@ -1265,196 +1265,355 @@
        <x>20</x>
        <y>20</y>
        <width>589</width>
-       <height>276</height>
+       <height>371</height>
       </rect>
      </property>
      <property name="title">
       <string>Charge Algorithm</string>
      </property>
-     <widget class="QRadioButton" name="threePhaseButton">
+     <widget class="QSpinBox" name="restTimerSpinBox">
       <property name="geometry">
        <rect>
-        <x>24</x>
-        <y>25</y>
-        <width>109</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>Three Phase</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="pulseButton">
-      <property name="geometry">
-       <rect>
-        <x>24</x>
+        <x>288</x>
         <y>100</y>
-        <width>161</width>
+        <width>67</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>30</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="absorptionTimeSpinBox">
+      <property name="geometry">
+       <rect>
+        <x>286</x>
+        <y>145</y>
+        <width>67</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>90</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="minimumDutyCycleSpinBox">
+      <property name="geometry">
+       <rect>
+        <x>288</x>
+        <y>190</y>
+        <width>67</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="floatDelaySpinBox">
+      <property name="geometry">
+       <rect>
+        <x>288</x>
+        <y>240</y>
+        <width>67</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>2</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="floatBulkSoCSpinBox">
+      <property name="geometry">
+       <rect>
+        <x>288</x>
+        <y>290</y>
+        <width>67</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>95</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="restTimeLabel">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>90</y>
+        <width>81</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in rest phase before changing to another ready battery.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Rest Time Minimum</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="absorptionTimeLabel">
+      <property name="geometry">
+       <rect>
+        <x>164</x>
+        <y>135</y>
+        <width>105</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in absorption phase before changing to another ready battery.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Absorption Time Minimum</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="dutyCyclMinimumLabel">
+      <property name="geometry">
+       <rect>
+        <x>174</x>
+        <y>185</y>
+        <width>89</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Minimum Duty Cycle to prevent zero collapse.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Duty Cycle Minimum</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="floatTimeLabel">
+      <property name="geometry">
+       <rect>
+        <x>182</x>
+        <y>235</y>
+        <width>81</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Maximum time in absorption phase befoer changing to float.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Time to Float</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="floatBulkSoCLabel">
+      <property name="geometry">
+       <rect>
+        <x>182</x>
+        <y>285</y>
+        <width>81</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>SoC at which the battery in float is changed to bulk phase</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>Float to Bulk SoC</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="absorptionMuteCheckbox">
+      <property name="geometry">
+       <rect>
+        <x>194</x>
+        <y>45</y>
+        <width>211</width>
         <height>22</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <italic>true</italic>
-       </font>
+      <property name="toolTip">
+       <string>Stop the batteries using absorption phase to avoid EMI effects.</string>
       </property>
       <property name="text">
-       <string>Pulse Charge</string>
+       <string>Suppress Absorption Phase</string>
       </property>
      </widget>
-     <widget class="QLabel" name="threePhaseText">
+     <widget class="QLabel" name="secLabel">
       <property name="geometry">
        <rect>
-        <x>46</x>
-        <y>50</y>
-        <width>501</width>
-        <height>51</height>
+        <x>372</x>
+        <y>105</y>
+        <width>37</width>
+        <height>21</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in rest phase before changing to another ready battery.</string>
       </property>
       <property name="styleSheet">
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
-       <string>After the voltage reaches the gassing limit, the absorption phase holds the voltage at that point until the current falls to a specified trigger point, or levels out. This is the most common method used in lead-acid chargers.</string>
+       <string>sec</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="threePhaseText_2">
+     <widget class="QLabel" name="secLabel_2">
       <property name="geometry">
        <rect>
-        <x>46</x>
-        <y>125</y>
-        <width>509</width>
-        <height>51</height>
+        <x>372</x>
+        <y>150</y>
+        <width>37</width>
+        <height>21</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in rest phase before changing to another ready battery.</string>
       </property>
       <property name="styleSheet">
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
-       <string>After the voltage reaches the gassing limit, the battery is placed in rest phase and another battery is allocated. Each battery is placed on the charger in turn but must remain in rest phase for a minimum time.</string>
+       <string>sec</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="hrLabel">
+      <property name="geometry">
+       <rect>
+        <x>372</x>
+        <y>245</y>
+        <width>37</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in rest phase before changing to another ready battery.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>hr</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="percentLabel">
+      <property name="geometry">
+       <rect>
+        <x>372</x>
+        <y>195</y>
+        <width>37</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in rest phase before changing to another ready battery.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>%</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="percentLabel_2">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>290</y>
+        <width>37</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in rest phase before changing to another ready battery.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string>%</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
       </property>
      </widget>
     </widget>
-    <widget class="QLabel" name="chargeParameterText_1">
+    <widget class="QPushButton" name="setChargeOptionButton">
      <property name="geometry">
       <rect>
-       <x>62</x>
-       <y>390</y>
-       <width>81</width>
-       <height>46</height>
+       <x>264</x>
+       <y>375</y>
+       <width>91</width>
+       <height>27</height>
       </rect>
-     </property>
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
      </property>
      <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignHCenter|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="chargeParameterSpinBox_1">
-     <property name="geometry">
-      <rect>
-       <x>70</x>
-       <y>355</y>
-       <width>67</width>
-       <height>25</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="chargeParameterSpinBox_2">
-     <property name="geometry">
-      <rect>
-       <x>170</x>
-       <y>355</y>
-       <width>67</width>
-       <height>25</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="chargeParameterText_2">
-     <property name="geometry">
-      <rect>
-       <x>162</x>
-       <y>390</y>
-       <width>81</width>
-       <height>46</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignHCenter|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="chargeParameterSpinBox_3">
-     <property name="geometry">
-      <rect>
-       <x>268</x>
-       <y>355</y>
-       <width>67</width>
-       <height>25</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="chargeParameterText_3">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>390</y>
-       <width>81</width>
-       <height>46</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignHCenter|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
+      <string>Set</string>
      </property>
     </widget>
    </widget>
