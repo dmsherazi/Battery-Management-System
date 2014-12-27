@@ -6,8 +6,8 @@ The firmware is written for an STM32F103 ARM Cortex M3 microcontroller and uses
 specific hardware published here.
 
 The firmware uses libopencm3 for hardware drivers, FreeRTOS for task management
-and ChaN FatFs for managing the local storage filesystem along with an
-adaption of the code by Martin Thomas for SDSC/MMC SPI drivers to incorporate
+and ChaN FatFs for managing the local storage filesystem, along with an
+adaption of the driver code by Martin Thomas for SDSC/MMC SPI drivers to incorporate
 libopencm3 and FreeRTOS.
 
 Several tasks are defined to manage:
@@ -29,14 +29,14 @@ Three versions are here represented. Each refers to slightly different
 voltage and current scales in the measurement header for the PCB version.
 It is compiled with 'make VERSION=x' where x = 2 or 3. Version 1 is obsolete.
 
-Two charger algorithms are provided: Three Phase and Pulse Charge. The latter
-avoids the PWM switching needed to maintain a constant absorption phase voltage,
-which reduces EMI problems and also reduces overcharging by keeping the battery
-charge voltages as low as possible. The pulse charge algorithm was developed
-from the Interrupted Charge Control and Intermittent Charge algorithms reported
-in the literature, and adapted to the efficient charging of multiple batteries
-from an uncontrolled variable power source such as that found in solar and
-aeolian systems.
+The charger algorithm is referred to as "Pulse Charge". This aims to avoid the
+PWM switching needed to maintain a constant absorption phase voltage, which
+reduces EMI problems and also reduces overcharging by keeping the battery charge
+voltages as low as possible. The Pulse Charge algorithm is aa adaptation of 
+the Interrupted Charge Control, Intermittent Charge, and Three Phase algorithms
+reported in the literature, providing efficient and independent charging of
+multiple batteries from an uncontrolled variable power source such as that found
+in solar and aeolian systems.
 
 More information is available on:
 

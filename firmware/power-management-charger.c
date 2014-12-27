@@ -223,29 +223,23 @@ if the current has stopped falling. Change to float phase if time exceeded. */
 
 /* Manage the change to float phase when the current drops below the float
 threshold. This is done on the averaged current as rapid response is not
-essential. (Note: measured currents are negative while charging).
+essential. (Note: measured currents are negative while charging). Ignore samples
+where the source voltage drops causing the battery voltage and current to fall.
 When the change occurs, force the SoC to 100%. This may not be correct if
 the battery is faulty with a low terminal voltage, but that case is handled
 by the resetBattery function. */
-                if (-getCurrentAv(index) < getFloatStageCurrent(index))
+                if ((-getCurrentAv(index) < getFloatStageCurrent(index)) &&
+                    (getVoltageAv(index) > (245*voltageLimit(getAbsorptionVoltage(index)))/256))
                 {
                     setBatteryChargingPhase(index,floatC);
                     absorptionPhaseTime[index] = 0;
                     resetBatterySoC(battery-1);
                 }
 
+
 /* Manage the absorption phase voltage limit. */
                 adaptDutyCycle(getVoltageAv(index),getAbsorptionVoltage(index),
                                &dutyCycle[index]);
-
-/* If the source voltage drops causing the battery voltage and current to fall,
-switch to bulk phase to avoid a premature change to float that may not recover
-very soon. */
-                if (getVoltageAv(index) < (245*voltageLimit(getAbsorptionVoltage(index)))/256)
-                {
-                    setBatteryChargingPhase(index,bulkC);
-                    dutyCycle[index] = 100*256;
-                }
             }
 
 /* Overcurrent protection:
@@ -265,11 +259,7 @@ This is done on the directly measured current for rapid response. */
 value that will allow it to grow again if needed (round-off error problem). */
             if (dutyCycle[index] < MIN_DUTYCYCLE) dutyCycle[index] = MIN_DUTYCYCLE;
 
-/* If the voltage drifts much above absorption voltage in any phase, turn off
-charging altogether.*/
             uint16_t dutyCycleActual = dutyCycle[index];
-            if (getVoltageAv(index) > (268*voltageLimit(getAbsorptionVoltage(index)))/256)
-                dutyCycleActual = 0;
 
 /* If the panel voltage is too low, turn off charging. */
             if (getPanelVoltage(0) < 10*256)
@@ -425,12 +415,15 @@ void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle)
 {
     uint32_t newDutyCycle = *dutyCycle;
     int16_t vLimitAdjusted = voltageLimit(vLimit);
-    int16_t voltageDiff = (voltage - vLimitAdjusted);
-    if (voltageDiff > 0)
+    if (voltage > vLimitAdjusted)
     {
-/* Speed up the return to the voltage limit as the difference is greater */
-/*        newDutyCycle = (newDutyCycle*((vLimitAdjusted-11*256)*115)/(voltage-11*256))>>7;*/
-        newDutyCycle = (newDutyCycle*115)>>7;
+/* If the voltage drifts too far above absorption voltage, drop the duty cycle
+by about 30%. This can happen if the battery is fully charged and absorption
+phase is entered. The dutycycle may not otherwise recover quickly enough. */
+        if (voltage > (268*vLimitAdjusted)/256)
+            newDutyCycle = (newDutyCycle*90)>>7;
+/* Otherwise reduce by about 10% */
+        else newDutyCycle = (newDutyCycle*115)>>7;
     }
     else
     {
