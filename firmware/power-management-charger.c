@@ -81,7 +81,6 @@ static int16_t currentAv[NUM_BATS];
 
 static uint32_t restPhaseTime[NUM_BATS];  /* Battery time in rest */
 static uint32_t onTime[NUM_BATS];   /* Battery time in charge */
-static uint64_t accumulatedrestPhaseTime[NUM_BATS];
 static uint16_t dutyCycle[NUM_BATS];
 static uint16_t dutyCycleMax;
 static uint32_t absorptionPhaseTime[NUM_BATS];   /* time in absorption */
@@ -175,10 +174,10 @@ phase, otherwise change to rest phase. */
                             break;
                         }
                     }
-/* On entering absorption phase, set duty cycle to 50% to reduce overshoot
+/* On entering absorption phase, drop duty cycle by 50% to reduce overshoot
 problems. */
                     if (getBatteryChargingPhase(index) == absorptionC)
-                        dutyCycle[index] = 50*256;
+                        dutyCycle[index] /= 2;
 /* Now that the cycle is finished, reset times to start next cycle. */
                     restPhaseTime[index] = 0;
                     onTime[index] = 0;
@@ -318,7 +317,6 @@ void resetChargeAlgorithm()
     {
         restPhaseTime[i] = 0;
         onTime[i] = 0;
-        accumulatedrestPhaseTime[i] = 0;
 /* Set battery state to rest if left in absorption pahse. */
         if (getBatteryChargingPhase(i) == absorptionC)
             setBatteryChargingPhase(i,restC);

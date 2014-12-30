@@ -29,7 +29,6 @@ qrc_*
 Makefile
 *.cmd
 *.net
-data-processing
 power-management
 power-management-tcp
 
