@@ -46,12 +46,13 @@ LDSCRIPT    = stm32-h103RET6.ld
 
 LDFLAGS	   += -I . -lc -T$(LDSCRIPT) -L$(DRIVERS_DIR)/lib -nostartfiles -Wl,--gc-sections
 LDFLAGS	   += -lopencm3_stm32f1
+LDFLAGS	   += -specs=nosys.specs
 
 CFILES	    = $(PROJECT).c $(PROJECT)-comms.c $(PROJECT)-file.c
 CFILES     += $(PROJECT)-monitor.c $(PROJECT)-hardware.c
 CFILES     += $(PROJECT)-lib.c $(PROJECT)-time.c $(PROJECT)-objdic.c
 CFILES     += $(PROJECT)-measurement.c $(PROJECT)-watchdog.c
-CFILES     += ff.c sd_spi_loc3_stm32_freertos.c fattime.c rtc.c freertos.c
+CFILES     += ff.c sd_spi_loc3_stm32_freertos.c fattime.c freertos.c
 CFILES     += tasks.c list.c queue.c timers.c port.c heap_1.c
 CFILES     += $(PROJECT)-charger.c
 

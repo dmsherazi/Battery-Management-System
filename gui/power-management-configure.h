@@ -5,7 +5,7 @@
 
 /****************************************************************************
  *   Copyright (C) 2013 by Ken Sarkies                                      *
- *   ksarkies@trinity.asn.au                                                *
+ *   ksarkies@internode.on.net                                              *
  *                                                                          *
  *   This file is part of Power Management GUI                              *
  *                                                                          *

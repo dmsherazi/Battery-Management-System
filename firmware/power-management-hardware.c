@@ -695,7 +695,11 @@ uint32_t flashWriteData(uint32_t *flashBlock, uint8_t *data, uint16_t size)
 
 uint32_t getTimeCounter()
 {
+#if (RTC_SOURCE == RTC)
     return rtc_get_counter_val();
+#else
+    return timeCounter;
+#endif
 }
 
 /*--------------------------------------------------------------------------*/
@@ -706,7 +710,11 @@ uint32_t getTimeCounter()
 
 void setTimeCounter(uint32_t time)
 {
+#if (RTC_SOURCE == RTC)
     rtc_set_counter_val(time);
+#else
+    timeCounter = time;;
+#endif
 }
 
 /*--------------------------------------------------------------------------*/
@@ -851,7 +859,6 @@ void sys_tick_handler(void)
     }
 
 /* updated every 1s if systick is used for real-time clock. */
-/*
     static uint16_t cnttime=0;
     cnttime++;
     if (cnttime >= 100)
@@ -859,7 +866,6 @@ void sys_tick_handler(void)
         cnttime = 0;
         updateTimeCount();
     }
-*/
     xPortSysTickHandler();
 }
 

@@ -2,21 +2,24 @@
 
 #include "integer.h"
 #include "fattime.h"
-#include "rtc.h"
+#include "power-management-time.h"
+#include <time.h>
 
+/* This provides a 32 bit integer construct of time based on years since 1980.
+Seconds are in 2 second increments. The tm struct gives years since 1900. */
 DWORD get_fattime (void)
 {
 	DWORD res;
-	RTC_t rtc;
+	time_t currentTime = (time_t)getTimeCounter();
+    struct tm *rtc;
+    rtc = localtime(currentTime);
 
-	rtc_gettime( &rtc );
-	
-	res =  (((DWORD)rtc.year - 1980) << 25)
-			| ((DWORD)rtc.month << 21)
-			| ((DWORD)rtc.mday << 16)
-			| (WORD)(rtc.hour << 11)
-			| (WORD)(rtc.min << 5)
-			| (WORD)(rtc.sec >> 1);
+	res =  (((DWORD)rtc->tm_year - 80) << 25)
+			| ((DWORD)rtc->tm_mon << 21)
+			| ((DWORD)rtc->tm_mday << 16)
+			| (WORD)(rtc->tm_hour << 11)
+			| (WORD)(rtc->tm_min << 5)
+			| (WORD)(rtc->tm_sec >> 1);
 
 	return res;
 }

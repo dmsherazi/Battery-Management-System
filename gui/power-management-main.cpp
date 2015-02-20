@@ -15,7 +15,7 @@ socat /dev/ttyUSB0,echo=0,ispeed=115200,ospeed=115200,raw tcp-l:6666,reuseaddr,f
 */
 /****************************************************************************
  *   Copyright (C) 2013 by Ken Sarkies                                      *
- *   ksarkies@trinity.asn.au                                                *
+ *   ksarkies@internode.on.net                                              *
  *                                                                          *
  *   This file is part of Power Management GUI                              *
  *                                                                          *

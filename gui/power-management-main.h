@@ -5,7 +5,7 @@
 
 /****************************************************************************
  *   Copyright (C) 2013 by Ken Sarkies                                      *
- *   ksarkies@trinity.asn.au                                                *
+ *   ksarkies@internode.on.net                                              *
  *                                                                          *
  *   This file is part of Power Management GUI                              *
  *                                                                          *
@@ -107,6 +107,12 @@ private:
     Ui::PowerManagementMainDialog PowerManagementMainUi;
 // Common code
     void initMainWindow(Ui::PowerManagementMainDialog);
+// Methods
+    void processResponse(const QString response);
+    void getCurrentVoltage(const QStringList breakdown,QString* sVoltage, QString* sCurrent);
+    void displayErrorMessage(const QString message);
+    void saveLine(QString line);    // Save line to a file
+    void ssleep(int seconds);
 // Variables
     uint baudrate;
     bool synchronized;
@@ -128,11 +134,6 @@ private:
     int load1Current;
     int load1Voltage;
     unsigned int indicators;
-    void processResponse(const QString response);
-    void getCurrentVoltage(const QStringList breakdown,QString* sVoltage, QString* sCurrent);
-    void displayErrorMessage(const QString message);
-    void saveLine(QString line);    // Save line to a file
-    void ssleep(int seconds);
     char timeTick;
 };
 

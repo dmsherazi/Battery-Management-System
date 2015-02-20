@@ -50,6 +50,9 @@ Initial 29 September 2013
 (note only STM32F1xx,  STM32F05x have compatible memory organization). */
 #define FLASH_PAGE_SIZE 2048
 
+/* RTC select hardware RTC or software counter */
+#define RTC_SOURCE      RTC
+
 /*--------------------------------------------------------------------------*/
 /* Interface Prototypes */
 /*--------------------------------------------------------------------------*/

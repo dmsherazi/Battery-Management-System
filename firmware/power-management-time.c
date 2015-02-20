@@ -28,6 +28,7 @@ Initial 25 November 2013
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "power-management-objdic.h"
 #include "power-management-hardware.h"
@@ -35,122 +36,46 @@ Initial 25 November 2013
 #include "power-management-time.h"
 #include "power-management-comms.h"
 
-static const uint8_t DaysInMonth[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
 /*--------------------------------------------------------------------------*/
 /* @brief Return a string containing the time and date
 
-Convert the global time to a string.
-Based on code from Peter Dannegger found in the mikrocontroller.net forum
-but 100 year exceptions not included.
+Convert the global time to an ISO 8601 string.
 
 @param[out] timeString char*. Returns pointer to string with formatted date.
 */
 
 void putTimeToString(char* timeString)
 {
-/* Find the number of days, hours, minutes, seconds */
-    uint32_t timeCounter = getTimeCounter();
-    uint8_t second = timeCounter % 60;
-    uint8_t minute = (timeCounter/60) % 60;
-    uint8_t hour = (timeCounter/3600) % 24;
-    uint16_t day = (uint16_t)(timeCounter/86400);
-    uint16_t year = 0;
-    uint16_t dayOfYear = 365;
-    uint16_t dayOfLastYear = 365;
-
-/* Break down into years since 2000 and number of days left in the month */
-    for(;;)
-    {
-        dayOfLastYear = dayOfYear;
-        if ((year & 0x03) == 0) dayOfYear = 366;
-        else  dayOfYear = 365;
-        if (day < dayOfYear) break;
-        day -= dayOfYear;
-        year++;
-    }
-    year += 2000;
-
-/* Add back Feb 29 if the last year was a leap year (quirk of above loop) */
-    if((dayOfLastYear == 366) && (day > 58)) day++;
-
-    uint8_t month;
-    for(month = 1; day >= DaysInMonth[month-1]; month++)
-        day -= DaysInMonth[month-1];
-
-    uint8_t dayOfMonth = day + 1;
-    char buffer[10];
-    intToAscii(year, timeString);
-    stringAppend(timeString,"-");
-    if (month < 10) stringAppend(timeString,"0");
-    intToAscii(month, buffer);
-    stringAppend(timeString,buffer);
-    stringAppend(timeString,"-");
-    if (dayOfMonth < 10) stringAppend(timeString,"0");
-    intToAscii(dayOfMonth, buffer);
-    stringAppend(timeString,buffer);
-    stringAppend(timeString,"T");
-    intToAscii(hour, buffer);
-    if (hour < 10) stringAppend(timeString,"0");
-    stringAppend(timeString,buffer);
-    stringAppend(timeString,":");
-    intToAscii(minute, buffer);
-    if (minute < 10) stringAppend(timeString,"0");
-    stringAppend(timeString,buffer);
-    stringAppend(timeString,":");
-    intToAscii(second, buffer);
-    if (second < 10) stringAppend(timeString,"0");
-    stringAppend(timeString,buffer);
+    strftime(timeString, sizeof timeString, "%FT%TZ", (time_t)getTimeCounter());
 }
 
 /*--------------------------------------------------------------------------*/
 /* @brief Set the time variable from an ISO 8601 formatted date/time
 
-Based on code from LalaDumm found in the mikrocontroller.net forum.
-100 year exceptions not included.
-
-@param[in] isoTime: pointer to string with formatted date.
+@param[in] timeString: pointer to string with formatted date.
 */
 
 void setTimeFromString(char* timeString)
 {
+    struct tm currentTime;
     char buffer[5];
     uint8_t i;
-    uint32_t days = 0;
 
     for (i=0; i<4; i++) buffer[i] = timeString[i];
     buffer[4] = 0;
-    uint16_t year = asciiToInt(buffer);
+    currentTime.tm_year = asciiToInt(buffer);
     for (i=0; i<2; i++) buffer[i] = timeString[i+5];
     buffer[2] = 0;
-    uint16_t month = asciiToInt(buffer);
+    currentTime.tm_mon = asciiToInt(buffer);
     for (i=0; i<2; i++) buffer[i] = timeString[i+8];
-    uint16_t dayOfMonth = asciiToInt(buffer);
+    currentTime.tm_mday = asciiToInt(buffer);
     for (i=0; i<2; i++) buffer[i] = timeString[i+11];
-    uint16_t hour = asciiToInt(buffer);
+    currentTime.tm_hour = asciiToInt(buffer);
     for (i=0; i<2; i++) buffer[i] = timeString[i+14];
-    uint16_t minute = asciiToInt(buffer);
+    currentTime.tm_min = asciiToInt(buffer);
     for (i=0; i<2; i++) buffer[i] = timeString[i+17];
-    uint16_t second = asciiToInt(buffer);
+    currentTime.tm_sec = asciiToInt(buffer);
 
-    /* Calculate days of years after 2000 */
-    year -= 2000;
-    days = (uint32_t)year * 365;
-    days += (year+3)/4;
-
-    /* Loop thru each month, adding the days */
-    for (i = 0; i < month - 1; i++) days += DaysInMonth[i];
-
-    /* Leap year? adjust February */
-    if (((year & 0x03) == 0) && (month > 2)) days++;
-
-    /* Add remaining days */
-    days += dayOfMonth;
-
-    /* Convert to seconds, add all the other stuff */
-    uint32_t seconds = (days-1) * 86400L + (uint32_t)hour * 3600 +
-        (uint32_t)minute * 60 + second;
-
-    setTimeCounter(seconds);
+    setTimeCounter((uint32_t)mktime(&currentTime));
 }
 

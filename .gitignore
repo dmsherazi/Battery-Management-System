@@ -19,7 +19,6 @@
 *.pdf
 *.tag
 *.lss
-*.sym
 *.csv
 auxiliary/
 moc_*

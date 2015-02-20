@@ -4,7 +4,7 @@ Title:    Serial Port Subclass
 
 /***************************************************************************
  *   Copyright (C) 2007 by Ken Sarkies                                     *
- *   ksarkies@trinity.asn.au                                               *
+ *   ksarkies@internode.on.net                                             *
  *                                                                         *
  *   This file is part of Acquisition                                      *
  *                                                                         *
