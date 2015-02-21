@@ -46,7 +46,9 @@ Convert the global time to an ISO 8601 string.
 
 void putTimeToString(char* timeString)
 {
-    strftime(timeString, sizeof timeString, "%FT%TZ", (time_t)getTimeCounter());
+    time_t currentTime = (time_t)getTimeCounter();
+    struct tm *rtc = localtime(&currentTime);
+    strftime(timeString, sizeof timeString, "%FT%TZ", rtc);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -57,25 +59,25 @@ void putTimeToString(char* timeString)
 
 void setTimeFromString(char* timeString)
 {
-    struct tm currentTime;
+    struct tm newTime;
     char buffer[5];
     uint8_t i;
 
     for (i=0; i<4; i++) buffer[i] = timeString[i];
     buffer[4] = 0;
-    currentTime.tm_year = asciiToInt(buffer);
+    newTime.tm_year = asciiToInt(buffer)-1900;
     for (i=0; i<2; i++) buffer[i] = timeString[i+5];
     buffer[2] = 0;
-    currentTime.tm_mon = asciiToInt(buffer);
+    newTime.tm_mon = asciiToInt(buffer)-1;
     for (i=0; i<2; i++) buffer[i] = timeString[i+8];
-    currentTime.tm_mday = asciiToInt(buffer);
+    newTime.tm_mday = asciiToInt(buffer);
     for (i=0; i<2; i++) buffer[i] = timeString[i+11];
-    currentTime.tm_hour = asciiToInt(buffer);
+    newTime.tm_hour = asciiToInt(buffer);
     for (i=0; i<2; i++) buffer[i] = timeString[i+14];
-    currentTime.tm_min = asciiToInt(buffer);
+    newTime.tm_min = asciiToInt(buffer);
     for (i=0; i<2; i++) buffer[i] = timeString[i+17];
-    currentTime.tm_sec = asciiToInt(buffer);
+    newTime.tm_sec = asciiToInt(buffer);
 
-    setTimeCounter((uint32_t)mktime(&currentTime));
+    setTimeCounter((uint32_t)mktime(&newTime));
 }
 

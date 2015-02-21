@@ -720,7 +720,7 @@ void setTimeCounter(uint32_t time)
 /*--------------------------------------------------------------------------*/
 /** @brief Update the time counter value
 
-This is called from the systick ISR if it is used as a RTC.
+This is called from the systick ISR every second if it is used as a RTC.
 */
 
 void updateTimeCount(void)
