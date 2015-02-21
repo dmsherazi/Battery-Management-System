@@ -32,8 +32,9 @@ charging and monitoring of batteries:
    in the absorption phase. In float phase the charger is disconnected until the
    terminal voltage drops to a threshold value. Equalization is not provided.
 
-2. An algorithm based on Interrupted Charge Control (ICC) is also provided.
-   This has advantages of:
+2. An algorithm based on Interrupted Charge Control (ICC) is also provided to
+   place batteries in rest when they have reached the gassing voltage and there
+   are other batteries to be charged. This has advantages of:
    (a) better utilization of the charger among the batteries,
    (b) low EMI,
    (c) reduced gas generation.
@@ -62,12 +63,16 @@ http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-overview.html
 
 TODO
 
-1. Development of a 433MHz transponder set to convert serial transmissions 3.3V
-   and RS232 levels, to RF signalling.
-2. Improvement of MOSFET switch drivers to reduce EMI at higher rates. May not
-   be needed if ICC works well.
-3. Development of a 50W linear regulator to add to the solar panel side. This
+1. Development of a 433MHz transponder set to convert serial transmissions (3.3V
+   and RS232 levels) to RF signalling.
+2. Improvement of MOSFET switch drivers to reduce EMI at higher rates.
+3. Shunt regulator across panel terminals to reduce voltage in high voltage
+   panels which might stress the MOSFETs. This will put an additional load
+   across the panels to divert current and reduce the voltage.
+4. MPPT regulator for the panel.
+5. Development of a 50W linear regulator to add to the solar panel side. This
    will allow avoidance of switching while limiting the battery charge voltage.
    Ideally this would be controlled through the processor DAC but that would
    need major hardware changes.
+
 
