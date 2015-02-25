@@ -25,6 +25,10 @@ used for this particular PCB version.
 
 (c) K. Sarkies 02/04/2014
 
+Version
+0.1 - 24/2/2015 Add jumper and pullup so that overload cutout on panel can be
+      disabled.
+
 Todo:
 1. Redesign card with on-board processor.
 
