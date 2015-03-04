@@ -1271,7 +1271,7 @@
      <property name="title">
       <string>Charge Algorithm</string>
      </property>
-     <widget class="QSpinBox" name="restTimerSpinBox">
+     <widget class="QSpinBox" name="restTimeSpinBox">
       <property name="geometry">
        <rect>
         <x>288</x>

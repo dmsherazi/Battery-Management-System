@@ -189,6 +189,22 @@ void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
     QString command = "ps";
     socket->write(command.append(QString("%1").arg(option,2)).append("\n\r")
                          .toAscii().constData());
+    int lowVoltage = (int)(PowerManagementConfigUi.lowVoltageDoubleSpinBox->value()*256);
+    command = "pv";
+    socket->write(command.append(QString("%1").arg(lowVoltage,2)).append("\n\r")
+                         .toAscii().constData());
+    int criticalVoltage = (int)(PowerManagementConfigUi.lowVoltageDoubleSpinBox->value()*256);
+    command = "pV";
+    socket->write(command.append(QString("%1").arg(criticalVoltage,2)).append("\n\r")
+                         .toAscii().constData());
+    int lowSoC = (int)(PowerManagementConfigUi.lowVoltageDoubleSpinBox->value()*256);
+    command = "px";
+    socket->write(command.append(QString("%1").arg(lowSoC,2)).append("\n\r")
+                         .toAscii().constData());
+    int criticalSoC = (int)(PowerManagementConfigUi.lowVoltageDoubleSpinBox->value()*256);
+    command = "pX";
+    socket->write(command.append(QString("%1").arg(criticalSoC,2)).append("\n\r")
+                         .toAscii().constData());
 }
 
 //-----------------------------------------------------------------------------
@@ -198,11 +214,26 @@ void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
 
 void PowerManagementConfigGui::on_setChargeOptionButton_clicked()
 {
-    int restTime = PowerManagementConfigUi.restTimerSpinBox->value();
+    int restTime = PowerManagementConfigUi.restTimeSpinBox->value();
+    QString command = "pR";
+    socket->write(command.append(QString("%1").arg(restTime,2)).append("\n\r")
+                         .toAscii().constData());
     int absorptionTime = PowerManagementConfigUi.absorptionTimeSpinBox->value();
+    command = "pA";
+    socket->write(command.append(QString("%1").arg(absorptionTime,2)).append("\n\r")
+                         .toAscii().constData());
     int dutyCycleMin = PowerManagementConfigUi.minimumDutyCycleSpinBox->value();
+    command = "pD";
+    socket->write(command.append(QString("%1").arg(dutyCycleMin,2)).append("\n\r")
+                         .toAscii().constData());
     int floatTime = PowerManagementConfigUi.floatDelaySpinBox->value();
+    command = "pF";
+    socket->write(command.append(QString("%1").arg(floatTime,2)).append("\n\r")
+                         .toAscii().constData());
     int floatSoC = PowerManagementConfigUi.floatBulkSoCSpinBox->value();
+    command = "pB";
+    socket->write(command.append(QString("%1").arg(floatSoC,2)).append("\n\r")
+                         .toAscii().constData());
 }
 
 //-----------------------------------------------------------------------------
@@ -216,9 +247,11 @@ void PowerManagementConfigGui::on_absorptionMuteCheckbox_clicked()
 {
     if (PowerManagementConfigUi.absorptionMuteCheckbox->isChecked())
     {
+        socket->write("pm+\n\r");
     }
     else
     {
+        socket->write("pm-\n\r");
     }
 }
 
@@ -358,6 +391,7 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
     if (size <= 0) return;
     QChar command = breakdown[0].at(1);
     QChar battery = breakdown[0].at(2);
+    QChar parameter = breakdown[0].at(2);
     int controlByte = 0;
     if (size > 1) controlByte = breakdown[1].simplified().toInt();
 // Error Code
@@ -531,6 +565,11 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.isolationMaintainCheckBox->setChecked(true);
             else
                 PowerManagementConfigUi.isolationMaintainCheckBox->setChecked(false);
+            bool absorptionMute = (((controlByte >> 9) & 0x01) > 0);
+            if (absorptionMute)
+                PowerManagementConfigUi.absorptionMuteCheckbox->setChecked(true);
+            else
+                PowerManagementConfigUi.absorptionMuteCheckbox->setChecked(false);
             break;
         }
 // Show current time settings from the system
@@ -610,6 +649,61 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                     PowerManagementConfigUi.resetMissing3Button->setText("X");
                 }
             }
+            break;
+        }
+// Show tracking parameters
+        case 't':
+        {
+            if (size < 3) break;
+            if (parameter == 'V')
+            {
+                float lowVoltage = (float)breakdown[1].simplified().toInt()/256;
+                float criticalVoltage = (float)breakdown[2].simplified().toInt()/256;
+                PowerManagementConfigUi.lowVoltageDoubleSpinBox
+                    ->setValue(lowVoltage);
+                PowerManagementConfigUi.criticalVoltageDoubleSpinBox
+                    ->setValue(criticalVoltage);
+            }
+            else if (parameter == 'S')
+            {
+                int lowSoC = (float)breakdown[1].simplified().toInt();
+                int criticalSoC = (float)breakdown[2].simplified().toInt();
+                PowerManagementConfigUi.lowSoCSpinBox
+                    ->setValue(lowSoC);
+                PowerManagementConfigUi.criticalSoCSpinBox
+                    ->setValue(criticalSoC);
+            }
+            break;
+        }
+// Show charger parameters
+        case 'c':
+        {
+            if (size < 3) break;
+            if (parameter == 'R')
+            {
+                int restTime = (float)breakdown[1].simplified().toInt();
+                int absorptionTime = (float)breakdown[2].simplified().toInt();
+                PowerManagementConfigUi.restTimeSpinBox
+                    ->setValue(restTime);
+                PowerManagementConfigUi.absorptionTimeSpinBox
+                    ->setValue(absorptionTime);
+            }
+            else if (parameter == 'D')
+            {
+                int dutyCycleMin = (float)breakdown[1].simplified().toInt();
+                PowerManagementConfigUi.minimumDutyCycleSpinBox
+                    ->setValue(dutyCycleMin);
+            }
+            else if (parameter == 'F')
+            {
+                int floatTime = (float)breakdown[1].simplified().toInt();
+                int floatSoC = (float)breakdown[2].simplified().toInt();
+                PowerManagementConfigUi.floatDelaySpinBox
+                    ->setValue(floatTime);
+                PowerManagementConfigUi.floatBulkSoCSpinBox
+                    ->setValue(floatSoC);
+            }
+            break;
         }
     }
 }
