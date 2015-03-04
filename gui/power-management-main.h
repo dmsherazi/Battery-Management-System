@@ -45,6 +45,11 @@ typedef enum {battery1UnderVoltage, battery2UnderVoltage, battery3UnderVoltage,
               load1OverCurrent, load2OverCurrent, panelOverCurrent, }
               IndicatorType;
 
+#define DEFAULT_SERIAL_PORT "/dev/ttyUSB0"
+#define DEFAULT_BAUDRATE    4
+#define DEFAULT_TCP_ADDRESS "192.168.2.14"
+#define DEFAULT_TCP_PORT    6666
+
 #define millisleep(a) usleep(a*1000)
 
 //-----------------------------------------------------------------------------
@@ -56,14 +61,12 @@ class PowerManagementGui : public QDialog
 {
     Q_OBJECT
 public:
-    PowerManagementGui(QString inPort, uint baudrate, QWidget* parent = 0);
+    PowerManagementGui(QString device, uint parameter, QWidget* parent = 0);
     ~PowerManagementGui();
     bool success();
     QString error();
 private slots:
-#ifndef SERIAL
     void on_connectButton_clicked();
-#endif
     void onDataAvailable();
     void on_load1Battery1_pressed();
     void on_load1Battery2_pressed();
@@ -107,6 +110,7 @@ private:
     Ui::PowerManagementMainDialog PowerManagementMainUi;
 // Common code
     void initMainWindow(Ui::PowerManagementMainDialog);
+    void setSourceComboBox();
 // Methods
     void processResponse(const QString response);
     void getCurrentVoltage(const QStringList breakdown,QString* sVoltage, QString* sCurrent);
@@ -114,6 +118,7 @@ private:
     void saveLine(QString line);    // Save line to a file
     void ssleep(int seconds);
 // Variables
+    QString serialDevice;
     uint baudrate;
     bool synchronized;
     QString connectAddress;
@@ -124,8 +129,8 @@ private:
     SerialPort* socket;           //!< Serial port object pointer
 #else
     QTcpSocket *socket;
-    bool validsocket();
 #endif
+    bool validsocket();
     quint16 blockSize;
     QTime tick;
     QDir saveDirectory;

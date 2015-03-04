@@ -6,6 +6,16 @@
 
 This is the PC user interface to the Solar-Battery Power Management System.
 
+Call with power-management [options]
+
+-P   port (/dev/ttyUSB0 default)
+-b   baudrate (from 2400, 4800, 9600, 19200, 38400 default, 57600, 115200)
+-a   TCP address (192.168.2.14 default)
+-p   TCP port (6666 default)
+
+The first two are used only when compiled for serial comms, and the latter when
+compiled for TCP/IP.
+
 @note
 Compiler: gcc (Ubuntu 4.6.3-1ubuntu5) 4.6.3
 @note
@@ -46,18 +56,27 @@ Uses: Qt version 4.8.1
 int main(int argc,char ** argv)
 {
 /* Interpret any command line options */
-    QString inPort = SERIAL_PORT;
-    int c;
-    uint initialBaudrate = 4;
+    QString serialDevice = DEFAULT_SERIAL_PORT;
+    uint initialBaudrate = DEFAULT_BAUDRATE;
+    QString tcpAddress = DEFAULT_TCP_ADDRESS;
+    uint tcpPort = DEFAULT_TCP_PORT;
     int baudParm;
+    int c;
     opterr = 0;
+#ifdef SERIAL
     while ((c = getopt (argc, argv, "P:b:")) != -1)
+#else
+    while ((c = getopt (argc, argv, "a:p:")) != -1)
+#endif
     {
         switch (c)
         {
+#ifdef SERIAL
+// Serial Port Device
         case 'P':
-            inPort = optarg;
+            serialDevice = optarg;
             break;
+// Serial baudrate
         case 'b':
             baudParm = atoi(optarg);
             switch (baudParm)
@@ -74,9 +93,23 @@ int main(int argc,char ** argv)
                 return false;
             }
             break;
+#else
+// TCP address
+        case 'a':
+            tcpAddress = optarg;
+// TCP port number
+        case 'p':
+            tcpPort = atoi(optarg);
+#endif
+// Unknown
         case '?':
-            if (optopt == 'P')
+#ifdef SERIAL
+            if ((optopt == 'P') || (optopt == 'b'))
                 fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+#else
+            if ((optopt == 'a') || (optopt == 'p'))
+                fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+#endif
             else if (isprint (optopt))
                 fprintf (stderr, "Unknown option `-%c'.\n", optopt);
             else
@@ -84,9 +117,18 @@ int main(int argc,char ** argv)
             default: return false;
         }
     }
+    QString inDevice;
+    uint parameter;
+#ifdef SERIAL
+    inDevice = serialDevice;
+    parameter = initialBaudrate;
+#else
+    inDevice = tcpAddress;
+    parameter = tcpPort;
+#endif
 
     QApplication application(argc,argv);
-    PowerManagementGui powerManagementGui(inPort,initialBaudrate);
+    PowerManagementGui powerManagementGui(inDevice,parameter);
     if (powerManagementGui.success())
     {
         powerManagementGui.show();

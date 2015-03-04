@@ -45,16 +45,6 @@
     <string/>
    </property>
   </widget>
-  <widget class="QSpinBox" name="displayfrequencySpinBox">
-   <property name="geometry">
-    <rect>
-     <x>553</x>
-     <y>543</y>
-     <width>61</width>
-     <height>23</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="battery1Charge">
    <property name="geometry">
     <rect>
@@ -93,32 +83,6 @@
    </property>
    <property name="text">
     <string>Battery 1 Charge</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="displayFreqLabel">
-   <property name="geometry">
-    <rect>
-     <x>523</x>
-     <y>513</y>
-     <width>121</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Display Frequency</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="displayIntervalLabel">
-   <property name="geometry">
-    <rect>
-     <x>623</x>
-     <y>547</y>
-     <width>64</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>0.1 sec</string>
    </property>
   </widget>
   <widget class="QLabel" name="battery2ChargeLabel">
@@ -1876,7 +1840,7 @@
   <widget class="QPushButton" name="connectButton">
    <property name="geometry">
     <rect>
-     <x>284</x>
+     <x>378</x>
      <y>510</y>
      <width>89</width>
      <height>27</height>
@@ -2036,7 +2000,20 @@
   <widget class="QComboBox" name="sourceComboBox">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>168</x>
+     <y>510</y>
+     <width>121</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Source of data stream</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="baudrateComboBox">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
      <y>510</y>
      <width>87</width>
      <height>29</height>
@@ -2046,17 +2023,58 @@
     <string>Source of data stream</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="sourceLineEdit">
+  <widget class="QLineEdit" name="tcpPortEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>378</x>
+     <x>292</x>
+     <y>510</y>
+     <width>79</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>TCP Port to connect to server.</string>
+   </property>
+   <property name="text">
+    <string>6666</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="tcpAddressEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>178</x>
      <y>510</y>
      <width>113</width>
      <height>25</height>
     </rect>
    </property>
    <property name="text">
-    <string>/dev/ttyUSB0</string>
+    <string>192.168.2.14</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="serialTCPCheckBox">
+   <property name="geometry">
+    <rect>
+     <x>476</x>
+     <y>510</y>
+     <width>71</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string>Serial</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

@@ -65,46 +65,47 @@ socat /dev/ttyUSB0,echo=0,ispeed=115200,ospeed=115200,raw tcp-l:6666,reuseaddr,f
 @param[in] parent Parent widget.
 */
 
-PowerManagementGui::PowerManagementGui(QString inPort, uint baudrate,
+PowerManagementGui::PowerManagementGui(QString device, uint parameter,
                                        QWidget* parent) : QDialog(parent)
 {
+// Build the User Interface display from the Ui class in ui_mainwindowform.h
     PowerManagementMainUi.setupUi(this);
     initMainWindow(PowerManagementMainUi);
 
     saveFile.clear();
     response.clear();
 
-#ifdef SERIAL
-/* Create serial port */
-    socket = new SerialPort(inPort);
-    PowerManagementMainUi.connectButton->setEnabled(false);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
-// Attempt to initialise the serial port with the default setting
-    synchronized = false;
-    if (socket->initPort(baudrate,100))
-        synchronized = true;
-    else
-        errorMessage = QString("Unable to access the serial port\n"
-                            "Check the connections and power.\n"
-                            "You may need root privileges?");
-#else
-// Query the socket to establish a connection
-    connectAddress = "192.168.2.14";
-    connectPort = 6666;
     socket = NULL;
+#ifdef SERIAL
+    baudrate = parameter;
+    serialDevice = device;
+/* Create serial port if it has been specified, otherwise leave to the GUI. */
     on_connectButton_clicked();
+#else
+// Query the TCP socket to establish a connection
+    connectAddress = device;
+    connectPort = parameter;
+/* Open TCP port if it has been specified, otherwise leave to the GUI. */
+    if (! connectAddress.isEmpty()) on_connectButton_clicked();
 #endif
+    if (socket != NULL)
+    {
 /* Turn on microcontroller communications */
-    socket->write("pc+\n\r");
+        socket->write("pc+\n\r");
 /* This should cause the microcontroller to respond with all data */
-    socket->write("dS\n\r");
+        socket->write("dS\n\r");
+    }
 }
 
 PowerManagementGui::~PowerManagementGui()
 {
 /* Turn off microcontroller communications */
-    socket->write("pc-\n\r");
-    delete socket;
+    if (socket != NULL)
+    {
+        socket->write("pc-\n\r");
+        delete socket;
+        socket = NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -112,12 +113,6 @@ PowerManagementGui::~PowerManagementGui()
 
 void PowerManagementGui::initMainWindow(Ui::PowerManagementMainDialog mainWindow)
 {
-// Build the User Interface display from the Ui class in ui_mainwindowform.h
-    mainWindow.sourceComboBox->addItem("Serial");
-    mainWindow.sourceComboBox->addItem("TCP/IP");
-    mainWindow.sourceComboBox->setCurrentIndex(0);    //Serial Default
-    mainWindow.sourceLineEdit->setText("/dev/ttyUSB0");
-
 // Uncheck all buttons in case the microcontroller doesn't respond.
     mainWindow.load1Battery1->setAutoExclusive(false);
     mainWindow.load1Battery1->setChecked(false);
@@ -180,6 +175,64 @@ void PowerManagementGui::initMainWindow(Ui::PowerManagementMainDialog mainWindow
         setStyleSheet("background-color:lightpink;");
     mainWindow.battery3SoCReset->
         setText("R");
+
+#ifdef SERIAL
+    mainWindow.tcpAddressEdit->setEnabled(false);
+    mainWindow.tcpAddressEdit->hide();
+    mainWindow.tcpPortEdit->setEnabled(false);
+    mainWindow.tcpPortEdit->hide();
+    mainWindow.sourceComboBox->setEnabled(true);
+    mainWindow.sourceComboBox->show();
+    mainWindow.sourceComboBox->raise();
+    mainWindow.baudrateComboBox->setEnabled(true);
+    mainWindow.baudrateComboBox->show();
+    mainWindow.baudrateComboBox->raise();
+#else
+    mainWindow.sourceComboBox->setEnabled(false);
+    mainWindow.sourceComboBox->hide();
+    mainWindow.baudrateComboBox->setEnabled(false);
+    mainWindow.baudrateComboBox->hide();
+    mainWindow.tcpAddressEdit->setEnabled(true);
+    mainWindow.tcpAddressEdit->show();
+    mainWindow.tcpAddressEdit->raise();
+    mainWindow.tcpPortEdit->setEnabled(true);
+    mainWindow.tcpPortEdit->show();
+    mainWindow.tcpPortEdit->raise();
+#endif
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Initialize the Serial Combo Box Items
+
+This queries the serial devices in /dev and fills in the source combo box
+with likely candidates. The default is /dev/ttyUSB0.
+*/
+
+void PowerManagementGui::setSourceComboBox()
+{
+    QString serialDevice;
+    PowerManagementMainUi.sourceComboBox->clear();
+    PowerManagementMainUi.sourceComboBox->insertItem(0,"/dev/ttyS0");
+    for (int i=3; i>=0; i--)
+    {
+        serialDevice = "/dev/ttyACM"+QString::number(i);
+        QFileInfo checkACMFile(serialDevice);
+        if (checkACMFile.exists())
+            PowerManagementMainUi.sourceComboBox->insertItem(0,serialDevice);
+    }
+    for (int i=3; i>=0; i--)
+    {
+        serialDevice = "/dev/ttyUSB"+QString::number(i);
+        QFileInfo checkUSBFile(serialDevice);
+        if (checkUSBFile.exists())
+            PowerManagementMainUi.sourceComboBox->insertItem(0,serialDevice);
+    }
+    PowerManagementMainUi.sourceComboBox->setCurrentIndex(0);
+
+    QStringList baudrates;
+    baudrates << "2400" << "4800" << "9600" << "19200" << "38400" << "57600" << "115200";
+    PowerManagementMainUi.baudrateComboBox->addItems(baudrates);
+    PowerManagementMainUi.baudrateComboBox->setCurrentIndex(DEFAULT_BAUDRATE);
 }
 
 //-----------------------------------------------------------------------------
@@ -1814,10 +1867,6 @@ void PowerManagementGui::ssleep(int centiseconds)
 }
 
 //-----------------------------------------------------------------------------
-// TCP specific functions
-
-#ifndef SERIAL
-//-----------------------------------------------------------------------------
 /** @brief Check if a socket is valid, that is, connected.
 */
 bool PowerManagementGui::validsocket()
@@ -1837,37 +1886,70 @@ bool PowerManagementGui::validsocket()
 //-----------------------------------------------------------------------------
 /** @brief Attempt to connect to the remote system.
 
+For serial, if opening the port is successful, connect to the slot, otherwise
+delete the socket.
 */
 void PowerManagementGui::on_connectButton_clicked()
 {
-    if (socket != NULL) delete socket;
+#ifdef SERIAL
+    if (socket == NULL)
+    {
+        socket = new SerialPort(serialDevice);
+        if (socket->initPort(baudrate,100))
+        {
+            connect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
+            PowerManagementMainUi.connectButton->setText("Disconnect");
+        }
+        else
+        {
+            delete socket;
+            socket = NULL;
+            displayErrorMessage("Unable to connect to serial port");
+        }
+    }
+    else
+    {
+        disconnect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
+        delete socket;
+        socket = NULL;
+        PowerManagementMainUi.connectButton->setText("Connect");
+    }
+    setSourceComboBox();
+#else
+    if (socket == NULL)
+    {
 // Create the TCP socket to the internet process
-    socket = new QTcpSocket(this);
+        socket = new QTcpSocket(this);
 // Setup QT signal/slots for reading and error handling
 // The readyRead signal from the QAbstractSocket is linked to the onDataAvailable slot
-    connect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
+        connect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
 // Connect to the host
-    blockSize = 0;
-// Pull in all the information table
-    QMessageBox msgBox;
-    msgBox.open();
-    msgBox.setText("Attempting to connect. Please wait.");
-    int count;
-    for (count=0; count<100;count++)
-    {
-        ssleep(1);
-        socket->abort();
-        socket->connectToHost(connectAddress, connectPort);
-        if (socket->waitForConnected(1000)) break;
+        blockSize = 0;
+        QMessageBox msgBox;
+        msgBox.open();
+        msgBox.setText("Attempting to connect. Please wait.");
+        int count;
+        for (count=0; count<100;count++)
+        {
+            ssleep(1);
+            socket->abort();
+            socket->connectToHost(connectAddress, connectPort);
+            if (socket->waitForConnected(1000)) break;
+        }
+        if (count >= 100) 
+        {
+            msgBox.setText("Timeout while attempting to access remote system.");
+            ssleep(20);
+        }
+        msgBox.close();
+        PowerManagementMainUi.connectButton->setText("Disconnect");
     }
-    if (count >= 100) 
+    else
     {
-        msgBox.setText("Timeout while attempting to access remote system.");
-        ssleep(20);
+        disconnect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
+        delete socket;
+        socket = NULL;
+        PowerManagementMainUi.connectButton->setText("Connect");
     }
-    msgBox.close();
-// Ask for the remote system switch settings (process later)
-    if (validsocket()) socket->write("dS\n\r");
-}
 #endif
-
+}
