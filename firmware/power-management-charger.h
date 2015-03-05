@@ -29,24 +29,6 @@ Initial 18 October 2013
 #ifndef POWER_MANAGEMENT_CHARGER_H_
 #define POWER_MANAGEMENT_CHARGER_H_
 
-/* SoC above which charging is stopped in float phase */
-#define FLOAT_BULK_SOC  95*256
-
-/* Time to wait before passing to float. 2 hours, in seconds. */
-#define FLOAT_DELAY     7200
-
-/* Minimum time that the battery is in a rest phase, in seconds. */
-#define REST_TIME 30
-
-/* Minimum time that the battery is in the absorption phase, in seconds. */
-#define ABSORPTION_TIME 90
-
-/* This defines the lowest the duty cycle is allowed to go as it may not recover
-when it needs to be raised. Check that the duty cycle reduction doesn't
-cause duty cycle to go to zero at any time. The lower this is, the longer
-it will take the duty cycle to rise in response to changes. */
-#define MIN_DUTYCYCLE   256
-
 #include <stdint.h>
 #include <stdbool.h>
 

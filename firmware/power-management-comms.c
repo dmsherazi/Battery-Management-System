@@ -273,14 +273,6 @@ released. The command is followed by an interface number 0-5 being batteries
                 else if (line[2] == '+') configData.config.autoTrack = true;
                 break;
             }
-/* Anxx Set battery absorption voltage limit, n is battery, xx is limit */
-        case 'A':
-            {
-                if (battery < 3)
-                    configData.config.absorptionVoltage[battery] =
-                        asciiToInt((char*)line+3);
-                break;
-            }
 /* c-, c+ Turn communications sending on or off */
         case 'c':
             {
@@ -301,31 +293,7 @@ released. The command is followed by an interface number 0-5 being batteries
                 if (line[2] == '-') configData.config.debugMessageSend = false;
                 break;
             }
-/* Dxx Set charger duty cycle (debug only) */
-        case 'D':
-            {
-                uint8_t dutyCycle = asciiToInt((char*)line+2);
-                if (dutyCycle > 99) dutyCycle = 99;
-                pwmSetDutyCycle(dutyCycle);
-                break;
-            }
-/* fnxx Set battery float current trigger, n is battery, xx is trigger */
-        case 'f':
-            {
-                if (battery < 3)
-                    configData.config.floatStageCurrentScale[battery] =
-                        asciiToInt((char*)line+3);
-                break;
-            }
-/* Fnxx Set battery float voltage limit, n is battery, xx is limit */
-        case 'F':
-            {
-                if (battery < 3)
-                    configData.config.floatVoltage[battery] =
-                        asciiToInt((char*)line+3);
-                break;
-            }
-/* Hxx Set time from an ISO formatted string. */
+/* Hxx Set time from an ISO 8601 formatted string. */
         case 'H':
             {
                 setTimeFromString((char*)line+2);
@@ -361,19 +329,8 @@ released. The command is followed by an interface number 0-5 being batteries
                     configData.config.recording = true;
                 break;
             }
-/* sn Set monitor strategy byte n for keeping isolation or avoiding loading
-the battery under charge. */
-        case 's':
-            {
-                configData.config.monitorStrategy = asciiToInt((char*)line+3);
-                break;
-            }
-/* Sn Set charging algorithm and reset the algorithm if different to current one
-(now obsolete as only one algorithm is used). */
-        case 'S':
-            {
-                break;
-            }
+/*--------------------*/
+/* BATTERY parameters */
 /* Tntxx Set battery type and capacity, n is battery, t is type, xx is capacity */
         case 'T':
             {
@@ -389,6 +346,95 @@ the battery under charge. */
                         setBatteryChargeParameters(battery);
                     }
                 }
+                break;
+            }
+/* Anxx Set battery gassing voltage limit, n is battery, xx is limit */
+        case 'A':
+            {
+                if (battery < 3)
+                    configData.config.absorptionVoltage[battery] =
+                        asciiToInt((char*)line+3);
+                break;
+            }
+/* fnxx Set battery float current trigger, n is battery, xx is trigger */
+        case 'f':
+            {
+                if (battery < 3)
+                    configData.config.floatStageCurrentScale[battery] =
+                        asciiToInt((char*)line+3);
+                break;
+            }
+/* Fnxx Set battery float voltage limit, n is battery, xx is limit */
+        case 'F':
+            {
+                if (battery < 3)
+                    configData.config.floatVoltage[battery] =
+                        asciiToInt((char*)line+3);
+                break;
+            }
+/*--------------------*/
+/* MONITOR parameters */
+/* sn Set monitor strategy byte n for keeping isolation or avoiding loading
+the battery under charge. */
+        case 's':
+            {
+                configData.config.monitorStrategy = asciiToInt((char*)line+2);
+                break;
+            }
+/* vx set low voltage threshold, x is voltage times 256. */
+        case 'v':
+            {
+                configData.config.lowVoltage = asciiToInt((char*)line+2);
+                break;
+            }
+/* Vx set critical voltage threshold, x is voltage times 256. */
+        case 'V':
+            {
+                configData.config.criticalVoltage = asciiToInt((char*)line+2);
+                break;
+            }
+/* xx set low SoC threshold, x is voltage times 256. */
+        case 'x':
+            {
+                configData.config.lowSoC = asciiToInt((char*)line+2);
+                break;
+            }
+/* Xx set critical SoC threshold, x is voltage times 256. */
+        case 'X':
+            {
+                configData.config.criticalSoC = asciiToInt((char*)line+2);
+                break;
+            }
+/*--------------------*/
+/* CHARGER parameters */
+/* Rx set charger algorithm minimum rest time in seconds. */
+        case 'R':
+            {
+                configData.config.restTime = asciiToInt((char*)line+2);
+                break;
+            }
+/* Ax set charger algorithm minimum gassing phase time in seconds.. */
+        case 'G':
+            {
+                configData.config.absorptionTime = asciiToInt((char*)line+2);
+                break;
+            }
+/* Dx set charger minimum duty cycle. */
+        case 'D':
+            {
+                configData.config.minDutyCycle = asciiToInt((char*)line+2);
+                break;
+            }
+/* Fx set charger time to float in seconds. */
+        case 'e':
+            {
+                configData.config.floatTime = asciiToInt((char*)line+2);
+                break;
+            }
+/* Bx set charger SoC to change float to bulk. */
+        case 'B':
+            {
+                configData.config.floatBulkSoC = asciiToInt((char*)line+2);
                 break;
             }
         }

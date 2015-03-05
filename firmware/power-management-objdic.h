@@ -68,6 +68,12 @@ struct Config
 {
 /* Valid data block indicator */
     uint8_t validBlock;
+/* Communications Control Variables */
+    bool enableSend;            /* Any communications transmission occurs */
+    bool measurementSend;       /* Measurements are transmitted */
+    bool debugMessageSend;      /* Debug messages are transmitted */
+/* Recording Control Variables */
+    bool recording;             /* Recording of performance data */
 /* Battery characteristics and model parameters */
     uint16_t batteryCapacity[NUM_BATS];
     battery_Type batteryType[NUM_BATS];
@@ -78,16 +84,20 @@ struct Config
     int16_t alphaR;         /* forgetting factor for battery resistance estimator */
     int16_t alphaV;         /* forgetting factor for battery voltage smoothing */
     int16_t alphaC;         /* forgetting factor for battery current smoothing */
-/* Communications Control Variables */
-    bool enableSend;            /* Any communications transmission occurs */
-    bool measurementSend;       /* Measurements are transmitted */
-    bool debugMessageSend;      /* Debug messages are transmitted */
-/* Recording Control Variables */
-    bool recording;             /* Recording of performance data */
 /* Tracking Control Variables */
     bool autoTrack;             /* Automatic management of batteries */
     uint8_t monitorStrategy;    /* Bitmap of monitoring strategies (see monitor header). */
     uint8_t panelSwitchSetting; /* Global value of the panel switch setting */
+    int16_t lowVoltage;         /* Low voltage threshold */
+    int16_t criticalVoltage;    /* Critical voltage threshold */
+    int16_t lowSoC;             /* Low SoC threshold */
+    int16_t criticalSoC;        /* Critical SoC threshold */
+    int16_t floatBulkSoC;       /* SoC to change from flat back to bulk phase */
+/* Charger Control Variables */
+    int16_t restTime;           /* Minimum time to rest battery under charge */
+    int16_t absorptionTime;     /* Minimum time for battery to stay in absorption phase */
+    int16_t minDutyCycle;       /* Minimum PWM duty cycle */
+    int16_t floatTime;          /* Time before battery placed in float phase */
 /* Delay Variables */
     portTickType watchdogDelay;
     portTickType chargerDelay;

@@ -51,6 +51,38 @@ Note these definitions cannot be placed in the header file.
 /* Delay to allow measurements to settle during the calibration sequence (1ms ticks) */
 #define CALIBRATION_DELAY           ((portTickType)4096/portTICK_RATE_MS)
 
+/*--------------------------------------------------------------------------*/
+/* Battery default parameters */
+#define BATTERY_CAPACITY_1  54
+#define BATTERY_CAPACITY_2  54
+#define BATTERY_CAPACITY_3  54
+#define BATTERY_TYPE_1      wetT
+#define BATTERY_TYPE_2      wetT
+#define BATTERY_TYPE_3      wetT
+/*--------------------------------------------------------------------------*/
+/* Battery state default triggers. */
+/* These depend on the electronic component values (see measurement header). */
+#define LOW_VOLTAGE         2816    /* 11.0V */
+#define CRITICAL_VOLTAGE    2688    /* 10.5V */
+#define LOW_SOC             60*256   /* 60% */
+#define CRITICAL_SOC        45*256   /* 45% */
+/*--------------------------------------------------------------------------*/
+/* Charger algorithm default parameters */
+/* Minimum time that the battery is in a rest phase, in seconds. */
+#define REST_TIME 30
+/* Minimum time that the battery is in the absorption phase, in seconds. */
+#define ABSORPTION_TIME 90
+/* This defines the lowest the duty cycle is allowed to go as it may not recover
+when it needs to be raised. Check that the duty cycle reduction doesn't
+cause duty cycle to go to zero at any time. The lower this is, the longer
+it will take the duty cycle to rise in response to changes. */
+#define MIN_DUTYCYCLE   256
+/* Time to wait before passing to float. 2 hours, in seconds. */
+#define FLOAT_DELAY     7200
+/* SoC above which charging is stopped in float phase */
+#define FLOAT_BULK_SOC  95*256
+
+/*--------------------------------------------------------------------------*/
 /* Preset the config data block in FLASH to a given pattern to indicate unused. */
 union ConfigGroup configDataBlock __attribute__ ((section (".configBlock"))) = {{0xA5}};
 union ConfigGroup configData;
@@ -69,29 +101,39 @@ void setGlobalDefaults(void)
     flashReadData((uint32_t*)configDataBlock.data,
                    configData.data,sizeof(configData.config));
     if (configData.config.validBlock == VALID_BLOCK) return;
-/* Set default battery parameters */
-    configData.config.batteryCapacity[0] = 54;
-    configData.config.batteryCapacity[1] = 54;
-    configData.config.batteryCapacity[2] = 54;
-    configData.config.batteryType[0] = wetT;
-    configData.config.batteryType[1] = wetT;
-    configData.config.batteryType[2] = wetT;
-    configData.config.alphaR = 100;             /* about 0.4 */
-    configData.config.alphaV = 256;             /* No Filter */
-    configData.config.alphaC = 180;     /* about 0.7, for detecting float state. */
-    uint8_t i=0;
-    for (i=0; i<NUM_BATS; i++) setBatteryChargeParameters(i);
-    for (i=0; i<NUM_IFS; i++) setCurrentOffset(i,0);    /* Zero current offsets. */
 /* Set default communications control variables */
     configData.config.measurementSend = true;
     configData.config.debugMessageSend = false;
     configData.config.enableSend = false;
 /* Set default recording control variables */
     configData.config.recording = false;
+/* Set default battery parameters */
+    configData.config.batteryCapacity[0] = BATTERY_CAPACITY_1;
+    configData.config.batteryCapacity[1] = BATTERY_CAPACITY_2;
+    configData.config.batteryCapacity[2] = BATTERY_CAPACITY_3;
+    configData.config.batteryType[0] = BATTERY_TYPE_1;
+    configData.config.batteryType[1] = BATTERY_TYPE_2;
+    configData.config.batteryType[2] = BATTERY_TYPE_3;
+    configData.config.alphaR = 100;             /* about 0.4 */
+    configData.config.alphaV = 256;             /* No Filter */
+    configData.config.alphaC = 180;     /* about 0.7, for detecting float state. */
+    uint8_t i=0;
+    for (i=0; i<NUM_BATS; i++) setBatteryChargeParameters(i);
+    for (i=0; i<NUM_IFS; i++) setCurrentOffset(i,0);    /* Zero current offsets. */
 /* Set default tracking parameters */
     configData.config.autoTrack = false;    /* Don't track unless instructed */
     configData.config.monitorStrategy = 0xFF;   /* All strategies on */
     configData.config.panelSwitchSetting = 0;
+    configData.config.lowVoltage = LOW_VOLTAGE;
+    configData.config.criticalVoltage = CRITICAL_VOLTAGE;
+    configData.config.lowSoC = LOW_SOC;
+    configData.config.criticalSoC = CRITICAL_SOC;
+    configData.config.floatBulkSoC = FLOAT_BULK_SOC;
+/* Set default charging parameters */
+    configData.config.restTime = REST_TIME;
+    configData.config.absorptionTime = ABSORPTION_TIME;
+    configData.config.minDutyCycle = MIN_DUTYCYCLE ;
+    configData.config.floatTime = FLOAT_DELAY;
 /* Set default system control variables */
     configData.config.watchdogDelay = WATCHDOG_DELAY;
     configData.config.chargerDelay = CHARGER_DELAY;

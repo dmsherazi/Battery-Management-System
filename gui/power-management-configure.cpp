@@ -219,7 +219,7 @@ void PowerManagementConfigGui::on_setChargeOptionButton_clicked()
     socket->write(command.append(QString("%1").arg(restTime,2)).append("\n\r")
                          .toAscii().constData());
     int absorptionTime = PowerManagementConfigUi.absorptionTimeSpinBox->value();
-    command = "pA";
+    command = "pG";
     socket->write(command.append(QString("%1").arg(absorptionTime,2)).append("\n\r")
                          .toAscii().constData());
     int dutyCycleMin = PowerManagementConfigUi.minimumDutyCycleSpinBox->value();
@@ -227,7 +227,7 @@ void PowerManagementConfigGui::on_setChargeOptionButton_clicked()
     socket->write(command.append(QString("%1").arg(dutyCycleMin,2)).append("\n\r")
                          .toAscii().constData());
     int floatTime = PowerManagementConfigUi.floatDelaySpinBox->value();
-    command = "pF";
+    command = "pe";
     socket->write(command.append(QString("%1").arg(floatTime,2)).append("\n\r")
                          .toAscii().constData());
     int floatSoC = PowerManagementConfigUi.floatBulkSoCSpinBox->value();

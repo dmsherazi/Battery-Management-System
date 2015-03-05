@@ -64,9 +64,18 @@ Initial 29 September 2013
 #include "power-management-charger.h"
 #include "power-management-monitor.h"
 
+/*--------------------------------------------------------------------------*/
 /* Local Prototypes */
 static void initGlobals(void);
 
+/*--------------------------------------------------------------------------*/
+/* Global Variables */
+/* These configuration variables are part of the Object Dictionary. */
+/* This is defined in power-management-objdic and is updated in response to
+received messages. */
+extern union ConfigGroup configData;
+
+/*--------------------------------------------------------------------------*/
 /* Local Persistent Variables */
 static uint8_t monitorWatchdogCount;
 static bool calibrate;
@@ -345,10 +354,11 @@ the SoC. Maximum charge is the battery capacity in ampere seconds. */
 /* Collect battery charge fill state estimations. */
                 uint16_t batteryAbsVoltage = abs(getBatteryVoltage(i));
                 batteryFillState[i] = normalF;
-                if ((batteryAbsVoltage < LOW_VOLTAGE) || (batterySoC[i] < LOW_SOC))
+                if ((batteryAbsVoltage < configData.config.lowVoltage) ||
+                    (batterySoC[i] < configData.config.lowSoC))
                     batteryFillState[i] = lowF;
-                else if ((batteryAbsVoltage < CRITICAL_VOLTAGE) ||
-                         (batterySoC[i] < CRITICAL_SOC))
+                else if ((batteryAbsVoltage < configData.config.criticalVoltage) ||
+                         (batterySoC[i] < configData.config.criticalSoC))
                     batteryFillState[i] = criticalF;
             }
         }
@@ -413,7 +423,7 @@ panel. */
 /* Change each battery to bulk phase if it is in float phase and the SoC drops
 below a charging restart threshold (nominally 95%). */
             if ((getBatteryChargingPhase(i) == floatC) &&
-                (getBatterySoC(i) < FLOAT_BULK_SOC))
+                (getBatterySoC(i) < configData.config.floatBulkSoC))
                 setBatteryChargingPhase(i,bulkC);
         }
 
@@ -422,7 +432,7 @@ or in rest phase, deallocate battery to allow algorithms to find another. */
         if (batteryUnderCharge > 0)
         {
             bool floatPhase = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
-                     && (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC));
+                     && (batterySoC[batteryUnderCharge-1] > configData.config.floatBulkSoC));
             bool restPhase = (getBatteryChargingPhase(batteryUnderCharge-1) == restC);
             if (floatPhase || restPhase)
             {
@@ -438,7 +448,7 @@ or in rest phase, deallocate battery to allow algorithms to find another. */
             batteryUnderLoad = batteryFillStateSort[0];
 /* If the battery is in float and higher than 95%, stop charging */
             bool floatPhase = ((getBatteryChargingPhase(batteryUnderCharge-1) == floatC)
-                     && (batterySoC[batteryUnderCharge-1] > FLOAT_CHARGE_SOC));
+                     && (batterySoC[batteryUnderCharge-1] > configData.config.floatBulkSoC));
             if (floatPhase)
             {
                 decisionStatus |= 0x02;
@@ -458,7 +468,7 @@ not in float state with SoC > 95%, nor in rest phase. */
                 {
                     uint8_t index = batteryFillStateSort[numBats-i-1]-1;
                     bool floatPhase = ((getBatteryChargingPhase(index) == floatC)
-                             && (batterySoC[index] > FLOAT_CHARGE_SOC));
+                             && (batterySoC[index] > configData.config.floatBulkSoC));
                     bool restPhase = (getBatteryChargingPhase(index) == restC);
                     if (!(floatPhase || restPhase))
                     {
@@ -518,7 +528,7 @@ battery is found leave the charger unallocated. */
                     {
                         uint8_t battery = batteryFillStateSort[numBats-i-1];
                         bool floatPhase = ((getBatteryChargingPhase(battery-1) == floatC)
-                                 && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
+                                 && (batterySoC[battery-1] > configData.config.floatBulkSoC));
                         bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
                         if (!(floatPhase || restPhase))
                         {
@@ -580,7 +590,7 @@ If no suitable battery is found leave the charger unallocated. */
                     {
                         uint8_t battery = batteryFillStateSort[numBats-i-1];
                         bool floatPhase = ((getBatteryChargingPhase(battery-1) == floatC)
-                                 && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
+                                 && (batterySoC[battery-1] > configData.config.floatBulkSoC));
                         bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
                         if (!(floatPhase || restPhase))
                         {
@@ -637,7 +647,7 @@ rest phases regardless in case the algorithm got the charge states wrong. */
                 {
                     uint8_t battery = batteryFillStateSort[numBats-i-1];
                     bool floatPhase = ((getBatteryChargingPhase(battery-1) == floatC)
-                             && (batterySoC[battery-1] > FLOAT_CHARGE_SOC));
+                             && (batterySoC[battery-1] > configData.config.floatBulkSoC));
                     bool restPhase = (getBatteryChargingPhase(battery-1) == restC);
                     if (!(floatPhase || restPhase))
                     {

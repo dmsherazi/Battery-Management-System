@@ -67,12 +67,21 @@ Initial 2 October 2014
 #include "power-management-monitor.h"
 #include "power-management-charger.h"
 
+/*--------------------------------------------------------------------------*/
 /* Local Prototypes */
 static void initGlobals(void);
 static void adaptDutyCycle(int16_t voltage, int16_t vLimit, uint16_t* dutyCycle);
 static void calculateAverageMeasures(uint8_t index);
 static int16_t voltageLimit(uint16_t limitV);
 
+/*--------------------------------------------------------------------------*/
+/* Global Variables */
+/* These configuration variables are part of the Object Dictionary. */
+/* This is defined in power-management-objdic and is updated in response to
+received messages. */
+extern union ConfigGroup configData;
+
+/*--------------------------------------------------------------------------*/
 /* Local Persistent Variables */
 static battery_Ch_States batteryChargingPhase[NUM_BATS];
 static uint8_t chargerWatchdogCount;
@@ -98,11 +107,11 @@ void prvChargerTask(void *pvParameters)
 
     initGlobals();
 
-    uint32_t minimumRestTime = (uint32_t)(REST_TIME*1024)/getChargerDelay();
-    uint32_t floatDelay = (uint32_t)(FLOAT_DELAY*1024)/getChargerDelay();
-
     while (1)
     {
+        uint32_t minimumRestTime = (uint32_t)(configData.config.restTime*1024)/getChargerDelay();
+        uint32_t floatDelay = (uint32_t)(configData.config.floatTime*1024)/getChargerDelay();
+
 /* Wait until the next tick cycle */
         vTaskDelay(getChargerDelay());
 /* Reset watchdog counter */
@@ -194,7 +203,7 @@ charging */
 /* At the end of the absorption period, if another battery has changed to bulk
 phase, pass to rest phase to allow some other battery to have its turn. This
 will take effect on the next cycle of the monitor task. */
-                if (absorptionPhaseTime[index] > ABSORPTION_TIME)
+                if (absorptionPhaseTime[index] > configData.config.absorptionTime)
                 {
                     for (i=0; i<NUM_BATS; i++)
                     {
@@ -258,7 +267,8 @@ This is done on the directly measured current for rapid response. */
 /* Set the duty cycle. */
 /* Never let duty cycle go too near zero else it will not recover. Set to a
 value that will allow it to grow again if needed (round-off error problem). */
-            if (dutyCycle[index] < MIN_DUTYCYCLE) dutyCycle[index] = MIN_DUTYCYCLE;
+            if (dutyCycle[index] < configData.config.minDutyCycle)
+                dutyCycle[index] = configData.config.minDutyCycle;
 
             uint16_t dutyCycleActual = dutyCycle[index];
 
