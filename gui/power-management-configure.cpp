@@ -65,6 +65,18 @@ PowerManagementConfigGui::PowerManagementConfigGui(QTcpSocket* tcpSocket, QWidge
 #endif
 // Build the User Interface display from the Ui class in ui_mainwindowform.h
     PowerManagementConfigUi.setupUi(this);
+    PowerManagementConfigUi.battery1AbsorptionCurrent->setDecimals(2);
+    PowerManagementConfigUi.battery2AbsorptionCurrent->setDecimals(2);
+    PowerManagementConfigUi.battery3AbsorptionCurrent->setDecimals(2);
+    PowerManagementConfigUi.battery1AbsorptionVoltage->setDecimals(2);
+    PowerManagementConfigUi.battery2AbsorptionVoltage->setDecimals(2);
+    PowerManagementConfigUi.battery3AbsorptionVoltage->setDecimals(2);
+    PowerManagementConfigUi.battery1FloatVoltage->setDecimals(2);
+    PowerManagementConfigUi.battery2FloatVoltage->setDecimals(2);
+    PowerManagementConfigUi.battery3FloatVoltage->setDecimals(2);
+    PowerManagementConfigUi.battery1FloatCurrent->setDecimals(2);
+    PowerManagementConfigUi.battery2FloatCurrent->setDecimals(2);
+    PowerManagementConfigUi.battery3FloatCurrent->setDecimals(2);
 // Set the calibrate progress bar to invisible
     PowerManagementConfigUi.calibrateProgressBar->setVisible(false);
     PowerManagementConfigUi.calibrateProgressBar->setValue(0);
@@ -467,38 +479,34 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
         case 'A':
         {
             if (size < 3) break;
-            QString absorptionVoltage = QString("%1 V").arg(breakdown[2]
-                                         .simplified().toFloat()/256,0,'f',2);
+            float absorptionVoltage = breakdown[2].simplified().toFloat()/256;
             float bulkCurrentScale = breakdown[1].simplified().toFloat();
             if (battery == '1')
             {
                 PowerManagementConfigUi.battery1AbsorptionVoltage
-                    ->setText(absorptionVoltage);
+                    ->setValue(absorptionVoltage);
                 float battery1Capacity = PowerManagementConfigUi.
                             battery1CapacitySpinBox->value();
                 PowerManagementConfigUi.battery1AbsorptionCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery1Capacity/bulkCurrentScale,0,'f',2));
+                    ->setValue(battery1Capacity/bulkCurrentScale);
             }
             else if (battery == '2')
             {
                 PowerManagementConfigUi.battery2AbsorptionVoltage
-                    ->setText(absorptionVoltage);
+                    ->setValue(absorptionVoltage);
                 float battery2Capacity = PowerManagementConfigUi.
                             battery2CapacitySpinBox->value();
                 PowerManagementConfigUi.battery2AbsorptionCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery2Capacity/bulkCurrentScale,0,'f',2));
+                    ->setValue(battery2Capacity/bulkCurrentScale);
             }
             else if (battery == '3')
             {
                 PowerManagementConfigUi.battery3AbsorptionVoltage
-                    ->setText(absorptionVoltage);
+                    ->setValue(absorptionVoltage);
                 float battery3Capacity = PowerManagementConfigUi.
                             battery3CapacitySpinBox->value();
                 PowerManagementConfigUi.battery3AbsorptionCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery3Capacity/bulkCurrentScale,0,'f',2));
+                    ->setValue(battery3Capacity/bulkCurrentScale);
             }
             break;
         }
@@ -506,38 +514,34 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
         case 'F':
         {
             if (size < 3) break;
-            QString floatVoltage = QString("%1 V").arg(breakdown[2]
-                                         .simplified().toFloat()/256,0,'f',2);
+            float floatVoltage = breakdown[2].simplified().toFloat()/256;
             float floatCurrentScale = breakdown[1].simplified().toFloat();
             if (battery == '1')
             {
                 PowerManagementConfigUi.battery1FloatVoltage
-                    ->setText(floatVoltage);
+                    ->setValue(floatVoltage);
                 float battery1Capacity = PowerManagementConfigUi.
                             battery1CapacitySpinBox->value();
                 PowerManagementConfigUi.battery1FloatCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery1Capacity/floatCurrentScale,0,'f',2));
+                    ->setValue(battery1Capacity/floatCurrentScale);
             }
             else if (battery == '2')
             {
                 PowerManagementConfigUi.battery2FloatVoltage
-                    ->setText(floatVoltage);
+                    ->setValue(floatVoltage);
                 float battery2Capacity = PowerManagementConfigUi.
                             battery2CapacitySpinBox->value();
                 PowerManagementConfigUi.battery2FloatCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery2Capacity/floatCurrentScale,0,'f',2));
+                    ->setValue(battery2Capacity/floatCurrentScale);
             }
             else if (battery == '3')
             {
                 PowerManagementConfigUi.battery3FloatVoltage
-                    ->setText(floatVoltage);
+                    ->setValue(floatVoltage);
                 float battery3Capacity = PowerManagementConfigUi.
                             battery3CapacitySpinBox->value();
                 PowerManagementConfigUi.battery3FloatCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery3Capacity/floatCurrentScale,0,'f',2));
+                    ->setValue(battery3Capacity/floatCurrentScale);
             }
             break;
         }
