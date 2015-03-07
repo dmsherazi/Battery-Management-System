@@ -772,6 +772,25 @@
       </rect>
      </property>
     </widget>
+    <widget class="QLabel" name="battery1Label_2">
+     <property name="geometry">
+      <rect>
+       <x>14</x>
+       <y>145</y>
+       <width>123</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="text">
+      <string>NOTE: All battery parameters must be entered before setting to flash.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="calibrationTab">
     <property name="toolTip">

@@ -173,6 +173,140 @@ void PowerManagementConfigGui::on_setBatteryButton_clicked()
 }
 
 //-----------------------------------------------------------------------------
+/** @brief Battery 1 type changed
+
+When the type is changed, update the corresponding battery parameters with
+defaults.
+
+Here there are two parameters assumed, the float scale which is the fractional
+C at which the trigger to float occurs, and the fractional C at which the bulk
+charge current is limited.
+*/
+
+void PowerManagementConfigGui::on_battery1TypeCombo_activated(int index)
+{
+qDebug() << "activated" << index;
+    int floatScale = 50;
+    int bulkScale = 5;
+    if (index == 0)
+    {
+        int capacity = PowerManagementConfigUi.battery1CapacitySpinBox->value();
+        PowerManagementConfigUi.battery1AbsorptionCurrent->
+                                setValue((float)(capacity/bulkScale));
+        PowerManagementConfigUi.battery1AbsorptionCurrent->setValue(14.5);
+        PowerManagementConfigUi.battery1FloatVoltage->setValue(13.2);
+        PowerManagementConfigUi.battery1FloatCurrent->
+                                setValue(capacity/(floatScale));
+    }
+    if (index == 1)
+    {
+        int capacity = PowerManagementConfigUi.battery2CapacitySpinBox->value();
+        PowerManagementConfigUi.battery1AbsorptionCurrent->
+                                setValue((float)(capacity/bulkScale));
+        PowerManagementConfigUi.battery1AbsorptionVoltage->setValue(14.6);
+        PowerManagementConfigUi.battery1FloatVoltage->setValue(13.6);
+        PowerManagementConfigUi.battery1FloatCurrent->
+                                setValue(capacity/(floatScale));
+    }
+    if (index == 2)
+    {
+        int capacity = PowerManagementConfigUi.battery3CapacitySpinBox->value();
+        PowerManagementConfigUi.battery1AbsorptionCurrent->
+                                setValue((float)(capacity/bulkScale));
+        PowerManagementConfigUi.battery1AbsorptionVoltage->setValue(14.1);
+        PowerManagementConfigUi.battery1FloatVoltage->setValue(13.8);
+        PowerManagementConfigUi.battery1FloatCurrent->
+                                setValue(capacity/(floatScale));
+    }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Battery 2 type changed
+
+When the type is changed, update the corresponding battery parameters with
+defaults.
+*/
+
+void PowerManagementConfigGui::on_battery2TypeCombo_activated(int index)
+{
+    int floatScale = 50;
+    int bulkScale = 5;
+    if (index == 0)
+    {
+        int capacity = PowerManagementConfigUi.battery1CapacitySpinBox->value();
+        PowerManagementConfigUi.battery2AbsorptionCurrent->
+                                setValue((float)(capacity/bulkScale));
+        PowerManagementConfigUi.battery2AbsorptionCurrent->setValue(14.5);
+        PowerManagementConfigUi.battery2FloatVoltage->setValue(13.2);
+        PowerManagementConfigUi.battery2FloatCurrent->
+                                setValue(capacity/(floatScale));
+    }
+    if (index == 1)
+    {
+        int capacity = PowerManagementConfigUi.battery2CapacitySpinBox->value();
+        PowerManagementConfigUi.battery2AbsorptionCurrent->
+                                setValue((float)(capacity/bulkScale));
+        PowerManagementConfigUi.battery2AbsorptionVoltage->setValue(14.6);
+        PowerManagementConfigUi.battery2FloatVoltage->setValue(13.6);
+        PowerManagementConfigUi.battery2FloatCurrent->
+                                setValue(capacity/(floatScale));
+    }
+    if (index == 2)
+    {
+        int capacity = PowerManagementConfigUi.battery3CapacitySpinBox->value();
+        PowerManagementConfigUi.battery2AbsorptionCurrent->
+                                setValue((float)(capacity/bulkScale));
+        PowerManagementConfigUi.battery2AbsorptionVoltage->setValue(14.1);
+        PowerManagementConfigUi.battery2FloatVoltage->setValue(13.8);
+        PowerManagementConfigUi.battery2FloatCurrent->
+                                setValue(capacity/(floatScale));
+    }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Battery 3 type changed
+
+When the type is changed, update the corresponding battery parameters with
+defaults.
+*/
+
+void PowerManagementConfigGui::on_battery3TypeCombo_activated(int index)
+{
+    int floatScale = 50;
+    int bulkScale = 5;
+    if (index == 0)
+    {
+        int capacity = PowerManagementConfigUi.battery1CapacitySpinBox->value();
+        PowerManagementConfigUi.battery3AbsorptionCurrent->
+                                setValue((float)(capacity/bulkScale));
+        PowerManagementConfigUi.battery3AbsorptionCurrent->setValue(14.5);
+        PowerManagementConfigUi.battery3FloatVoltage->setValue(13.2);
+        PowerManagementConfigUi.battery3FloatCurrent->
+                                setValue(capacity/(floatScale));
+    }
+    if (index == 1)
+    {
+        int capacity = PowerManagementConfigUi.battery2CapacitySpinBox->value();
+        PowerManagementConfigUi.battery3AbsorptionCurrent->
+                                setValue((float)(capacity/bulkScale));
+        PowerManagementConfigUi.battery3AbsorptionVoltage->setValue(14.6);
+        PowerManagementConfigUi.battery3FloatVoltage->setValue(13.6);
+        PowerManagementConfigUi.battery3FloatCurrent->
+                                setValue(capacity/(floatScale));
+    }
+    if (index == 2)
+    {
+        int capacity = PowerManagementConfigUi.battery3CapacitySpinBox->value();
+        PowerManagementConfigUi.battery3AbsorptionCurrent->
+                                setValue((float)(capacity/bulkScale));
+        PowerManagementConfigUi.battery3AbsorptionVoltage->setValue(14.1);
+        PowerManagementConfigUi.battery3FloatVoltage->setValue(13.8);
+        PowerManagementConfigUi.battery3FloatCurrent->
+                                setValue(capacity/(floatScale));
+    }
+}
+
+//-----------------------------------------------------------------------------
 /** @brief Set Tracking Strategy Options
 
 0x01 The option allowing or preventing loads connected to the charging battery.

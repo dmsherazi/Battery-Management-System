@@ -53,22 +53,25 @@ public:
     ~PowerManagementConfigGui();
     QString error();
 private slots:
-    void onMessageReceived(const QString &text);
-    void on_calibrateButton_clicked();
-    void on_queryBatteryButton_clicked();
     void on_timeSetButton_clicked();
-    void on_closeButton_clicked();
-    void on_setBatteryButton_clicked();
-    void displayErrorMessage(const QString message);
-    void on_setTrackOptionButton_clicked();
-    void on_setChargeOptionButton_clicked();
-    void on_absorptionMuteCheckbox_clicked();
     void on_debugMessageCheckbox_clicked();
     void on_dataMessageCheckbox_clicked();
     void on_echoTestButton_clicked();
+    void on_queryBatteryButton_clicked();
+    void on_closeButton_clicked();
+    void on_setBatteryButton_clicked();
+    void on_battery1TypeCombo_activated(int index);
+    void on_battery2TypeCombo_activated(int index);
+    void on_battery3TypeCombo_activated(int index);
     void on_resetMissing1Button_clicked();
     void on_resetMissing2Button_clicked();
     void on_resetMissing3Button_clicked();
+    void on_calibrateButton_clicked();
+    void on_setTrackOptionButton_clicked();
+    void on_setChargeOptionButton_clicked();
+    void on_absorptionMuteCheckbox_clicked();
+    void onMessageReceived(const QString &text);
+    void displayErrorMessage(const QString message);
 private:
 // User Interface object instance
     Ui::PowerManagementConfigDialog PowerManagementConfigUi;
