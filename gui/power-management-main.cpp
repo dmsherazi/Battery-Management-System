@@ -99,7 +99,7 @@ PowerManagementGui::PowerManagementGui(QString device, uint parameter,
 
 PowerManagementGui::~PowerManagementGui()
 {
-/* Turn off microcontroller communications */
+/* Turn off microcontroller communications to save power. */
     if (socket != NULL)
     {
         socket->write("pc-\n\r");

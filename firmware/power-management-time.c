@@ -48,7 +48,29 @@ void putTimeToString(char* timeString)
 {
     time_t currentTime = (time_t)getTimeCounter();
     struct tm *rtc = localtime(&currentTime);
-    strftime(timeString, sizeof timeString, "%FT%TZ", rtc);
+//    strftime(timeString, sizeof timeString, "%FT%TZ", rtc);
+    char buffer[10];
+    intToAscii(rtc->tm_year+1900, timeString);
+    stringAppend(timeString,"-");
+    if (rtc->tm_mon < 9) stringAppend(timeString,"0");
+    intToAscii(rtc->tm_mon+1, buffer);
+    stringAppend(timeString,buffer);
+    stringAppend(timeString,"-");
+    if (rtc->tm_mday < 10) stringAppend(timeString,"0");
+    intToAscii(rtc->tm_mday, buffer);
+    stringAppend(timeString,buffer);
+    stringAppend(timeString,"T");
+    if (rtc->tm_hour < 10) stringAppend(timeString,"0");
+    intToAscii(rtc->tm_hour, buffer);
+    stringAppend(timeString,buffer);
+    stringAppend(timeString,":");
+    if (rtc->tm_min < 10) stringAppend(timeString,"0");
+    intToAscii(rtc->tm_min, buffer);
+    stringAppend(timeString,buffer);
+    stringAppend(timeString,":");
+    if (rtc->tm_sec < 10) stringAppend(timeString,"0");
+    intToAscii(rtc->tm_sec, buffer);
+    stringAppend(timeString,buffer);
 }
 
 /*--------------------------------------------------------------------------*/
