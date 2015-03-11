@@ -148,25 +148,46 @@ Resistance, type and capacity of the batteries are set from the GUI values.
 
 void PowerManagementConfigGui::on_setBatteryButton_clicked()
 {
+    int battery1Capacity = PowerManagementConfigUi.battery1CapacitySpinBox
+                ->value();
+    int battery2Capacity = PowerManagementConfigUi.battery2CapacitySpinBox
+                ->value();
+    int battery3Capacity = PowerManagementConfigUi.battery3CapacitySpinBox
+                ->value();
+// Set type and capacity. Capacity is an integer unscaled.
     QString typeSet1 = "pT1";
     typeSet1.append(QString("%1").arg(PowerManagementConfigUi.battery1TypeCombo
                 ->currentIndex(),1));
-    typeSet1.append(QString("%1").arg(PowerManagementConfigUi.battery1CapacitySpinBox
-                ->value(),-0));
+    typeSet1.append(QString("%1").arg(battery1Capacity,-0));
     socket->write(typeSet1.append("\n\r").toAscii().constData());
     QString typeSet2 = "pT2";
     typeSet2.append(QString("%1").arg(PowerManagementConfigUi.battery2TypeCombo
                 ->currentIndex(),1));
-    typeSet2.append(QString("%1").arg(PowerManagementConfigUi.battery2CapacitySpinBox
-                ->value(),-0));
+    typeSet2.append(QString("%1").arg(battery2Capacity,-0));
     socket->write(typeSet2.append("\n\r").toAscii().constData());
     QString typeSet3 = "pT3";
     typeSet3.append(QString("%1").arg(PowerManagementConfigUi.battery3TypeCombo
                 ->currentIndex(),1));
-    typeSet3.append(QString("%1").arg(PowerManagementConfigUi.battery3CapacitySpinBox
-                ->value(),-0));
+    typeSet3.append(QString("%1").arg(battery3Capacity,-0));
     socket->write(typeSet3.append("\n\r").toAscii().constData());
-// Set gassing voltages
+/* Set bulk current limit scales. These are the scaling factors relating the
+battery capacity to the bulk current limit. */
+    QString bulkISet1 = "pI1";
+    bulkISet1.append(QString("%1")
+                .arg((unsigned int)(battery1Capacity/
+                 PowerManagementConfigUi.battery1AbsorptionCurrent->value()),-0));
+    socket->write(bulkISet1.append("\n\r").toAscii().constData());
+    QString bulkISet2 = "pI2";
+    bulkISet2.append(QString("%1")
+                .arg((unsigned int)(battery2Capacity/
+                 PowerManagementConfigUi.battery2AbsorptionCurrent->value()),-0));
+    socket->write(bulkISet2.append("\n\r").toAscii().constData());
+    QString bulkISet3 = "pI3";
+    bulkISet3.append(QString("%1")
+                .arg((unsigned int)(battery3Capacity/
+                 PowerManagementConfigUi.battery3AbsorptionCurrent->value()),-0));
+    socket->write(bulkISet3.append("\n\r").toAscii().constData());
+// Set gassing voltage limits
     QString gassingVSet1 = "pA1";
     gassingVSet1.append(QString("%1")
                 .arg((unsigned int)(PowerManagementConfigUi.battery1AbsorptionVoltage
@@ -182,7 +203,7 @@ void PowerManagementConfigGui::on_setBatteryButton_clicked()
                 .arg((unsigned int)(PowerManagementConfigUi.battery3AbsorptionVoltage
                 ->value()*256),-0));
     socket->write(gassingVSet3.append("\n\r").toAscii().constData());
-// Set float voltages
+// Set float voltage limits
     QString floatVSet1 = "pF1";
     floatVSet1.append(QString("%1")
                 .arg((unsigned int)(PowerManagementConfigUi.battery1FloatVoltage
@@ -200,12 +221,6 @@ void PowerManagementConfigGui::on_setBatteryButton_clicked()
     socket->write(floatVSet3.append("\n\r").toAscii().constData());
 /* Set float current scales. These are the scaling factors relating the
 battery capacity to the float current trigger. */
-    int battery1Capacity = PowerManagementConfigUi.battery1CapacitySpinBox
-                ->value();
-    int battery2Capacity = PowerManagementConfigUi.battery2CapacitySpinBox
-                ->value();
-    int battery3Capacity = PowerManagementConfigUi.battery3CapacitySpinBox
-                ->value();
     QString floatISet1 = "pf1";
     floatISet1.append(QString("%1")
                 .arg((unsigned int)(battery1Capacity/
@@ -306,7 +321,7 @@ void PowerManagementConfigGui::on_battery2TypeCombo_activated(int index)
     {
         PowerManagementConfigUi.battery2AbsorptionCurrent->
                                 setValue((float)capacity/bulkScale);
-        PowerManagementConfigUi.battery2AbsorptionCurrent->setValue(14.5);
+        PowerManagementConfigUi.battery2AbsorptionVoltage->setValue(14.5);
         PowerManagementConfigUi.battery2FloatVoltage->setValue(13.2);
         PowerManagementConfigUi.battery2FloatCurrent->
                                 setValue((float)capacity/floatScale);

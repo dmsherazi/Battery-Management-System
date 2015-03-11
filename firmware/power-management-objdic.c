@@ -240,7 +240,7 @@ int16_t getAlphaR(void)
 }
 
 /*--------------------------------------------------------------------------*/
-/** @brief Provide the Current Offset
+/** @brief Provide the Current Offset for A/D measurements
 
 @parameter uint8_t interface: the interface 0...NUM_IFS.
 */
@@ -251,7 +251,7 @@ int16_t getCurrentOffset(uint8_t interface)
 }
 
 /*--------------------------------------------------------------------------*/
-/** @brief Set the Current Offset
+/** @brief Set the Current Offset for A/D measurements
 
 @parameter uint8_t interface: the interface 0...NUM_IFS.
 @parameter uint16_t current offset value
