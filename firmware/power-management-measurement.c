@@ -140,8 +140,8 @@ temperature */
             av[12] += adcValue(12);
         }
 
-/* Process the averaged results */
-/* Compute averages from the burst, scale and offset to the real quantities,
+/* Process the averaged results. */
+/* Compute averages from the burst; scale and offset to the real quantities;
 and reset the averages for the next cycle. */
         for (i=0; i<NUM_IFS; i++)
         {
