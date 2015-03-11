@@ -240,10 +240,12 @@ released. The command is followed by an interface number 0-5 being batteries
                 dataMessageSend(id,(int32_t)configData.config.batteryType[battery],
                                    (int32_t)configData.config.batteryCapacity[battery]);
                 id[1] = 'F';
-                dataMessageSend(id,(int32_t)configData.config.floatStageCurrentScale[battery],
+                dataMessageSend(id,(int32_t)configData.config.
+                                                floatStageCurrentScale[battery],
                                    (int32_t)configData.config.floatVoltage[battery]);
                 id[1] = 'A';
-                dataMessageSend(id,(int32_t)configData.config.bulkCurrentLimitScale[battery],
+                dataMessageSend(id,(int32_t)configData.config.
+                                                bulkCurrentLimitScale[battery],
                                    (int32_t)configData.config.absorptionVoltage[battery]);
                 break;
             }

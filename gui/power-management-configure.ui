@@ -557,7 +557,7 @@
       <rect>
        <x>472</x>
        <y>285</y>
-       <width>133</width>
+       <width>149</width>
        <height>17</height>
       </rect>
      </property>
@@ -570,7 +570,7 @@
       <rect>
        <x>472</x>
        <y>325</y>
-       <width>143</width>
+       <width>163</width>
        <height>17</height>
       </rect>
      </property>
@@ -661,6 +661,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Current limit in bulk phase.</string>
+     </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery1AbsorptionVoltage">
      <property name="geometry">
@@ -670,6 +673,9 @@
        <width>87</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Voltage limit in absorption phase.</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery1FloatVoltage">
@@ -681,6 +687,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Voltage limit in float phase.</string>
+     </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery1FloatCurrent">
      <property name="geometry">
@@ -690,6 +699,9 @@
        <width>87</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Current in absorption phase at which change to float phase is triggered.</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery2FloatCurrent">
@@ -701,6 +713,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Current in absorption phase at which change to float phase is triggered.</string>
+     </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery2FloatVoltage">
      <property name="geometry">
@@ -710,6 +725,9 @@
        <width>87</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Voltage limit in float phase.</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery2AbsorptionVoltage">
@@ -721,6 +739,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Voltage limit in absorption phase.</string>
+     </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery2AbsorptionCurrent">
      <property name="geometry">
@@ -730,6 +751,9 @@
        <width>87</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Current limit in bulk phase.</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery3FloatCurrent">
@@ -741,6 +765,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Current in absorption phase at which change to float phase is triggered.</string>
+     </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery3FloatVoltage">
      <property name="geometry">
@@ -750,6 +777,9 @@
        <width>87</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Voltage limit in float phase.</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery3AbsorptionVoltage">
@@ -761,6 +791,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Voltage limit in absorption phase.</string>
+     </property>
     </widget>
     <widget class="QDoubleSpinBox" name="battery3AbsorptionCurrent">
      <property name="geometry">
@@ -771,6 +804,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Current limit in bulk phase.</string>
+     </property>
     </widget>
     <widget class="QLabel" name="battery1Label_2">
      <property name="geometry">
@@ -778,14 +814,14 @@
        <x>14</x>
        <y>145</y>
        <width>123</width>
-       <height>71</height>
+       <height>236</height>
       </rect>
      </property>
      <property name="layoutDirection">
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="text">
-      <string>NOTE: All battery parameters must be entered before setting to flash.</string>
+      <string> Changing the type or capacity will result in defaults being loaded to the four battery electrical parameters. These match the defaults in the firmware. If necessary change these after setting the type and/or capacity.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

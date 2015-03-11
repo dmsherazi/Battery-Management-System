@@ -61,8 +61,11 @@ private slots:
     void on_closeButton_clicked();
     void on_setBatteryButton_clicked();
     void on_battery1TypeCombo_activated(int index);
+    void on_battery1CapacitySpinBox_valueChanged(int i);
     void on_battery2TypeCombo_activated(int index);
+    void on_battery2CapacitySpinBox_valueChanged(int i);
     void on_battery3TypeCombo_activated(int index);
+    void on_battery3CapacitySpinBox_valueChanged(int i);
     void on_resetMissing1Button_clicked();
     void on_resetMissing2Button_clicked();
     void on_resetMissing3Button_clicked();

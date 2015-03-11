@@ -239,7 +239,8 @@ When the change occurs, force the SoC to 100%. This may not be correct if
 the battery is faulty with a low terminal voltage, but that case is handled
 by the resetBattery function. */
                 if ((-getCurrentAv(index) < getFloatStageCurrent(index)) &&
-                    (getVoltageAv(index) > (245*voltageLimit(getAbsorptionVoltage(index)))/256))
+                    (getVoltageAv(index) >
+                        (245*voltageLimit(getAbsorptionVoltage(index)))/256))
                 {
                     setBatteryChargingPhase(index,floatC);
                     absorptionPhaseTime[index] = 0;

@@ -102,7 +102,7 @@ PowerManagementConfigGui::PowerManagementConfigGui(QTcpSocket* tcpSocket, QWidge
             ->setText(QString("0 m").append(QChar(0x03A9)));
 /* Ask for battery parameters to fill display */
     on_queryBatteryButton_clicked();
-/* Ask for control settings */
+/* Ask for monitor control settings */
     socket->write("dS\n\r");
 /* Ask for charge parameter settings */
     socket->write("dC\n\r");
@@ -131,7 +131,7 @@ void PowerManagementConfigGui::on_calibrateButton_clicked()
 //-----------------------------------------------------------------------------
 /** @brief Query Battery Parameters
 
-Resistance, type and capacity of the batteries are returned.
+Resistance, type and capacity and parameters of the batteries are returned.
 */
 
 void PowerManagementConfigGui::on_queryBatteryButton_clicked()
@@ -166,6 +166,61 @@ void PowerManagementConfigGui::on_setBatteryButton_clicked()
     typeSet3.append(QString("%1").arg(PowerManagementConfigUi.battery3CapacitySpinBox
                 ->value(),-0));
     socket->write(typeSet3.append("\n\r").toAscii().constData());
+// Set gassing voltages
+    QString gassingVSet1 = "pA1";
+    gassingVSet1.append(QString("%1")
+                .arg((unsigned int)(PowerManagementConfigUi.battery1AbsorptionVoltage
+                ->value()*256),-0));
+    socket->write(gassingVSet1.append("\n\r").toAscii().constData());
+    QString gassingVSet2 = "pA2";
+    gassingVSet2.append(QString("%1")
+                .arg((unsigned int)(PowerManagementConfigUi.battery2AbsorptionVoltage
+                ->value()*256),-0));
+    socket->write(gassingVSet2.append("\n\r").toAscii().constData());
+    QString gassingVSet3 = "pA3";
+    gassingVSet3.append(QString("%1")
+                .arg((unsigned int)(PowerManagementConfigUi.battery3AbsorptionVoltage
+                ->value()*256),-0));
+    socket->write(gassingVSet3.append("\n\r").toAscii().constData());
+// Set float voltages
+    QString floatVSet1 = "pF1";
+    floatVSet1.append(QString("%1")
+                .arg((unsigned int)(PowerManagementConfigUi.battery1FloatVoltage
+                ->value()*256),-0));
+    socket->write(floatVSet1.append("\n\r").toAscii().constData());
+    QString floatVSet2 = "pF2";
+    floatVSet2.append(QString("%1")
+                .arg((unsigned int)(PowerManagementConfigUi.battery2FloatVoltage
+                ->value()*256),-0));
+    socket->write(floatVSet2.append("\n\r").toAscii().constData());
+    QString floatVSet3 = "pF3";
+    floatVSet3.append(QString("%1")
+                .arg((unsigned int)(PowerManagementConfigUi.battery3FloatVoltage
+                ->value()*256),-0));
+    socket->write(floatVSet3.append("\n\r").toAscii().constData());
+/* Set float current scales. These are the scaling factors relating the
+battery capacity to the float current trigger. */
+    int battery1Capacity = PowerManagementConfigUi.battery1CapacitySpinBox
+                ->value();
+    int battery2Capacity = PowerManagementConfigUi.battery2CapacitySpinBox
+                ->value();
+    int battery3Capacity = PowerManagementConfigUi.battery3CapacitySpinBox
+                ->value();
+    QString floatISet1 = "pf1";
+    floatISet1.append(QString("%1")
+                .arg((unsigned int)(battery1Capacity/
+                 PowerManagementConfigUi.battery1FloatCurrent->value()),-0));
+    socket->write(floatISet1.append("\n\r").toAscii().constData());
+    QString floatISet2 = "pf2";
+    floatISet2.append(QString("%1")
+                .arg((unsigned int)(battery2Capacity/
+                 PowerManagementConfigUi.battery2FloatCurrent->value()),-0));
+    socket->write(floatISet2.append("\n\r").toAscii().constData());
+    QString floatISet3 = "pf3";
+    floatISet3.append(QString("%1")
+                .arg((unsigned int)(battery3Capacity/
+                 PowerManagementConfigUi.battery3FloatCurrent->value()),-0));
+    socket->write(floatISet3.append("\n\r").toAscii().constData());
 /* Write to FLASH */
     socket->write("aW\n\r");
 /* Refresh display of set parameters */
@@ -185,39 +240,54 @@ charge current is limited.
 
 void PowerManagementConfigGui::on_battery1TypeCombo_activated(int index)
 {
-qDebug() << "activated" << index;
-    int floatScale = 50;
-    int bulkScale = 5;
+    float floatScale = 50;
+    float bulkScale = 5;
+    int capacity = PowerManagementConfigUi.battery1CapacitySpinBox->value();
     if (index == 0)
     {
-        int capacity = PowerManagementConfigUi.battery1CapacitySpinBox->value();
         PowerManagementConfigUi.battery1AbsorptionCurrent->
-                                setValue((float)(capacity/bulkScale));
-        PowerManagementConfigUi.battery1AbsorptionCurrent->setValue(14.5);
+                                setValue((float)capacity/bulkScale);
+        PowerManagementConfigUi.battery1AbsorptionVoltage->setValue(14.5);
         PowerManagementConfigUi.battery1FloatVoltage->setValue(13.2);
         PowerManagementConfigUi.battery1FloatCurrent->
-                                setValue(capacity/(floatScale));
+                                setValue((float)capacity/floatScale);
     }
     if (index == 1)
     {
-        int capacity = PowerManagementConfigUi.battery2CapacitySpinBox->value();
         PowerManagementConfigUi.battery1AbsorptionCurrent->
-                                setValue((float)(capacity/bulkScale));
+                                setValue((float)capacity/bulkScale);
         PowerManagementConfigUi.battery1AbsorptionVoltage->setValue(14.6);
         PowerManagementConfigUi.battery1FloatVoltage->setValue(13.6);
         PowerManagementConfigUi.battery1FloatCurrent->
-                                setValue(capacity/(floatScale));
+                                setValue((float)capacity/floatScale);
     }
     if (index == 2)
     {
-        int capacity = PowerManagementConfigUi.battery3CapacitySpinBox->value();
         PowerManagementConfigUi.battery1AbsorptionCurrent->
-                                setValue((float)(capacity/bulkScale));
+                                setValue((float)capacity/bulkScale);
         PowerManagementConfigUi.battery1AbsorptionVoltage->setValue(14.1);
         PowerManagementConfigUi.battery1FloatVoltage->setValue(13.8);
         PowerManagementConfigUi.battery1FloatCurrent->
-                                setValue(capacity/(floatScale));
+                                setValue((float)capacity/floatScale);
     }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Battery 1 capacity changed
+
+When the capacity is changed, update the corresponding battery parameters with
+defaults.
+
+Here there are two parameters assumed, the float scale which is the fractional
+C at which the trigger to float occurs, and the fractional C at which the bulk
+charge current is limited.
+*/
+
+void PowerManagementConfigGui::on_battery1CapacitySpinBox_valueChanged(int i)
+{
+// Simply call the type combobox function to reset all parameters.
+    int index = PowerManagementConfigUi.battery1TypeCombo->currentIndex();
+    on_battery1TypeCombo_activated(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -229,38 +299,54 @@ defaults.
 
 void PowerManagementConfigGui::on_battery2TypeCombo_activated(int index)
 {
-    int floatScale = 50;
-    int bulkScale = 5;
+    float floatScale = 50;
+    float bulkScale = 5;
+    int capacity = PowerManagementConfigUi.battery2CapacitySpinBox->value();
     if (index == 0)
     {
-        int capacity = PowerManagementConfigUi.battery1CapacitySpinBox->value();
         PowerManagementConfigUi.battery2AbsorptionCurrent->
-                                setValue((float)(capacity/bulkScale));
+                                setValue((float)capacity/bulkScale);
         PowerManagementConfigUi.battery2AbsorptionCurrent->setValue(14.5);
         PowerManagementConfigUi.battery2FloatVoltage->setValue(13.2);
         PowerManagementConfigUi.battery2FloatCurrent->
-                                setValue(capacity/(floatScale));
+                                setValue((float)capacity/floatScale);
     }
     if (index == 1)
     {
-        int capacity = PowerManagementConfigUi.battery2CapacitySpinBox->value();
         PowerManagementConfigUi.battery2AbsorptionCurrent->
-                                setValue((float)(capacity/bulkScale));
+                                setValue((float)capacity/bulkScale);
         PowerManagementConfigUi.battery2AbsorptionVoltage->setValue(14.6);
         PowerManagementConfigUi.battery2FloatVoltage->setValue(13.6);
         PowerManagementConfigUi.battery2FloatCurrent->
-                                setValue(capacity/(floatScale));
+                                setValue((float)capacity/floatScale);
     }
     if (index == 2)
     {
-        int capacity = PowerManagementConfigUi.battery3CapacitySpinBox->value();
         PowerManagementConfigUi.battery2AbsorptionCurrent->
-                                setValue((float)(capacity/bulkScale));
+                                setValue((float)capacity/bulkScale);
         PowerManagementConfigUi.battery2AbsorptionVoltage->setValue(14.1);
         PowerManagementConfigUi.battery2FloatVoltage->setValue(13.8);
         PowerManagementConfigUi.battery2FloatCurrent->
-                                setValue(capacity/(floatScale));
+                                setValue((float)capacity/floatScale);
     }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Battery 2 capacity changed
+
+When the capacity is changed, update the corresponding battery parameters with
+defaults.
+
+Here there are two parameters assumed, the float scale which is the fractional
+C at which the trigger to float occurs, and the fractional C at which the bulk
+charge current is limited.
+*/
+
+void PowerManagementConfigGui::on_battery2CapacitySpinBox_valueChanged(int i)
+{
+// Simply call the type combobox function to reset all parameters.
+    int index = PowerManagementConfigUi.battery2TypeCombo->currentIndex();
+    on_battery2TypeCombo_activated(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -272,38 +358,54 @@ defaults.
 
 void PowerManagementConfigGui::on_battery3TypeCombo_activated(int index)
 {
-    int floatScale = 50;
-    int bulkScale = 5;
+    float floatScale = 50;
+    float bulkScale = 5;
+    int capacity = PowerManagementConfigUi.battery3CapacitySpinBox->value();
     if (index == 0)
     {
-        int capacity = PowerManagementConfigUi.battery1CapacitySpinBox->value();
         PowerManagementConfigUi.battery3AbsorptionCurrent->
-                                setValue((float)(capacity/bulkScale));
+                                setValue((float)capacity/bulkScale);
         PowerManagementConfigUi.battery3AbsorptionCurrent->setValue(14.5);
         PowerManagementConfigUi.battery3FloatVoltage->setValue(13.2);
         PowerManagementConfigUi.battery3FloatCurrent->
-                                setValue(capacity/(floatScale));
+                                setValue((float)capacity/floatScale);
     }
     if (index == 1)
     {
-        int capacity = PowerManagementConfigUi.battery2CapacitySpinBox->value();
         PowerManagementConfigUi.battery3AbsorptionCurrent->
-                                setValue((float)(capacity/bulkScale));
+                                setValue((float)capacity/bulkScale);
         PowerManagementConfigUi.battery3AbsorptionVoltage->setValue(14.6);
         PowerManagementConfigUi.battery3FloatVoltage->setValue(13.6);
         PowerManagementConfigUi.battery3FloatCurrent->
-                                setValue(capacity/(floatScale));
+                                setValue((float)capacity/floatScale);
     }
     if (index == 2)
     {
-        int capacity = PowerManagementConfigUi.battery3CapacitySpinBox->value();
         PowerManagementConfigUi.battery3AbsorptionCurrent->
-                                setValue((float)(capacity/bulkScale));
+                                setValue((float)capacity/bulkScale);
         PowerManagementConfigUi.battery3AbsorptionVoltage->setValue(14.1);
         PowerManagementConfigUi.battery3FloatVoltage->setValue(13.8);
         PowerManagementConfigUi.battery3FloatCurrent->
-                                setValue(capacity/(floatScale));
+                                setValue((float)capacity/floatScale);
     }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Battery 3 capacity changed
+
+When the capacity is changed, update the corresponding battery parameters with
+defaults.
+
+Here there are two parameters assumed, the float scale which is the fractional
+C at which the trigger to float occurs, and the fractional C at which the bulk
+charge current is limited.
+*/
+
+void PowerManagementConfigGui::on_battery3CapacitySpinBox_valueChanged(int i)
+{
+// Simply call the type combobox function to reset all parameters.
+    int index = PowerManagementConfigUi.battery3TypeCombo->currentIndex();
+    on_battery3TypeCombo_activated(index);
 }
 
 //-----------------------------------------------------------------------------
