@@ -102,9 +102,11 @@ PowerManagementConfigGui::PowerManagementConfigGui(QTcpSocket* tcpSocket, QWidge
             ->setText(QString("0 m").append(QChar(0x03A9)));
 /* Ask for battery parameters to fill display */
     on_queryBatteryButton_clicked();
-/* Ask for monitor control settings */
+/* Ask for switch control settings */
     socket->write("dS\n\r");
-/* Ask for charge parameter settings */
+/* Ask for monitor strategy parameter settings */
+    socket->write("dT\n\r");
+/* Ask for charger strategy parameter settings */
     socket->write("dC\n\r");
 }
 
@@ -125,7 +127,6 @@ void PowerManagementConfigGui::on_calibrateButton_clicked()
     this->setEnabled(false);
     QApplication::processEvents();
     socket->write("pC\n\r");
-    
 }
 
 //-----------------------------------------------------------------------------
@@ -452,22 +453,28 @@ void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
     QString command = "ps";
     socket->write(command.append(QString("%1").arg(option,2)).append("\n\r")
                          .toAscii().constData());
-    int lowVoltage = (int)(PowerManagementConfigUi.lowVoltageDoubleSpinBox->value()*256);
     command = "pv";
+    int lowVoltage = (int)(PowerManagementConfigUi.
+                                lowVoltageDoubleSpinBox->value()*256);
     socket->write(command.append(QString("%1").arg(lowVoltage,2)).append("\n\r")
                          .toAscii().constData());
-    int criticalVoltage = (int)(PowerManagementConfigUi.lowVoltageDoubleSpinBox->value()*256);
     command = "pV";
+    int criticalVoltage = (int)(PowerManagementConfigUi.
+                                criticalVoltageDoubleSpinBox->value()*256);
     socket->write(command.append(QString("%1").arg(criticalVoltage,2)).append("\n\r")
                          .toAscii().constData());
-    int lowSoC = (int)(PowerManagementConfigUi.lowVoltageDoubleSpinBox->value()*256);
     command = "px";
+    int lowSoC = (int)(PowerManagementConfigUi.
+                                lowSoCSpinBox->value());
     socket->write(command.append(QString("%1").arg(lowSoC,2)).append("\n\r")
                          .toAscii().constData());
-    int criticalSoC = (int)(PowerManagementConfigUi.lowVoltageDoubleSpinBox->value()*256);
     command = "pX";
+    int criticalSoC = (int)(PowerManagementConfigUi.
+                                criticalSoCSpinBox->value());
     socket->write(command.append(QString("%1").arg(criticalSoC,2)).append("\n\r")
                          .toAscii().constData());
+/* Write to FLASH */
+    socket->write("aW\n\r");
 }
 
 //-----------------------------------------------------------------------------
@@ -477,26 +484,40 @@ void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
 
 void PowerManagementConfigGui::on_setChargeOptionButton_clicked()
 {
+    int option = 0;
+    if (PowerManagementConfigUi.absorptionMuteCheckbox->isChecked())
+    {
+        option |= 0x01;
+    }
+    else
+    {
+        option &= ~0x01;
+    }
+    QString command = "pS";
+    socket->write(command.append(QString("%1").arg(option,2)).append("\n\r")
+                         .toAscii().constData());
+    command = "pR";
     int restTime = PowerManagementConfigUi.restTimeSpinBox->value();
-    QString command = "pR";
     socket->write(command.append(QString("%1").arg(restTime,2)).append("\n\r")
                          .toAscii().constData());
-    int absorptionTime = PowerManagementConfigUi.absorptionTimeSpinBox->value();
     command = "pG";
+    int absorptionTime = PowerManagementConfigUi.absorptionTimeSpinBox->value();
     socket->write(command.append(QString("%1").arg(absorptionTime,2)).append("\n\r")
                          .toAscii().constData());
-    int dutyCycleMin = PowerManagementConfigUi.minimumDutyCycleSpinBox->value();
     command = "pD";
+    int dutyCycleMin = PowerManagementConfigUi.minimumDutyCycleSpinBox->value();
     socket->write(command.append(QString("%1").arg(dutyCycleMin,2)).append("\n\r")
                          .toAscii().constData());
-    int floatTime = PowerManagementConfigUi.floatDelaySpinBox->value();
     command = "pe";
+    int floatTime = PowerManagementConfigUi.floatDelaySpinBox->value();
     socket->write(command.append(QString("%1").arg(floatTime,2)).append("\n\r")
                          .toAscii().constData());
-    int floatSoC = PowerManagementConfigUi.floatBulkSoCSpinBox->value();
     command = "pB";
+    int floatSoC = PowerManagementConfigUi.floatBulkSoCSpinBox->value();
     socket->write(command.append(QString("%1").arg(floatSoC,2)).append("\n\r")
                          .toAscii().constData());
+/* Write to FLASH */
+    socket->write("aW\n\r");
 }
 
 //-----------------------------------------------------------------------------
@@ -810,21 +831,6 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.debugMessageCheckbox->setChecked(true);
             else
                 PowerManagementConfigUi.debugMessageCheckbox->setChecked(false);
-            bool avoidLoad = (((controlByte >> 7) & 0x01) > 0);
-            if (avoidLoad)
-                PowerManagementConfigUi.loadChargeCheckBox->setChecked(true);
-            else
-                PowerManagementConfigUi.loadChargeCheckBox->setChecked(false);
-            bool maintainIsolate = (((controlByte >> 8) & 0x01) > 0);
-            if (maintainIsolate)
-                PowerManagementConfigUi.isolationMaintainCheckBox->setChecked(true);
-            else
-                PowerManagementConfigUi.isolationMaintainCheckBox->setChecked(false);
-            bool absorptionMute = (((controlByte >> 9) & 0x01) > 0);
-            if (absorptionMute)
-                PowerManagementConfigUi.absorptionMuteCheckbox->setChecked(true);
-            else
-                PowerManagementConfigUi.absorptionMuteCheckbox->setChecked(false);
             break;
         }
 // Show current time settings from the system

@@ -390,7 +390,6 @@ uint16_t getControls(void)
     if (configData.config.recording) controls |= 1<<1;
     if (configData.config.measurementSend) controls |= 1<<3;
     if (configData.config.debugMessageSend) controls |= 1<<4;
-    controls |= (configData.config.monitorStrategy & 0x03) << 7;
     return controls;
 }
 

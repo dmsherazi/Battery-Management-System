@@ -209,14 +209,15 @@ struct Config
     int16_t alphaC;         /* forgetting factor for battery current smoothing */
 /* Tracking Control Variables */
     bool autoTrack;             /* Automatic management of batteries */
-    uint8_t monitorStrategy;    /* Bitmap of monitoring strategies (see monitor header). */
     uint8_t panelSwitchSetting; /* Global value of the panel switch setting */
+    uint8_t monitorStrategy;    /* Bitmap of monitoring strategies (see monitor header). */
     int16_t lowVoltage;         /* Low voltage threshold */
     int16_t criticalVoltage;    /* Critical voltage threshold */
     int16_t lowSoC;             /* Low SoC threshold */
     int16_t criticalSoC;        /* Critical SoC threshold */
     int16_t floatBulkSoC;       /* SoC to change from flat back to bulk phase */
 /* Charger Control Variables */
+    uint8_t chargerStrategy;    /* Bitmap of charging strategies (see charger header). */
     int16_t restTime;           /* Minimum time to rest battery under charge */
     int16_t absorptionTime;     /* Minimum time for battery to stay in absorption phase */
     int16_t minDutyCycle;       /* Minimum PWM duty cycle */

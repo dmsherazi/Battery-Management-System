@@ -241,23 +241,40 @@ released. The command is followed by an interface number 0-5 being batteries
                                    (int32_t)configData.config.batteryCapacity[battery]);
                 id[1] = 'F';
                 dataMessageSend(id,(int32_t)configData.config.
-                                                floatStageCurrentScale[battery],
+                                            floatStageCurrentScale[battery],
                                    (int32_t)configData.config.floatVoltage[battery]);
                 id[1] = 'A';
                 dataMessageSend(id,(int32_t)configData.config.
-                                                bulkCurrentLimitScale[battery],
+                                            bulkCurrentLimitScale[battery],
                                    (int32_t)configData.config.absorptionVoltage[battery]);
                 break;
             }
-/* C Ask for charger parameters to be sent */
+/* T Ask for monitor strategy parameters to be sent. */
+        case 'T':
+            {
+                char id[] = "pts";
+                dataMessageSend(id,(int32_t)configData.config.monitorStrategy,0);
+                id[2] = 'V';
+                dataMessageSend(id,(int32_t)configData.config.lowVoltage,
+                                   (int32_t)configData.config.criticalVoltage);
+                id[2] = 'S';
+                dataMessageSend(id,(int32_t)configData.config.lowSoC,
+                                   (int32_t)configData.config.criticalSoC);
+                id[2] = 'F';
+                dataMessageSend(id,(int32_t)configData.config.floatBulkSoC,0);
+                break;
+            }
+/* C Ask for charger strategy parameters to be sent. */
         case 'C':
             {
-                char id[] = "p3";
-                dataMessageSend(id,256,0);
-                id[1] = 'P';
-                dataMessageSend(id,30,3);
-                id[1] = 'V';
-                dataMessageSend(id,97,0);
+                char id[] = "pcs";
+                dataMessageSend(id,(int32_t)configData.config.chargerStrategy,0);
+                id[2] = 'R';
+                dataMessageSend(id,(int32_t)configData.config.restTime,
+                                   (int32_t)configData.config.absorptionTime);
+                id[2] = 'D';
+                dataMessageSend(id,(int32_t)configData.config.minDutyCycle,
+                                   (int32_t)configData.config.floatTime);
                 break;
             }
         }
@@ -309,7 +326,7 @@ released. The command is followed by an interface number 0-5 being batteries
                         asciiToInt((char*)line+3);
                 break;
             }
-/* M-, M+ Turn on/off battery missing */
+/* m-, m+ Turn on/off battery missing */
         case 'm':
             {
                 if (line[3] == '-') setBatteryMissing(battery,false);
@@ -409,6 +426,12 @@ the battery under charge. */
             }
 /*--------------------*/
 /* CHARGER parameters */
+/* Sx set charger strategy. */
+        case 'S':
+            {
+                configData.config.chargerStrategy = asciiToInt((char*)line+2);
+                break;
+            }
 /* Rx set charger algorithm minimum rest time in seconds. */
         case 'R':
             {
