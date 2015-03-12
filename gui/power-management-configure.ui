@@ -288,6 +288,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Measured battery resistance</string>
+     </property>
      <property name="frameShape">
       <enum>QFrame::Box</enum>
      </property>
@@ -304,6 +307,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Measured battery resistance</string>
+     </property>
      <property name="frameShape">
       <enum>QFrame::Box</enum>
      </property>
@@ -319,6 +325,9 @@
        <width>71</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Measured battery resistance</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::Box</enum>
@@ -351,6 +360,9 @@
        <width>52</width>
        <height>25</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Battery capacity in Ampere Hours</string>
      </property>
      <property name="minimum">
       <number>40</number>
@@ -390,6 +402,9 @@
        <height>25</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Battery capacity in Ampere Hours</string>
+     </property>
      <property name="minimum">
       <number>40</number>
      </property>
@@ -427,6 +442,9 @@
        <width>52</width>
        <height>25</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Battery capacity in Ampere Hours</string>
      </property>
      <property name="minimum">
       <number>40</number>
@@ -492,6 +510,9 @@
        <height>29</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Battery type</string>
+     </property>
     </widget>
     <widget class="QComboBox" name="battery2TypeCombo">
      <property name="geometry">
@@ -502,6 +523,9 @@
        <height>29</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Battery type</string>
+     </property>
     </widget>
     <widget class="QComboBox" name="battery3TypeCombo">
      <property name="geometry">
@@ -511,6 +535,9 @@
        <width>87</width>
        <height>29</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Battery type</string>
      </property>
     </widget>
     <widget class="QLabel" name="typeLabel">
@@ -1060,6 +1087,9 @@
        <height>27</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Write parameters into Flash memory</string>
+     </property>
      <property name="text">
       <string>Set</string>
      </property>
@@ -1072,6 +1102,9 @@
        <width>67</width>
        <height>25</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Voltage lower threshold to elevate priority for charging.</string>
      </property>
      <property name="minimum">
       <double>10.000000000000000</double>
@@ -1095,6 +1128,9 @@
        <height>25</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Voltage lower threshold to remove battery from low priority load.</string>
+     </property>
      <property name="minimum">
       <double>10.000000000000000</double>
      </property>
@@ -1117,6 +1153,9 @@
        <height>25</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>State of Charge to elevate priority for charging.</string>
+     </property>
      <property name="value">
       <number>60</number>
      </property>
@@ -1129,6 +1168,9 @@
        <width>61</width>
        <height>25</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>State of Charge lower threshold to remove battery from low priority load.</string>
      </property>
      <property name="value">
       <number>45</number>
@@ -1263,6 +1305,9 @@
         <height>25</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in rest phase. Can exceed this if other batteries are under charge.</string>
+      </property>
       <property name="value">
        <number>30</number>
       </property>
@@ -1275,6 +1320,9 @@
         <width>67</width>
         <height>25</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in absorption phase.</string>
       </property>
       <property name="value">
        <number>90</number>
@@ -1289,6 +1337,9 @@
         <height>25</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Minimum duty cycle to prevent it falling to zero (from which it cannot recover).</string>
+      </property>
       <property name="value">
        <number>10</number>
       </property>
@@ -1302,6 +1353,9 @@
         <height>25</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Minimum time to remain in absorption phase before changing to float phase. Older batteries may have a gassing current too high to reach the current trigger.</string>
+      </property>
       <property name="value">
        <number>2</number>
       </property>
@@ -1314,6 +1368,9 @@
         <width>67</width>
         <height>25</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>State of Charge at which a battery in float phase switches to bulk phase to allow recharging.</string>
       </property>
       <property name="value">
        <number>95</number>
@@ -1594,6 +1651,9 @@
        <width>91</width>
        <height>27</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Write parameters into Flash memory</string>
      </property>
      <property name="text">
       <string>Set</string>
