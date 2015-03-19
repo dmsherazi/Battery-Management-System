@@ -318,21 +318,6 @@ released. The command is followed by an interface number 0-5 being batteries
                 setTimeFromString((char*)line+2);
                 break;
             }
-/* Inxx Set bulk current limit, n is battery, xx is limit */
-        case 'I':
-            {
-                if (battery < 3)
-                    configData.config.bulkCurrentLimitScale[battery] =
-                        asciiToInt((char*)line+3);
-                break;
-            }
-/* m-, m+ Turn on/off battery missing */
-        case 'm':
-            {
-                if (line[3] == '-') setBatteryMissing(battery,false);
-                else if (line[3] == '+') setBatteryMissing(battery,true);
-                break;
-            }
 /* M-, M+ Turn on/off data messaging (mainly for debug) */
         case 'M':
             {
@@ -367,6 +352,21 @@ released. The command is followed by an interface number 0-5 being batteries
                 }
                 break;
             }
+/* m-, m+ Turn on/off battery missing */
+        case 'm':
+            {
+                if (line[3] == '-') setBatteryMissing(battery,false);
+                else if (line[3] == '+') setBatteryMissing(battery,true);
+                break;
+            }
+/* Inxx Set bulk current limit, n is battery, xx is limit */
+        case 'I':
+            {
+                if (battery < 3)
+                    configData.config.bulkCurrentLimitScale[battery] =
+                        asciiToInt((char*)line+3);
+                break;
+            }
 /* Anxx Set battery gassing voltage limit, n is battery, xx is limit */
         case 'A':
             {
@@ -397,7 +397,9 @@ released. The command is followed by an interface number 0-5 being batteries
 the battery under charge. */
         case 's':
             {
-                configData.config.monitorStrategy = asciiToInt((char*)line+2);
+                uint8_t monitorStrategy = line[2]-'0';
+                if (monitorStrategy < 3)
+                    configData.config.monitorStrategy = monitorStrategy;
                 break;
             }
 /* vx set low voltage threshold, x is voltage times 256. */
@@ -429,7 +431,9 @@ the battery under charge. */
 /* Sx set charger strategy. */
         case 'S':
             {
-                configData.config.chargerStrategy = asciiToInt((char*)line+2);
+                uint8_t chargerStrategy = line[2]-'0';
+                if (chargerStrategy < 2)
+                    configData.config.chargerStrategy = chargerStrategy;
                 break;
             }
 /* Rx set charger algorithm minimum rest time in seconds. */

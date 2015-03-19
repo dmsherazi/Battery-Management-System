@@ -451,7 +451,7 @@ void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
         option &= ~0x02;
     }
     QString command = "ps";
-    socket->write(command.append(QString("%1").arg(option,2)).append("\n\r")
+    socket->write(command.append(QString("%1").arg(option,1)).append("\n\r")
                          .toAscii().constData());
     command = "pv";
     int lowVoltage = (int)(PowerManagementConfigUi.
@@ -475,6 +475,8 @@ void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
                          .toAscii().constData());
 /* Write to FLASH */
     socket->write("aW\n\r");
+/* Ask for monitor strategy parameter settings */
+    socket->write("dT\n\r");
 }
 
 //-----------------------------------------------------------------------------
@@ -484,19 +486,8 @@ void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
 
 void PowerManagementConfigGui::on_setChargeOptionButton_clicked()
 {
-    int option = 0;
-    if (PowerManagementConfigUi.absorptionMuteCheckbox->isChecked())
-    {
-        option |= 0x01;
-    }
-    else
-    {
-        option &= ~0x01;
-    }
-    QString command = "pS";
-    socket->write(command.append(QString("%1").arg(option,2)).append("\n\r")
-                         .toAscii().constData());
-    command = "pR";
+    on_absorptionMuteCheckbox_clicked();
+    QString command = "pR";
     int restTime = PowerManagementConfigUi.restTimeSpinBox->value();
     socket->write(command.append(QString("%1").arg(restTime,2)).append("\n\r")
                          .toAscii().constData());
@@ -518,6 +509,8 @@ void PowerManagementConfigGui::on_setChargeOptionButton_clicked()
                          .toAscii().constData());
 /* Write to FLASH */
     socket->write("aW\n\r");
+/* Ask for charger strategy parameter settings */
+    socket->write("dC\n\r");
 }
 
 //-----------------------------------------------------------------------------
@@ -529,14 +522,18 @@ of reducing EMI.
 
 void PowerManagementConfigGui::on_absorptionMuteCheckbox_clicked()
 {
+    int option = 0;
     if (PowerManagementConfigUi.absorptionMuteCheckbox->isChecked())
     {
-        socket->write("pm+\n\r");
+        option |= 0x01;
     }
     else
     {
-        socket->write("pm-\n\r");
+        option &= ~0x01;
     }
+    QString command = "pS";
+    socket->write(command.append(QString("%1").arg(option,1)).append("\n\r")
+                         .toAscii().constData());
 }
 
 //-----------------------------------------------------------------------------
@@ -916,6 +913,7 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
         case 't':
         {
             if (size < 3) break;
+// Low voltage and critical voltage thresholds.
             if (parameter == 'V')
             {
                 float lowVoltage = (float)breakdown[1].simplified().toInt()/256;
@@ -925,6 +923,7 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                 PowerManagementConfigUi.criticalVoltageDoubleSpinBox
                     ->setValue(criticalVoltage);
             }
+// Low SoC and critical SoC thresholds.
             else if (parameter == 'S')
             {
                 int lowSoC = (float)breakdown[1].simplified().toInt();
@@ -933,6 +932,25 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                     ->setValue(lowSoC);
                 PowerManagementConfigUi.criticalSoCSpinBox
                     ->setValue(criticalSoC);
+            }
+/* Monitor strategy byte. Bit 0 is to allow charger and load on the same
+battery; bit 1 is to maintain an isolated battery in normal conditions. */
+            else if (parameter == 's')
+            {
+                int monitorStrategy = (float)breakdown[1].simplified().toInt();
+                bool separateLoad = (monitorStrategy & 1) > 0;
+                PowerManagementConfigUi.loadChargeCheckBox
+                    ->setChecked(separateLoad);
+                bool preserveIsolation = (monitorStrategy & 2) > 0;
+                PowerManagementConfigUi.isolationMaintainCheckBox
+                    ->setChecked(preserveIsolation);
+            }
+// SoC below which float phase is changed to bulk phase.
+            else if (parameter == 'F')
+            {
+                int floatBulkSoC = (float)breakdown[1].simplified().toInt();
+                PowerManagementConfigUi.floatBulkSoCSpinBox
+                    ->setValue(floatBulkSoC);
             }
             break;
         }
@@ -963,6 +981,14 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
                     ->setValue(floatTime);
                 PowerManagementConfigUi.floatBulkSoCSpinBox
                     ->setValue(floatSoC);
+            }
+/* Charger strategy byte. Bit 0 is to suppress the absortion phase for EMI. */
+            else if (parameter == 's')
+            {
+                int chargerStrategy = (float)breakdown[1].simplified().toInt();
+                bool suppressAbsorptionPhase = (chargerStrategy & 1) > 0;
+                PowerManagementConfigUi.absorptionMuteCheckbox
+                    ->setChecked(suppressAbsorptionPhase);
             }
             break;
         }

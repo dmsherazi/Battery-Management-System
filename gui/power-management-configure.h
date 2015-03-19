@@ -53,12 +53,12 @@ public:
     ~PowerManagementConfigGui();
     QString error();
 private slots:
+    void on_closeButton_clicked();
     void on_timeSetButton_clicked();
     void on_debugMessageCheckbox_clicked();
     void on_dataMessageCheckbox_clicked();
     void on_echoTestButton_clicked();
     void on_queryBatteryButton_clicked();
-    void on_closeButton_clicked();
     void on_setBatteryButton_clicked();
     void on_battery1TypeCombo_activated(int index);
     void on_battery1CapacitySpinBox_valueChanged(int i);

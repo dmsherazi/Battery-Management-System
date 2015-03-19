@@ -84,6 +84,7 @@ void setGlobalDefaults(void)
     configData.config.criticalSoC = CRITICAL_SOC;
     configData.config.floatBulkSoC = FLOAT_BULK_SOC;
 /* Set default charging parameters */
+    configData.config.chargerStrategy = 0;  /* All strategies off */
     configData.config.restTime = REST_TIME;
     configData.config.absorptionTime = ABSORPTION_TIME;
     configData.config.minDutyCycle = MIN_DUTYCYCLE ;
