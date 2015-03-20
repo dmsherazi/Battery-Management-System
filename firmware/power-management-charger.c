@@ -28,6 +28,8 @@ until the average current during this absorption phase drops to the float limit
 or continues for an extended period. At this point the battery is considered as
 charged and only side reactions are occurring.
 
+One strategy control is provided to suppress the absorption phase to reduce EMI.
+
 Initial 2 October 2014
 */
 
@@ -198,38 +200,43 @@ problems. */
 charging */
             else if (getBatteryChargingPhase(index) == absorptionC)
             {
-                restPhaseTime[index] = 0;
-                onTime[index] = 0;
+/* If suppression is in place, just pass to rest phase */
+                if ((configData.config.chargerStrategy & 1) > 0)
+                    setBatteryChargingPhase(index,restC);
+                else
+                {
+                    restPhaseTime[index] = 0;
+                    onTime[index] = 0;
 /* At the end of the absorption period, if another battery has changed to bulk
 phase, pass to rest phase to allow some other battery to have its turn. This
 will take effect on the next cycle of the monitor task. */
-                if (absorptionPhaseTime[index] > configData.config.absorptionTime)
-                {
-                    for (i=0; i<NUM_BATS; i++)
+                    if (absorptionPhaseTime[index] > configData.config.absorptionTime)
                     {
-                        if (getBatteryChargingPhase(i) == bulkC)
+                        for (i=0; i<NUM_BATS; i++)
                         {
-                            setBatteryChargingPhase(index,restC);
-                            absorptionPhaseTime[index] = 0;
-                            break;
+                            if (getBatteryChargingPhase(i) == bulkC)
+                            {
+                                setBatteryChargingPhase(index,restC);
+                                absorptionPhaseTime[index] = 0;
+                                break;
+                            }
                         }
                     }
-                }
 /* Check if current is above the last recorded value slightly reduced, to detect
 if the current has stopped falling. Change to float phase if time exceeded. */
-                if ((240*absorptionPhaseCurrent[index])/256 > getCurrentAv(index))
-                {
-                    absorptionPhaseTime[index]++;
-                    if (absorptionPhaseTime[index] > floatDelay)
+                    if ((240*absorptionPhaseCurrent[index])/256 > getCurrentAv(index))
                     {
-                        setBatteryChargingPhase(index,floatC);
-                        absorptionPhaseTime[index] = 0;
-                        absorptionPhaseCurrent[index] = 0;
+                        absorptionPhaseTime[index]++;
+                        if (absorptionPhaseTime[index] > floatDelay)
+                        {
+                            setBatteryChargingPhase(index,floatC);
+                            absorptionPhaseTime[index] = 0;
+                            absorptionPhaseCurrent[index] = 0;
+                        }
                     }
-                }
 /* If current is dropping, reset the last recorded current */
-                else
-                    absorptionPhaseCurrent[index] = 0;
+                    else
+                        absorptionPhaseCurrent[index] = 0;
 
 /* Manage the change to float phase when the current drops below the float
 threshold. This is done on the averaged current as rapid response is not
@@ -238,19 +245,19 @@ where the source voltage drops causing the battery voltage and current to fall.
 When the change occurs, force the SoC to 100%. This may not be correct if
 the battery is faulty with a low terminal voltage, but that case is handled
 by the resetBattery function. */
-                if ((-getCurrentAv(index) < getFloatStageCurrent(index)) &&
-                    (getVoltageAv(index) >
-                        (245*voltageLimit(getAbsorptionVoltage(index)))/256))
-                {
-                    setBatteryChargingPhase(index,floatC);
-                    absorptionPhaseTime[index] = 0;
-                    resetBatterySoC(battery-1);
-                }
-
+                    if ((-getCurrentAv(index) < getFloatStageCurrent(index)) &&
+                        (getVoltageAv(index) >
+                            (245*voltageLimit(getAbsorptionVoltage(index)))/256))
+                    {
+                        setBatteryChargingPhase(index,floatC);
+                        absorptionPhaseTime[index] = 0;
+                        resetBatterySoC(battery-1);
+                    }
 
 /* Manage the absorption phase voltage limit. */
-                adaptDutyCycle(getVoltageAv(index),getAbsorptionVoltage(index),
-                               &dutyCycle[index]);
+                    adaptDutyCycle(getVoltageAv(index),getAbsorptionVoltage(index),
+                                   &dutyCycle[index]);
+                }
             }
 
 /* Overcurrent protection:

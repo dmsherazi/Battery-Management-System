@@ -465,12 +465,12 @@ void PowerManagementConfigGui::on_setTrackOptionButton_clicked()
                          .toAscii().constData());
     command = "px";
     int lowSoC = (int)(PowerManagementConfigUi.
-                                lowSoCSpinBox->value());
+                                lowSoCSpinBox->value())*256;
     socket->write(command.append(QString("%1").arg(lowSoC,2)).append("\n\r")
                          .toAscii().constData());
     command = "pX";
     int criticalSoC = (int)(PowerManagementConfigUi.
-                                criticalSoCSpinBox->value());
+                                criticalSoCSpinBox->value())*256;
     socket->write(command.append(QString("%1").arg(criticalSoC,2)).append("\n\r")
                          .toAscii().constData());
 /* Write to FLASH */
@@ -496,7 +496,7 @@ void PowerManagementConfigGui::on_setChargeOptionButton_clicked()
     socket->write(command.append(QString("%1").arg(absorptionTime,2)).append("\n\r")
                          .toAscii().constData());
     command = "pD";
-    int dutyCycleMin = PowerManagementConfigUi.minimumDutyCycleSpinBox->value();
+    int dutyCycleMin = PowerManagementConfigUi.minimumDutyCycleSpinBox->value()*256;
     socket->write(command.append(QString("%1").arg(dutyCycleMin,2)).append("\n\r")
                          .toAscii().constData());
     command = "pe";
@@ -504,7 +504,7 @@ void PowerManagementConfigGui::on_setChargeOptionButton_clicked()
     socket->write(command.append(QString("%1").arg(floatTime,2)).append("\n\r")
                          .toAscii().constData());
     command = "pB";
-    int floatSoC = PowerManagementConfigUi.floatBulkSoCSpinBox->value();
+    int floatSoC = PowerManagementConfigUi.floatBulkSoCSpinBox->value()*256;
     socket->write(command.append(QString("%1").arg(floatSoC,2)).append("\n\r")
                          .toAscii().constData());
 /* Write to FLASH */
@@ -926,8 +926,8 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
 // Low SoC and critical SoC thresholds.
             else if (parameter == 'S')
             {
-                int lowSoC = (float)breakdown[1].simplified().toInt();
-                int criticalSoC = (float)breakdown[2].simplified().toInt();
+                int lowSoC = (float)breakdown[1].simplified().toInt()/256;
+                int criticalSoC = (float)breakdown[2].simplified().toInt()/256;
                 PowerManagementConfigUi.lowSoCSpinBox
                     ->setValue(lowSoC);
                 PowerManagementConfigUi.criticalSoCSpinBox
@@ -944,13 +944,6 @@ battery; bit 1 is to maintain an isolated battery in normal conditions. */
                 bool preserveIsolation = (monitorStrategy & 2) > 0;
                 PowerManagementConfigUi.isolationMaintainCheckBox
                     ->setChecked(preserveIsolation);
-            }
-// SoC below which float phase is changed to bulk phase.
-            else if (parameter == 'F')
-            {
-                int floatBulkSoC = (float)breakdown[1].simplified().toInt();
-                PowerManagementConfigUi.floatBulkSoCSpinBox
-                    ->setValue(floatBulkSoC);
             }
             break;
         }
@@ -969,14 +962,14 @@ battery; bit 1 is to maintain an isolated battery in normal conditions. */
             }
             else if (parameter == 'D')
             {
-                int dutyCycleMin = (float)breakdown[1].simplified().toInt();
+                int dutyCycleMin = (float)breakdown[1].simplified().toInt()/256;
                 PowerManagementConfigUi.minimumDutyCycleSpinBox
                     ->setValue(dutyCycleMin);
             }
             else if (parameter == 'F')
             {
                 int floatTime = (float)breakdown[1].simplified().toInt();
-                int floatSoC = (float)breakdown[2].simplified().toInt();
+                int floatSoC = (float)breakdown[2].simplified().toInt()/256;
                 PowerManagementConfigUi.floatDelaySpinBox
                     ->setValue(floatTime);
                 PowerManagementConfigUi.floatBulkSoCSpinBox
