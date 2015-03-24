@@ -297,8 +297,11 @@ responses will give each entry in the listing, terminated by an empty filename.
             writeFileHandle = breakdown[2].toInt();
             writeFileOpen = (writeFileHandle < 255);
             if (writeFileOpen)
+            {
                 PowerManagementRecordUi.recordFileButton->
                     setStyleSheet("background-color:lightgreen;");
+                PowerManagementRecordUi.recordFileName->setText(breakdown[3]);
+            }
             else
                 PowerManagementRecordUi.recordFileButton->
                     setStyleSheet("background-color:lightpink;");
@@ -306,8 +309,8 @@ responses will give each entry in the listing, terminated by an empty filename.
             readFileHandle = breakdown[3].toInt();
             readFileOpen = (readFileHandle < 255);
             if (readFileOpen)
-                PowerManagementRecordUi.recordFileName->setText(breakdown[3]);
-            break;
+                 PowerManagementRecordUi.readFileName->setText(breakdown[3]);
+           break;
         }
 // Open a file for recording.
         case 'W':
