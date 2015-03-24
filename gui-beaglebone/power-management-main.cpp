@@ -67,47 +67,53 @@ PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
     connect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
 // Attempt to initialise the serial port with the default setting
     synchronized = false;
-    baudrate = 6;
+    baudrate = 4;
     if (socket->initPort(baudrate,100))
         synchronized = true;
     else
         errorMessage = QString("Unable to access the serial port\n"
                             "Check the connections and power.\n"
                             "You may need root privileges?");
-    saveFile.clear();
     response.clear();
 
+// Initialize the Main GUI
     initGui();
-    initCalibration();
-    initRecording();
+
+// Setup to allow first seelction of a tab to initialise the contents.
+    recordingInitialised = false;
+    configInitialised = false;
+    connect(PowerManagementMainUi.tabWidget,SIGNAL(currentChanged(int)),
+            this,SLOT(tabChanged(int)));
+
+// Contact the remote unit and turn its transmissions on.
+    if (socket != NULL)
+    {
+/* Turn on microcontroller communications */
+        socket->write("pc+\n\r");
+/* This should cause the microcontroller to respond with all data */
+        socket->write("dS\n\r");
+    }
 }
 
+// In the embedded application we probably will never get here.
 PowerManagementGui::~PowerManagementGui()
 {
 /* Turn off microcontroller communications */
-    socket->write("pc-\n\r");
-    if (socket != NULL) socket->close();
-    if (socket != NULL) delete socket;
+    if (socket != NULL)
+    {
+        socket->write("pc-\n\r");
+        if (socket != NULL) socket->close();
+        if (socket != NULL) delete socket;
+    }
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Initialise GUI
+/** @brief Initialise the Main GUI
 
 */
 
 void PowerManagementGui::initGui()
 {
-    PowerManagementMainUi.recordFileName->installEventFilter(this);
-    PowerManagementMainUi.battery1CapacityEdit->installEventFilter(this);
-    PowerManagementMainUi.battery2CapacityEdit->installEventFilter(this);
-    PowerManagementMainUi.battery3CapacityEdit->installEventFilter(this);
-    PowerManagementMainUi.chargeParameterEdit_1->installEventFilter(this);
-    PowerManagementMainUi.chargeParameterEdit_2->installEventFilter(this);
-    PowerManagementMainUi.chargeParameterEdit_3->installEventFilter(this);
-    PowerManagementMainUi.lowVoltageEdit->installEventFilter(this);
-    PowerManagementMainUi.criticalVoltageEdit->installEventFilter(this);
-    PowerManagementMainUi.lowSoCEdit->installEventFilter(this);
-    PowerManagementMainUi.criticalSoCEdit->installEventFilter(this);
 // Uncheck all buttons in case the microcontroller doesn't respond.
     PowerManagementMainUi.load1Battery1->setAutoExclusive(false);
     PowerManagementMainUi.load1Battery1->setChecked(false);
@@ -170,13 +176,35 @@ void PowerManagementGui::initGui()
         setStyleSheet("background-color:lightpink;");
     PowerManagementMainUi.battery3SoCReset->
         setText("R");
+}
 
-    disableKeypad();
+//-----------------------------------------------------------------------------
+/** @brief Selection of New Tab
 
-/* Turn on microcontroller communications */
-    socket->write("pc+\n\r");
-/* This should cause the microcontroller to respond with all data */
-    socket->write("dS\n\r");
+This is called when the displayed tab is changed. It initializes the tab
+contents and requests data from the remote system. The recording tab and any of
+the configuration tabs will trigger this.
+
+Ensure that this is changed if the tab order is changed.
+
+We need to do this to avoid all parameters being requested at once, as the
+remote system queues become overloaded.
+*/
+
+void PowerManagementGui::tabChanged(int index)
+{
+// This is the recording tab
+    if ((index == 1) && ! recordingInitialised)
+    {
+        recordingInitialised = true;
+        initRecording();
+    }
+// Later ones are the configuration tabs
+    if ((index > 1) && ! configInitialised)
+    {
+        configInitialised = true;
+        initCalibration();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -223,7 +251,6 @@ void PowerManagementGui::processResponse(const QString response)
     if (size > 1) secondField = breakdown[1].simplified();
     QString current, voltage;
 // Load 1 current/voltage values
-    if (! saveFile.isEmpty()) saveLine(response);
     if ((size > 0) && (firstField == "dL1"))
     {
         getCurrentVoltage(breakdown,&current,&voltage);
@@ -1164,7 +1191,7 @@ void PowerManagementGui::processResponse(const QString response)
     {
         recordMessageReceived(response);
     }
-/* Messages for the Configure Task start with p or dS */
+/* Messages for the Configure Task start with p or dO or dD (debug) */
     if ((size > 0) && ((firstField.left(1) == "p") || (firstField.left(2) == "dO")))
     {
         configureMessageReceived(response);
@@ -1177,7 +1204,6 @@ void PowerManagementGui::processResponse(const QString response)
     if ((size > 0) && (firstField.left(1) == "D"))
     {
         qDebug() << response;
-        if (! saveFile.isEmpty()) saveLine(response);
     }
 }
 
@@ -1208,7 +1234,6 @@ void PowerManagementGui::getCurrentVoltage(const QStringList breakdown,
         *sVoltage = QString("%1").arg(fVoltage,0,'f',2);
         entry = entry.append(",").append(*sVoltage);
     }
-//    if (! saveFile.isEmpty()) saveLine(entry);
 }
 //-----------------------------------------------------------------------------
 /** @brief Test indicators on the Interface Cards.
@@ -1593,78 +1618,6 @@ void PowerManagementGui::on_battery3SoCReset_clicked()
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Obtain a save file name and path and attempt to open it.
-
-The save filename is created from date and time in the current directory.
-This avoids the need for keyboard input.
-
-The files are csv but the ending can be arbitrary to allow compatibility
-with the data processing application.
-*/
-
-void PowerManagementGui::on_saveFileButton_clicked()
-{
-//! Make sure there is no file already open.
-    if (! saveFile.isEmpty())
-    {
-        displayErrorMessage("A file is already open - close first");
-        return;
-    }
-    PowerManagementMainUi.errorLabel->clear();
-    QString filename = "data-" +
-                QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss") +
-                ".txt";
-    QFileInfo fileInfo(filename);
-    saveDirectory = fileInfo.absolutePath();
-    saveFile = saveDirectory.filePath(filename);
-    outFile = new QFile(saveFile);             // Open file for output
-    if (! outFile->open(QIODevice::WriteOnly))
-    {
-        displayErrorMessage("Could not open the output file");
-        return;
-    }
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Save a line to the opened save file.
-
-*/
-void PowerManagementGui::saveLine(QString line)
-{
-//! Check that the save file has been defined and is open.
-    if (saveFile.isEmpty())
-    {
-        displayErrorMessage("Output File not defined");
-        return;
-    }
-    if (! outFile->isOpen())
-    {
-        displayErrorMessage("Output File not open");
-        return;
-    }
-    QTextStream out(outFile);
-    out << line << "\n\r";
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Close the recording save file.
-
-*/
-void PowerManagementGui::on_closeFileButton_clicked()
-{
-    PowerManagementMainUi.errorLabel->clear();
-    if (saveFile.isEmpty())
-        displayErrorMessage("File already closed");
-    else
-    {
-        outFile->close();
-        delete outFile;
-//! Wipe the name to prevent the same file being used.
-        saveFile = QString();
-    }
-}
-
-//-----------------------------------------------------------------------------
 /** @brief Initiate AutoTrack Controls.
 
 */
@@ -1715,26 +1668,6 @@ bool PowerManagementGui::success()
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Close Window
-
-*/
-
-void PowerManagementGui::on_closeButton_clicked()
-{
-    accept();
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Close off the window and deallocate resources
-
-This may not be necessary as QT may implement it implicitly.
-*/
-void PowerManagementGui::closeEvent(QCloseEvent *event)
-{
-    event->accept();
-}
-
-//-----------------------------------------------------------------------------
 /** @brief Sleep for a number of centiseconds but keep processing events
 
 */
@@ -1773,13 +1706,6 @@ void PowerManagementGui::initCalibration()
     PowerManagementMainUi.battery3TypeCombo->addItem("Gel Cell");
     PowerManagementMainUi.battery3TypeCombo->addItem("AGM Cell");
     PowerManagementMainUi.battery3TypeCombo->setCurrentIndex(1);
-// Hide the charging algorithm parameter spinboxes and text.
-    PowerManagementMainUi.chargeParameterEdit_1->setVisible(false);
-    PowerManagementMainUi.chargeParameterText_1->setVisible(false);
-    PowerManagementMainUi.chargeParameterEdit_2->setVisible(false);
-    PowerManagementMainUi.chargeParameterText_2->setVisible(false);
-    PowerManagementMainUi.chargeParameterEdit_3->setVisible(false);
-    PowerManagementMainUi.chargeParameterText_3->setVisible(false);
 // Set the resistance display default (with Unicode Omega)
     PowerManagementMainUi.battery1Resistance
             ->setText(QString("0 m").append(QChar(0x03A9)));
@@ -1791,6 +1717,8 @@ void PowerManagementGui::initCalibration()
     on_queryBatteryButton_clicked();
 /* Ask for control settings */
     socket->write("dS\n\r");
+/* Ask for monitor strategy parameter settings */
+    socket->write("dT\n\r");
 /* Ask for charge parameter settings */
     socket->write("dC\n\r");
 }
@@ -1824,35 +1752,6 @@ void PowerManagementGui::on_queryBatteryButton_clicked()
     socket->write("dB3\n\r");
 }
 //-----------------------------------------------------------------------------
-/** @brief Set Battery Parameters
-
-Resistance, type and capacity of the batteries are set from the GUI values.
-*/
-
-void PowerManagementGui::on_setBatteryButton_clicked()
-{
-    QString typeSet1 = "pT1";
-    typeSet1.append(QString("%1").arg(PowerManagementMainUi.battery1TypeCombo
-                ->currentIndex(),1));
-    typeSet1.append(PowerManagementMainUi.battery1CapacityEdit->text());
-    socket->write(typeSet1.append("\n\r").toAscii().constData());
-    QString typeSet2 = "pT2";
-    typeSet2.append(QString("%1").arg(PowerManagementMainUi.battery2TypeCombo
-                ->currentIndex(),1));
-    typeSet2.append(PowerManagementMainUi.battery2CapacityEdit->text());
-    socket->write(typeSet2.append("\n\r").toAscii().constData());
-    QString typeSet3 = "pT3";
-    typeSet3.append(QString("%1").arg(PowerManagementMainUi.battery3TypeCombo
-                ->currentIndex(),1));
-    typeSet3.append(PowerManagementMainUi.battery3CapacityEdit->text());
-    socket->write(typeSet3.append("\n\r").toAscii().constData());
-/* Write to FLASH */
-    socket->write("aW\n\r");
-/* Refresh display of set parameters */
-    on_queryBatteryButton_clicked();
-}
-
-//-----------------------------------------------------------------------------
 /** @brief Set Tracking Strategy Options
 
 0x01 The option allowing or preventing loads connected to the charging battery.
@@ -1879,43 +1778,35 @@ void PowerManagementGui::on_setTrackOptionButton_clicked()
         option &= ~0x02;
     }
     QString command = "ps";
-    socket->write(command.append(QString("%1").arg(option,2)).append("\n\r")
+    socket->write(command.append(QString("%1").arg(option,1)).append("\n\r")
                          .toAscii().constData());
+/* Write to FLASH */
+    socket->write("aW\n\r");
+/* Ask for monitor strategy parameter settings */
+    socket->write("dT\n\r");
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Set Charge Algorithm Options
+/** @brief Set Absorption Phase Muted
 
+This stops the charge algorithm from entering absorption phase for the purpose
+of reducing EMI.
 */
 
-/* 0 Three Phase Algorithm. */
-void PowerManagementGui::on_threePhaseButton_clicked()
+void PowerManagementGui::on_absorptionMuteCheckbox_clicked()
 {
-    QString command = "pS0";
-    socket->write(command.append(QString("%1")).append("\n\r")
+    int option = 0;
+    if (PowerManagementMainUi.absorptionMuteCheckbox->isChecked())
+    {
+        option |= 0x01;
+    }
+    else
+    {
+        option &= ~0x01;
+    }
+    QString command = "pS";
+    socket->write(command.append(QString("%1").arg(option,1)).append("\n\r")
                          .toAscii().constData());
-/* Ask for charge parameter settings */
-    socket->write("dC\n\r");
-}
-
-/* 1 Intermittent Charge Algorithm. */
-void PowerManagementGui::on_pulseButton_clicked()
-{
-    QString command = "pS1";
-    socket->write(command.append(QString("%1")).append("\n\r")
-                         .toAscii().constData());
-/* Ask for charge parameter settings */
-    socket->write("dC\n\r");
-}
-
-/* 2 Interrupted Charge Control Algorithm. */
-void PowerManagementGui::on_iccButton_clicked()
-{
-    QString command = "pS2";
-    socket->write(command.append(QString("%1")).append("\n\r")
-                         .toAscii().constData());
-/* Ask for charge parameter settings */
-    socket->write("dC\n\r");
 }
 
 //-----------------------------------------------------------------------------
@@ -2039,12 +1930,12 @@ independent of formats.
 
 void PowerManagementGui::configureMessageReceived(const QString response)
 {
-    bool ok;
     QStringList breakdown = response.split(",");
     int size = breakdown.size();
     if (size <= 0) return;
     QChar command = breakdown[0].at(1);
     QChar battery = breakdown[0].at(2);
+    QChar parameter = breakdown[0].at(2);
     int controlByte = 0;
     if (size > 1) controlByte = breakdown[1].simplified().toInt();
 // Error Code
@@ -2097,22 +1988,22 @@ void PowerManagementGui::configureMessageReceived(const QString response)
             {
                 PowerManagementMainUi.battery1TypeCombo
                     ->setCurrentIndex(batteryType);
-                PowerManagementMainUi.battery1CapacityEdit
-                    ->setText(QString("%1").arg(batteryCapacity,-1));
+                PowerManagementMainUi.battery1CapacityLabel
+                    ->setText(QString("%1").arg(batteryCapacity,1));
             }
             else if (battery == '2')
             {
                 PowerManagementMainUi.battery2TypeCombo
                     ->setCurrentIndex(batteryType);
-                PowerManagementMainUi.battery2CapacityEdit
-                    ->setText(QString("%1").arg(batteryCapacity,-1));
+                PowerManagementMainUi.battery2CapacityLabel
+                    ->setText(QString("%1").arg(batteryCapacity,1));
             }
             else if (battery == '3')
             {
                 PowerManagementMainUi.battery3TypeCombo
                     ->setCurrentIndex(batteryType);
-                PowerManagementMainUi.battery3CapacityEdit
-                    ->setText(QString("%1").arg(batteryCapacity,-1));
+                PowerManagementMainUi.battery3CapacityLabel
+                    ->setText(QString("%1").arg(batteryCapacity,1));
             }
             break;
         }
@@ -2120,38 +2011,37 @@ void PowerManagementGui::configureMessageReceived(const QString response)
         case 'A':
         {
             if (size < 3) break;
-            QString absorptionVoltage = QString("%1 V").arg(breakdown[2]
-                                         .simplified().toFloat()/256,0,'f',2);
+            float absorptionVoltage = breakdown[2].simplified().toFloat()/256;
             float bulkCurrentScale = breakdown[1].simplified().toFloat();
             if (battery == '1')
             {
                 PowerManagementMainUi.battery1AbsorptionVoltage
-                    ->setText(absorptionVoltage);
-                float battery1Capacity = PowerManagementMainUi.
-                            battery1CapacityEdit->text().toFloat(&ok);
+                    ->setText(QString("%1").arg(absorptionVoltage,0,'f',3));
+                float battery1Capacity = (float)PowerManagementMainUi.
+                            battery1CapacityLabel->text().toInt();
                 PowerManagementMainUi.battery1AbsorptionCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery1Capacity/bulkCurrentScale,0,'f',2));
+                    ->setText(QString("%1")
+                            .arg(battery1Capacity/bulkCurrentScale,0,'f',3));
             }
             else if (battery == '2')
             {
                 PowerManagementMainUi.battery2AbsorptionVoltage
-                    ->setText(absorptionVoltage);
-                float battery2Capacity = PowerManagementMainUi.
-                            battery2CapacityEdit->text().toFloat(&ok);
+                    ->setText(QString("%1").arg(absorptionVoltage,0,'f',3));
+                float battery2Capacity = (float)PowerManagementMainUi.
+                            battery2CapacityLabel->text().toInt();
                 PowerManagementMainUi.battery2AbsorptionCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery2Capacity/bulkCurrentScale,0,'f',2));
+                    ->setText(QString("%1")
+                            .arg(battery2Capacity/bulkCurrentScale,0,'f',3));
             }
             else if (battery == '3')
             {
                 PowerManagementMainUi.battery3AbsorptionVoltage
-                    ->setText(absorptionVoltage);
-                float battery3Capacity = PowerManagementMainUi.
-                            battery3CapacityEdit->text().toFloat(&ok);
+                    ->setText(QString("%1").arg(absorptionVoltage,0,'f',3));
+                float battery3Capacity = (float)PowerManagementMainUi.
+                            battery3CapacityLabel->text().toInt();
                 PowerManagementMainUi.battery3AbsorptionCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery3Capacity/bulkCurrentScale,0,'f',2));
+                    ->setText(QString("%1")
+                            .arg(battery3Capacity/bulkCurrentScale,0,'f',3));
             }
             break;
         }
@@ -2159,38 +2049,37 @@ void PowerManagementGui::configureMessageReceived(const QString response)
         case 'F':
         {
             if (size < 3) break;
-            QString floatVoltage = QString("%1 V").arg(breakdown[2]
-                                         .simplified().toFloat()/256,0,'f',2);
+            float floatVoltage = breakdown[2].simplified().toFloat()/256;
             float floatCurrentScale = breakdown[1].simplified().toFloat();
             if (battery == '1')
             {
                 PowerManagementMainUi.battery1FloatVoltage
-                    ->setText(floatVoltage);
-                float battery1Capacity = PowerManagementMainUi.
-                            battery1CapacityEdit->text().toFloat(&ok);
+                    ->setText(QString("%1").arg(floatVoltage,0,'f',3));
+                float battery1Capacity = (float)PowerManagementMainUi.
+                            battery1CapacityLabel->text().toInt();
                 PowerManagementMainUi.battery1FloatCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery1Capacity/floatCurrentScale,0,'f',2));
+                    ->setText(QString("%1")
+                            .arg(battery1Capacity/floatCurrentScale,0,'f',3));
             }
             else if (battery == '2')
             {
                 PowerManagementMainUi.battery2FloatVoltage
-                    ->setText(floatVoltage);
-                float battery2Capacity = PowerManagementMainUi.
-                            battery2CapacityEdit->text().toFloat(&ok);
+                    ->setText(QString("%1").arg(floatVoltage,0,'f',3));
+                float battery2Capacity = (float)PowerManagementMainUi.
+                            battery2CapacityLabel->text().toInt();
                 PowerManagementMainUi.battery2FloatCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery2Capacity/floatCurrentScale,0,'f',2));
+                    ->setText(QString("%1")
+                            .arg(battery2Capacity/floatCurrentScale,0,'f',3));
             }
             else if (battery == '3')
             {
                 PowerManagementMainUi.battery3FloatVoltage
-                    ->setText(floatVoltage);
-                float battery3Capacity = PowerManagementMainUi.
-                            battery3CapacityEdit->text().toFloat(&ok);
+                    ->setText(QString("%1").arg(floatVoltage,0,'f',3));
+                float battery3Capacity = (float)PowerManagementMainUi.
+                            battery3CapacityLabel->text().toInt();
                 PowerManagementMainUi.battery3FloatCurrent
-                    ->setText(QString("%1 A")
-                        .arg(battery3Capacity/floatCurrentScale,0,'f',2));
+                    ->setText(QString("%1")
+                            .arg(battery3Capacity/floatCurrentScale,0,'f',3));
             }
             break;
         }
@@ -2208,98 +2097,6 @@ void PowerManagementGui::configureMessageReceived(const QString response)
                 PowerManagementMainUi.debugMessageCheckbox->setChecked(true);
             else
                 PowerManagementMainUi.debugMessageCheckbox->setChecked(false);
-            int chargeAlgorithm = (controlByte >> 5) & 0x03;
-            if (chargeAlgorithm == 0)
-            {
-                PowerManagementMainUi.threePhaseButton->setChecked(true);
-                PowerManagementMainUi.chargeParameterEdit_1->setVisible(true);
-                PowerManagementMainUi.chargeParameterEdit_1->
-                    setToolTip("Lowest duty cycle allowed to prevent it crashing to zero");
-                PowerManagementMainUi.chargeParameterText_1->setVisible(true);
-                PowerManagementMainUi.chargeParameterText_1->
-                    setText("Minimum Duty Cycle (%)");
-                PowerManagementMainUi.chargeParameterEdit_2->setVisible(false);
-                PowerManagementMainUi.chargeParameterText_2->setVisible(false);
-                PowerManagementMainUi.chargeParameterEdit_3->setVisible(false);
-                PowerManagementMainUi.chargeParameterText_3->setVisible(false);
-            }
-            if (chargeAlgorithm == 1)
-            {
-                PowerManagementMainUi.pulseButton->setChecked(true);
-                PowerManagementMainUi.chargeParameterEdit_1->setVisible(true);
-                PowerManagementMainUi.chargeParameterText_1->setVisible(true);
-                PowerManagementMainUi.chargeParameterEdit_2->setVisible(false);
-                PowerManagementMainUi.chargeParameterText_2->setVisible(false);
-                PowerManagementMainUi.chargeParameterEdit_3->setVisible(false);
-                PowerManagementMainUi.chargeParameterText_3->setVisible(false);
-            }
-            if (chargeAlgorithm == 2)
-            {
-                PowerManagementMainUi.iccButton->setChecked(true);
-                PowerManagementMainUi.chargeParameterEdit_1->setVisible(true);
-                PowerManagementMainUi.chargeParameterEdit_1->
-                    setToolTip("Low voltage threshold ending the rest phase and starting the absorption phase, in percent of OCV");
-                PowerManagementMainUi.chargeParameterText_1->setVisible(true);
-                PowerManagementMainUi.chargeParameterText_1->
-                    setText("Rest Phase Voltage %OCV");
-                PowerManagementMainUi.chargeParameterEdit_2->setVisible(true);
-                PowerManagementMainUi.chargeParameterEdit_2->
-                    setToolTip("Length of a slot in a cycle of the absorption phase");
-                PowerManagementMainUi.chargeParameterText_2->setVisible(true);
-                PowerManagementMainUi.chargeParameterText_2->
-                    setText("Slot Length (secs)");
-                PowerManagementMainUi.chargeParameterEdit_3->setVisible(true);
-                PowerManagementMainUi.chargeParameterEdit_3->
-                    setToolTip("Number of slots in a cycle of the absorption phase");
-                PowerManagementMainUi.chargeParameterText_3->setVisible(true);
-                PowerManagementMainUi.chargeParameterText_3->
-                    setText("Number of Slots");
-            }
-            bool avoidLoad = (((controlByte >> 7) & 0x01) > 0);
-            if (avoidLoad)
-                PowerManagementMainUi.loadChargeCheckBox->setChecked(true);
-            else
-                PowerManagementMainUi.loadChargeCheckBox->setChecked(false);
-            bool maintainIsolate = (((controlByte >> 8) & 0x01) > 0);
-            if (maintainIsolate)
-                PowerManagementMainUi.isolationMaintainCheckBox->setChecked(true);
-            else
-                PowerManagementMainUi.isolationMaintainCheckBox->setChecked(false);
-            break;
-        }
-// Show charger minimum duty cycle parameter
-        case '3':
-        {
-            if (size < 1) break;
-            int dutyCycle = breakdown[1].simplified().toInt();
-            if (PowerManagementMainUi.threePhaseButton->isChecked())
-                PowerManagementMainUi.chargeParameterEdit_1->
-                    setText(QString("%1").arg(dutyCycle,-1));
-            break;
-        }
-// Show charger ICC parameters
-        case 'P':
-        {
-            if (size < 2) break;
-            int slotLength = breakdown[1].simplified().toInt();
-            if (PowerManagementMainUi.iccButton->isChecked())
-                PowerManagementMainUi.chargeParameterEdit_2->
-                    setText(QString("%1").arg(slotLength,-1));
-            int slotNumber = breakdown[2].simplified().toInt();
-            if (PowerManagementMainUi.iccButton->isChecked())
-                PowerManagementMainUi.chargeParameterEdit_3->
-                    setText(QString("%1").arg(slotNumber,-1));
-            break;
-        }
-// Show charger voltage threshold parameter
-        case 'V':
-        {
-            if (size < 1) break;
-            int voltage = breakdown[1].simplified().toInt();
-            if ((PowerManagementMainUi.pulseButton->isChecked()) ||
-                (PowerManagementMainUi.iccButton->isChecked()))
-                PowerManagementMainUi.chargeParameterEdit_1->
-                    setText(QString("%1").arg(voltage,-1));
             break;
         }
 // Show current time settings from the system
@@ -2379,6 +2176,83 @@ void PowerManagementGui::configureMessageReceived(const QString response)
                     PowerManagementMainUi.resetMissing3Button->setText("X");
                 }
             }
+            break;
+        }
+// Show tracking parameters
+        case 't':
+        {
+            if (size < 3) break;
+// Low voltage and critical voltage thresholds.
+            if (parameter == 'V')
+            {
+                float lowVoltage = (float)breakdown[1].simplified().toInt()/256;
+                float criticalVoltage = (float)breakdown[2].simplified().toInt()/256;
+                PowerManagementMainUi.lowVoltageEdit
+                    ->setText(QString("%1").arg(lowVoltage,1));
+                PowerManagementMainUi.criticalVoltageEdit
+                    ->setText(QString("%1").arg(criticalVoltage,1));
+            }
+// Low SoC and critical SoC thresholds.
+            else if (parameter == 'S')
+            {
+                int lowSoC = (float)breakdown[1].simplified().toInt()/256;
+                int criticalSoC = (float)breakdown[2].simplified().toInt()/256;
+                PowerManagementMainUi.lowSoCEdit
+                    ->setText(QString("%1").arg(lowSoC,1));
+                PowerManagementMainUi.criticalSoCEdit
+                    ->setText(QString("%1").arg(criticalSoC,1));
+            }
+/* Monitor strategy byte. Bit 0 is to allow charger and load on the same
+battery; bit 1 is to maintain an isolated battery in normal conditions. */
+            else if (parameter == 's')
+            {
+                int monitorStrategy = (float)breakdown[1].simplified().toInt();
+                bool separateLoad = (monitorStrategy & 1) > 0;
+                PowerManagementMainUi.loadChargeCheckBox
+                    ->setChecked(separateLoad);
+                bool preserveIsolation = (monitorStrategy & 2) > 0;
+                PowerManagementMainUi.isolationMaintainCheckBox
+                    ->setChecked(preserveIsolation);
+            }
+            break;
+        }
+// Show charger parameters
+        case 'c':
+        {
+            if (size < 3) break;
+            if (parameter == 'R')
+            {
+                int restTime = (float)breakdown[1].simplified().toInt();
+                int absorptionTime = (float)breakdown[2].simplified().toInt();
+                PowerManagementMainUi.restTimeLabel
+                    ->setText(QString("%1").arg(restTime,1));
+                PowerManagementMainUi.absorptionTimeLabel
+                    ->setText(QString("%1").arg(absorptionTime,1));
+            }
+            else if (parameter == 'D')
+            {
+                int dutyCycleMin = (float)breakdown[1].simplified().toInt()/256;
+                PowerManagementMainUi.minimumDutyCycleLabel
+                    ->setText(QString("%1").arg(dutyCycleMin,1));
+            }
+            else if (parameter == 'F')
+            {
+                int floatTime = (float)breakdown[1].simplified().toInt()/3600;
+                int floatSoC = (float)breakdown[2].simplified().toInt()/256;
+                PowerManagementMainUi.floatDelayLabel
+                    ->setText(QString("%1").arg(floatTime,1));
+                PowerManagementMainUi.floatBulkSoCLabel
+                    ->setText(QString("%1").arg(floatSoC,1));
+            }
+/* Charger strategy byte. Bit 0 is to suppress the absortion phase for EMI. */
+            else if (parameter == 's')
+            {
+                int chargerStrategy = (float)breakdown[1].simplified().toInt();
+                bool suppressAbsorptionPhase = (chargerStrategy & 1) > 0;
+                PowerManagementMainUi.absorptionMuteCheckbox
+                    ->setChecked(suppressAbsorptionPhase);
+            }
+            break;
         }
     }
 }
@@ -2425,34 +2299,10 @@ void PowerManagementGui::initRecording()
     verticalHeader->setResizeMode(QHeaderView::Fixed);
     verticalHeader->setDefaultSectionSize(18);
     row = 0;
-// Signal to process a click on a directory item
-    connect(PowerManagementMainUi.fileTableView,
-                     SIGNAL(clicked(const QModelIndex)),
-                     this,SLOT(onListItemClicked(const QModelIndex)));
 // Send a command to refresh the directory
     refreshDirectory();
     writeFileHandle = 0xFF;
 }
-//-----------------------------------------------------------------------------
-/** @brief Delete File.
-
-If the delete checkbox is selected, delete the file (if it exists).
-*/
-
-void PowerManagementGui::on_deleteButton_clicked()
-{
-    QString fileName = PowerManagementMainUi.recordFileName->text();
-    if ((fileName.length() > 0) &&
-        (PowerManagementMainUi.deleteCheckBox->isChecked()))
-    {
-        socket->write("fX");
-        socket->write(fileName.toLocal8Bit().data());
-        socket->write("\n\r");
-        refreshDirectory();
-        getFreeSpace();
-    }
-}
-
 //-----------------------------------------------------------------------------
 /** @brief Open Recording File.
 
@@ -2540,6 +2390,7 @@ void PowerManagementGui::recordMessageReceived(const QString response)
 // Error Code
     switch (command[0].toAscii())
     {
+qDebug() << response;
 // Show Free Space
         case 'F':
         {
@@ -2585,7 +2436,7 @@ The response will be a comma separated list of items preceded by a type
             break;
         }
 // Status of recording and open files.
-// The write and read file handles are retrieved from this
+// The write file handles are retrieved from this
         case 's':
         {
             if (breakdown.size() <= 1) break;
@@ -2600,16 +2451,19 @@ The response will be a comma separated list of items preceded by a type
             writeFileHandle = breakdown[2].toInt();
             writeFileOpen = (writeFileHandle < 255);
             if (writeFileOpen)
+            {
                 PowerManagementMainUi.recordFileButton->
                     setStyleSheet("background-color:lightgreen;");
+                PowerManagementMainUi.recordFileName->setText(breakdown[3]);
+            }
             else
+            {
                 PowerManagementMainUi.recordFileButton->
                     setStyleSheet("background-color:lightpink;");
+                PowerManagementMainUi.recordFileName->setText(QString("D%1.TXT")
+                    .arg(QDate::currentDate().toString("MMdd")));
+            }
             if (breakdown.size() <= 3) break;
-            readFileHandle = breakdown[3].toInt();
-            readFileOpen = (readFileHandle < 255);
-            if (readFileOpen)
-                PowerManagementMainUi.recordFileName->setText(breakdown[3]);
             break;
         }
 // Open a file for recording.
@@ -2665,27 +2519,6 @@ int PowerManagementGui::extractValue(const QString &response)
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Slot to process Directory Entry Clicks.
-
-Display filename in edit box, or enter a directory and redisplay.
-*/
-
-void PowerManagementGui::onListItemClicked(const QModelIndex & index)
-{
-    PowerManagementMainUi.recordFileName->clear();
-    QStandardItem *item = model->itemFromIndex(index);
-    QString fileName = item->text();
-    QChar type = item->data().toChar();
-    if (type == 'f')
-    {
-        PowerManagementMainUi.recordFileName->setText(fileName);
-        PowerManagementMainUi.readFileName->setText(fileName);
-    }
-    if (type == 'd')
-        socket->write(QString("fD%1\n\r").arg(fileName).toLocal8Bit().data());
-}
-
-//-----------------------------------------------------------------------------
 /** @brief Remount the storage media
 
 */
@@ -2725,164 +2558,6 @@ void PowerManagementGui::requestRecordingStatus()
 void PowerManagementGui::getFreeSpace()
 {
     socket->write("fF\n\r");
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Activate Keypad
-
-*/
-
-void PowerManagementGui::on_keypadButton_clicked()
-{
-    if (PowerManagementMainUi.keypad->isEnabled())
-        disableKeypad();
-    else
-        enableKeypad();
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Enable the Keypad
-
-*/
-
-void PowerManagementGui::enableKeypad()
-{
-    PowerManagementMainUi.keypad->setEnabled(true);
-    PowerManagementMainUi.keypad->setVisible(true);
-    PowerManagementMainUi.keypadButton->setEnabled(false);
-    PowerManagementMainUi.keypadButton->setVisible(false);
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Disable the Keypad
-
-*/
-
-void PowerManagementGui::disableKeypad()
-{
-    PowerManagementMainUi.keypad->setEnabled(false);
-    PowerManagementMainUi.keypad->setVisible(false);
-    PowerManagementMainUi.keypadButton->setEnabled(true);
-    PowerManagementMainUi.keypadButton->setVisible(true);
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Reimplement LineEdit to respond to a single mouse click
-
-Needed to allow the keypad to appear when the line edit is selected.
-*/
-
-bool PowerManagementGui::eventFilter(QObject *obj, QEvent *event)
-{
-    if(event->type() == QEvent::MouseButtonPress)
-    {
-        enableKeypad();
-        lineEditObject = (QLineEdit*)obj;
-        QString objText = lineEditObject->text();
-// Fill the recording file name with default name.
-        if (obj == PowerManagementMainUi.recordFileName)
-        {
-            if (objText.isEmpty())
-            {
-                objText = "D" +
-                          QDateTime::currentDateTime().toString("MMdd") +
-                          ".TXT";
-                lineEditObject->setText(objText);
-                lineEditObject->setFocus();
-                lineEditObject->setCursorPosition(5);
-            }
-        }
-// All others clear the field for a new value.
-        else
-        {
-            lineEditObject->clear();
-        }
-        return true;
-    }
-    return false;
-}
-
-//-----------------------------------------------------------------------------
-/** @brief Keypad Data Entry
-
-All methods for 12 buttons.
-*/
-
-// Get rid of keypad.
-void PowerManagementGui::on_pbok_clicked()
-{
-    disableKeypad();
-}
-
-// Delete the character just after the cursor, except at start position.
-void PowerManagementGui::on_pberase_clicked()
-{
-    lineEditObject->backspace();
-}
-
-void PowerManagementGui::on_pbforward_clicked()
-{
-    lineEditObject->cursorForward(false);
-}
-
-void PowerManagementGui::on_pbback_clicked()
-{
-    lineEditObject->cursorBackward(false);
-}
-
-void PowerManagementGui::on_pbpoint_clicked()
-{
-    lineEditObject->insert(".");
-}
-
-void PowerManagementGui::on_pb0_clicked()
-{
-    lineEditObject->insert("0");
-}
-
-void PowerManagementGui::on_pb1_clicked()
-{
-    lineEditObject->insert("1");
-}
-
-void PowerManagementGui::on_pb2_clicked()
-{
-    lineEditObject->insert("2");
-}
-
-void PowerManagementGui::on_pb3_clicked()
-{
-    lineEditObject->insert("3");
-}
-
-void PowerManagementGui::on_pb4_clicked()
-{
-    lineEditObject->insert("4");
-}
-
-void PowerManagementGui::on_pb5_clicked()
-{
-    lineEditObject->insert("5");
-}
-
-void PowerManagementGui::on_pb6_clicked()
-{
-    lineEditObject->insert("6");
-}
-
-void PowerManagementGui::on_pb7_clicked()
-{
-    lineEditObject->insert("7");
-}
-
-void PowerManagementGui::on_pb8_clicked()
-{
-    lineEditObject->insert("8");
-}
-
-void PowerManagementGui::on_pb9_clicked()
-{
-    lineEditObject->insert("9");
 }
 
 

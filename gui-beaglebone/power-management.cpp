@@ -1,10 +1,11 @@
 /**
-@mainpage Power Management GUI
+@mainpage Power Management GUI for TouchScreen
 @version 1.0
 @author Ken Sarkies (www.jiggerjuice.net)
 @date 6 October 2013
 
-This is the PC user interface to the Solar-Battery Power Management System.
+This is the touchscreen user interface to the Solar-Battery Power Management
+System.on BeagleBone.
 
 @note
 Compiler: gcc (Ubuntu 4.6.3-1ubuntu5) 4.6.3
