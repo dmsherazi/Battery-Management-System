@@ -398,7 +398,7 @@ the battery under charge. */
         case 's':
             {
                 uint8_t monitorStrategy = line[2]-'0';
-                if (monitorStrategy < 3)
+                if (monitorStrategy <= 3)
                     configData.config.monitorStrategy = monitorStrategy;
                 break;
             }
