@@ -273,8 +273,10 @@ released. The command is followed by an interface number 0-5 being batteries
                 dataMessageSend(id,(int32_t)configData.config.restTime,
                                    (int32_t)configData.config.absorptionTime);
                 id[2] = 'D';
-                dataMessageSend(id,(int32_t)configData.config.minDutyCycle,
-                                   (int32_t)configData.config.floatTime);
+                dataMessageSend(id,(int32_t)configData.config.minDutyCycle,0);
+                id[2] = 'F';
+                dataMessageSend(id,(int32_t)configData.config.floatTime,
+                                   (int32_t)configData.config.floatBulkSoC);
                 break;
             }
         }
