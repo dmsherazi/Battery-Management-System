@@ -46,6 +46,7 @@ Uses: Qt version 4.8.1
 int main(int argc,char ** argv)
 {
     QApplication application(argc,argv);
+    application.setOverrideCursor(Qt::BlankCursor);
     PowerManagementGui powerManagementGui;
     if (powerManagementGui.success())
     {

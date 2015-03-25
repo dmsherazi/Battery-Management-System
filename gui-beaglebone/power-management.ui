@@ -860,107 +860,6 @@
       <string/>
      </property>
     </widget>
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="geometry">
-      <rect>
-       <x>554</x>
-       <y>130</y>
-       <width>61</width>
-       <height>98</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-     <widget class="QRadioButton" name="panelBattery2">
-      <property name="geometry">
-       <rect>
-        <x>22</x>
-        <y>40</y>
-        <width>21</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="panelBattery1">
-      <property name="geometry">
-       <rect>
-        <x>22</x>
-        <y>10</y>
-        <width>21</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="panelBattery3">
-      <property name="geometry">
-       <rect>
-        <x>22</x>
-        <y>70</y>
-        <width>21</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="Line" name="panelline2">
-      <property name="geometry">
-       <rect>
-        <x>19</x>
-        <y>26</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <property name="lineWidth">
-       <number>3</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <widget class="Line" name="panelline3">
-      <property name="geometry">
-       <rect>
-        <x>19</x>
-        <y>56</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <property name="lineWidth">
-       <number>3</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <zorder>panelline3</zorder>
-     <zorder>panelBattery3</zorder>
-     <zorder>panelline2</zorder>
-     <zorder>panelBattery2</zorder>
-     <zorder>panelBattery1</zorder>
-    </widget>
     <widget class="QLabel" name="panelImage">
      <property name="geometry">
       <rect>
@@ -1251,214 +1150,6 @@
      <property name="text">
       <string/>
      </property>
-    </widget>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="geometry">
-      <rect>
-       <x>474</x>
-       <y>130</y>
-       <width>61</width>
-       <height>96</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-     <widget class="QRadioButton" name="load2Battery2">
-      <property name="geometry">
-       <rect>
-        <x>22</x>
-        <y>42</y>
-        <width>21</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="load2Battery1">
-      <property name="geometry">
-       <rect>
-        <x>22</x>
-        <y>10</y>
-        <width>21</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="load2Battery3">
-      <property name="geometry">
-       <rect>
-        <x>22</x>
-        <y>75</y>
-        <width>21</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="Line" name="load2line1">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>25</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <property name="lineWidth">
-       <number>3</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <widget class="Line" name="load2line2">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>54</y>
-        <width>20</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <property name="lineWidth">
-       <number>3</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <zorder>load2line1</zorder>
-     <zorder>load2line2</zorder>
-     <zorder>load2Battery2</zorder>
-     <zorder>load2Battery3</zorder>
-     <zorder>load2Battery1</zorder>
-    </widget>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="geometry">
-      <rect>
-       <x>416</x>
-       <y>120</y>
-       <width>31</width>
-       <height>101</height>
-      </rect>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::RightToLeft</enum>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-     <widget class="QRadioButton" name="load1Battery2">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>50</y>
-        <width>21</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="load1Battery1">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>20</y>
-        <width>21</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="load1Battery3">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>80</y>
-        <width>21</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="Line" name="load1line1">
-      <property name="geometry">
-       <rect>
-        <x>2</x>
-        <y>35</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <property name="lineWidth">
-       <number>3</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <widget class="Line" name="load1line2">
-      <property name="geometry">
-       <rect>
-        <x>2</x>
-        <y>64</y>
-        <width>20</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <property name="lineWidth">
-       <number>3</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <zorder>load1line2</zorder>
-     <zorder>load1line1</zorder>
-     <zorder>load1Battery2</zorder>
-     <zorder>load1Battery3</zorder>
-     <zorder>load1Battery1</zorder>
     </widget>
     <widget class="QLabel" name="temperature">
      <property name="geometry">
@@ -1915,6 +1606,360 @@
       <enum>Qt::Vertical</enum>
      </property>
     </widget>
+    <widget class="QFrame" name="frame">
+     <property name="geometry">
+      <rect>
+       <x>572</x>
+       <y>140</y>
+       <width>41</width>
+       <height>106</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <widget class="Line" name="panelline2">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>16</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>3</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="panelline3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>46</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>3</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="panelBattery3">
+      <property name="geometry">
+       <rect>
+        <x>3</x>
+        <y>60</y>
+        <width>21</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="panelBattery2">
+      <property name="geometry">
+       <rect>
+        <x>3</x>
+        <y>30</y>
+        <width>21</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="panelBattery1">
+      <property name="geometry">
+       <rect>
+        <x>3</x>
+        <y>0</y>
+        <width>21</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="frame_3">
+     <property name="geometry">
+      <rect>
+       <x>404</x>
+       <y>130</y>
+       <width>41</width>
+       <height>106</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <widget class="Line" name="load2line2_2">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>54</y>
+        <width>20</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>3</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="load1Battery3">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>75</y>
+        <width>21</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="load1Battery2">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>42</y>
+        <width>21</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="load1Battery1">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>10</y>
+        <width>21</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="Line" name="load1line1">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>25</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>3</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="frame_2">
+     <property name="geometry">
+      <rect>
+       <x>478</x>
+       <y>125</y>
+       <width>41</width>
+       <height>106</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <widget class="Line" name="load2line1">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>30</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>3</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="load2line2">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>59</y>
+        <width>20</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>3</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="load2Battery1">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>15</y>
+        <width>21</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="load2Battery2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>47</y>
+        <width>21</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="load2Battery3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>80</y>
+        <width>21</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </widget>
+    <zorder>battery1Charge</zorder>
+    <zorder>load2OverCurrent</zorder>
+    <zorder>battery1CheckBox</zorder>
+    <zorder>battery1Fill</zorder>
+    <zorder>battery1line1</zorder>
+    <zorder>battery2line1</zorder>
+    <zorder>battery2Fill</zorder>
+    <zorder>line</zorder>
+    <zorder>load1CheckBox</zorder>
+    <zorder>battery1Op</zorder>
+    <zorder>battery2line3</zorder>
+    <zorder>battery3OverCurrent</zorder>
+    <zorder>battery2CheckBox</zorder>
+    <zorder>battery3line3</zorder>
+    <zorder>battery3Fill</zorder>
+    <zorder>load1Image</zorder>
+    <zorder>battery2Op</zorder>
+    <zorder>layoutWidget</zorder>
+    <zorder>battery2line2</zorder>
+    <zorder>battery2OverCurrent</zorder>
+    <zorder>load2CheckBox</zorder>
+    <zorder>battery1Charging</zorder>
+    <zorder>battery2UnderVoltage</zorder>
+    <zorder>battery3Charging</zorder>
+    <zorder>battery3Op</zorder>
+    <zorder>panelOverCurrent</zorder>
+    <zorder>battery3UnderVoltage</zorder>
+    <zorder>panelImage</zorder>
+    <zorder>battery1Health</zorder>
+    <zorder>battery3Charge</zorder>
+    <zorder>autoTrackCheckBox</zorder>
+    <zorder>battery1line3</zorder>
+    <zorder>load2Image</zorder>
+    <zorder>load1UnderVoltage</zorder>
+    <zorder>battery3Image</zorder>
+    <zorder>panelCheckBox</zorder>
+    <zorder>battery2Health</zorder>
+    <zorder>battery2Charge</zorder>
+    <zorder>battery3Health</zorder>
+    <zorder>temperature</zorder>
+    <zorder>battery2Charging</zorder>
+    <zorder>battery2ChargeLabel</zorder>
+    <zorder>battery1ChargeLabel</zorder>
+    <zorder>battery2Image</zorder>
+    <zorder>battery3line1</zorder>
+    <zorder>line_3</zorder>
+    <zorder>battery1Image</zorder>
+    <zorder>battery3line2</zorder>
+    <zorder>load2UnderVoltage</zorder>
+    <zorder>battery1OverCurrent</zorder>
+    <zorder>battery3CheckBox</zorder>
+    <zorder>battery1line2</zorder>
+    <zorder>load1OverCurrent</zorder>
+    <zorder>battery1UnderVoltage</zorder>
+    <zorder>battery3ChargeLabel</zorder>
+    <zorder>line_2</zorder>
+    <zorder>panelUnderVoltage</zorder>
+    <zorder>load2line3</zorder>
+    <zorder>load1line3</zorder>
+    <zorder>panelline4</zorder>
+    <zorder>battery1SoCReset</zorder>
+    <zorder>battery2SoCReset</zorder>
+    <zorder>battery3SoCReset</zorder>
+    <zorder>frame</zorder>
+    <zorder>frame_3</zorder>
+    <zorder>frame_2</zorder>
    </widget>
    <widget class="QWidget" name="recordingTab">
     <attribute name="title">
