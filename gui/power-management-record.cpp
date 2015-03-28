@@ -211,7 +211,7 @@ void PowerManagementRecordGui::onMessageReceived(const QString &response)
         }
 /* Directory listing.
 Fill a predefined model with strings from the response breakdown.
-The response will be a comma separated list of items preceded by a type
+The response will be a comma separated list of items preceded by a type.
 */
         case 'D':
         {
@@ -248,11 +248,14 @@ The response will be a comma separated list of items preceded by a type
 /* Directory listing incremental.
 Fill a predefined model with a string from the response breakdown. A series of
 responses will give each entry in the listing, terminated by an empty filename.
+This will ease the communications load by requesting each entry only after
+the previous entry has been fully received.
 */
         case 'd':
         {
-            model->clear();
-            if (breakdown.size() <= 1) break;
+            if (breakdown.size() < 1) break;
+// Empty parameters received indicates the directory listing has ended.
+            if (breakdown.size() == 1) break;
             for (int i=1; i<breakdown.size(); i++)
             {
                 QChar type = breakdown[i][0];
@@ -278,6 +281,9 @@ responses will give each entry in the listing, terminated by an empty filename.
 //                    item->setIcon(...);
                     model->appendRow(row);
                 }
+/* Request the next entry by sending another incremental directory command with
+no directory name. */
+                socket->write("fd\r\n");
             }
             break;
         }
@@ -414,7 +420,8 @@ This requests the directory entry for the top directory only.
 
 void PowerManagementRecordGui::refreshDirectory()
 {
-    socket->write("fD/\n\r");
+    model->clear();
+    socket->write("fd/\n\r");
 }
 
 //-----------------------------------------------------------------------------

@@ -105,7 +105,7 @@ void prvCommsTask( void *pvParameters )
 indefinitely waiting for input. */
         char character;
         xQueueReceive(commsReceiveQueue,&character,portMAX_DELAY);
-        if ((character == 0x0D) || (characterPosition > 78))
+        if ((character == 0x0D) || (character == 0x0A) || (characterPosition > 78))
         {
             line[characterPosition] = 0;
             characterPosition = 0;
@@ -479,6 +479,7 @@ Xfilename   - Delete the file. Filename is 8.3 string style.
 Cxx         - Close file. x is the file handle.
 Gxx         - Read a record from read or write file.
 Ddirname    - Get a directory listing. Directory name is 8.3 string style.
+d[dirname]  - Get the first (if dirname present) or next entry in directory.
 s           - Get status of open files and configData.config.recording flag
 M           - Mount the SD card.
 All commands return an error status byte at the end.
@@ -616,7 +617,8 @@ sent, the rest remains in the buffer until the next request. */
 /* Read the entire block to the local buffer. */
                             for (i=0; i<numRead; i++)
                             {
-                                uint8_t nextWritePointer = (writePointer+1) % GET_RECORD_SIZE;
+                                uint8_t nextWritePointer = (writePointer+1)
+                                                % GET_RECORD_SIZE;
                                 xQueueReceive(fileReceiveQueue,
                                     buffer+writePointer,portMAX_DELAY);
                                 writePointer = nextWritePointer;
@@ -649,7 +651,9 @@ sent, the rest remains in the buffer until the next request. */
                 break;
             }
 /* Get a directory listing. Gets all items in the directory and sends the
-type,size and name, each group separated by commas. */
+type,size and name, each group preceded by a comma. The file command requests
+each entry in turn, terminated by a null filename when the directory listing
+is exhausted. */
             case 'D':
             {
                 if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_TIMEOUT))
@@ -657,14 +661,15 @@ type,size and name, each group separated by commas. */
                 uint8_t fileStatus = FR_INT_ERR;
                 if (xSemaphoreTake(fileSendSemaphore,COMMS_FILE_TIMEOUT))
                 {
-                    char character,firstCharacter,type;
+                    char firstCharacter;
                     sendFileCommand('D',13,line+2);
                     commsPrintString("fD");
                     do
                     {
-                        type = 0;
+                        char type = 0;
 /* Single character entry type */
                         xQueueReceive(fileReceiveQueue,&type,portMAX_DELAY);
+                        char character;
 /* Four bytes of file size */
                         uint32_t fileSize = 0;
                         uint8_t i;
@@ -674,7 +679,7 @@ type,size and name, each group separated by commas. */
                             xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
                             fileSize = (fileSize << 8) + character;
                         }
-/* If the first character of name is zero then the listing is ended */
+/* Filename. If the first character of name is zero then the listing is ended */
                         character = 0;
                         xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
                         firstCharacter = character;
@@ -690,7 +695,7 @@ type,size and name, each group separated by commas. */
                                 character = 0;
                                 xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
                             }
-/* Discard the status byte */
+/* End of directory entry. Discard the status byte */
                             xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
                             uint8_t eol = 0;
 /* Send a zero parameter to ask for the next entry */
@@ -706,10 +711,12 @@ type,size and name, each group separated by commas. */
                 sendResponse("fE",(uint8_t)fileStatus);
                 break;
             }
-/* Return an next entry in the directory listing. If a directory name is sent,
-then return the first entry, otherwise the next entry in the directory listing.
-Returns the type, size and name. If there are no further entries, then an
-empty string is sent. */
+/* Return the next entry in the directory listing. If a directory name is sent,
+then return the first entry. If the name has a zero in the first position,
+return the next entry in the directory listing.
+Returns the type, size and name preceded by a comma for compatibility with
+the full directory listing request. If there are no further entries found in the
+directory, then an empty string is sent back. */
             case 'd':
             {
                 if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_TIMEOUT))
@@ -717,12 +724,12 @@ empty string is sent. */
                 uint8_t fileStatus = FR_INT_ERR;
                 if (xSemaphoreTake(fileSendSemaphore,COMMS_FILE_TIMEOUT))
                 {
-                    char character,firstCharacter,type;
                     sendFileCommand('D',13,line+2);
-                    commsPrintString("fD");
-                    type = 0;
+                    commsPrintString("fd");
+                    char type = 0;
 /* Single character entry type */
                     xQueueReceive(fileReceiveQueue,&type,portMAX_DELAY);
+                    char character;
 /* Four bytes of file size */
                     uint32_t fileSize = 0;
                     uint8_t i;
@@ -732,11 +739,10 @@ empty string is sent. */
                         xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
                         fileSize = (fileSize << 8) + character;
                     }
-/* If the first character of name is zero then the listing is ended */
+/* Filename. If the first character of name is zero then the listing is ended */
                     character = 0;
                     xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
-                    firstCharacter = character;
-                    if (firstCharacter > 0)
+                    if (character > 0)  /* Pull in remaining characters of name */
                     {
                         commsPrintString(",");
                         commsPrintChar(&type);
@@ -748,8 +754,6 @@ empty string is sent. */
                             character = 0;
                             xQueueReceive(fileReceiveQueue,&character,portMAX_DELAY);
                         }
-/* Discard the status byte */
-                        xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);
                     }
                     commsPrintString("\r\n");
                     xQueueReceive(fileReceiveQueue,&fileStatus,portMAX_DELAY);

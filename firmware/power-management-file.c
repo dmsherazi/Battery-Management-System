@@ -101,8 +101,8 @@ void prvFileTask( void *pvParameters )
 
     initFile();
 
-	while (1)
-	{
+    while (1)
+    {
 /* Build a command line before actioning */
 /** The first character is the command, followed by the total message length
 in bytes (which is the number of parameter bytes, if any, plus 2). */
@@ -317,7 +317,7 @@ differ from the number requested if EOF reached. */
         }
 /* Directory listing. */
 /* If the name is given, the directory specified is opened and the first entry
-returned. Subsequent calls without a name will return consequent entries.
+returned. Subsequent calls with zero length name will return subsequent entries.
 Returns a null terminated file name. At the end, or on error, a zero length
 string is sent.
 Preceding the name a type character:

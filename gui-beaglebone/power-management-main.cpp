@@ -2390,7 +2390,6 @@ void PowerManagementGui::recordMessageReceived(const QString response)
 // Error Code
     switch (command[0].toAscii())
     {
-qDebug() << response;
 // Show Free Space
         case 'F':
         {
@@ -2432,6 +2431,48 @@ The response will be a comma separated list of items preceded by a type
 //                    item->setIcon(...);
                     model->appendRow(row);
                 }
+            }
+            break;
+        }
+/* Directory listing incremental.
+Fill a predefined model with a string from the response breakdown. A series of
+responses will give each entry in the listing, terminated by an empty filename.
+This will ease the communications load by requesting each entry only after
+the previous entry has been fully received.
+*/
+        case 'd':
+        {
+            if (breakdown.size() < 1) break;
+// Empty parameters received indicates the directory listing has ended.
+            if (breakdown.size() == 1) break;
+            for (int i=1; i<breakdown.size(); i++)
+            {
+                QChar type = breakdown[i][0];
+                bool ok;
+                QString fileSize = QString("%1")
+                    .arg((float)breakdown[i].mid(1,8).toInt(&ok,16)/1000000,8,'f',3);
+                if (type == 'd')
+                    fileSize = "";
+                if ((type == 'f') || (type == 'd'))
+                {
+                    QString fileName = breakdown[i].mid(9,breakdown[i].length()-1);
+                    QFont font;
+                    if (type == 'd') font.setBold(true);
+                    QStandardItem *nameItem = new QStandardItem(fileName);
+                    QStandardItem *sizeItem = new QStandardItem(fileSize);
+                    QList<QStandardItem *> row;
+                    nameItem->setFont(font);
+                    nameItem->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
+                    sizeItem->setData(Qt::AlignRight, Qt::TextAlignmentRole);
+                    row.append(nameItem);
+                    row.append(sizeItem);
+                    nameItem->setData(QVariant(type));
+//                    item->setIcon(...);
+                    model->appendRow(row);
+                }
+/* Request the next entry by sending another incremental directory command with
+no directory name. */
+                socket->write("fd\r\n");
             }
             break;
         }
@@ -2537,7 +2578,8 @@ This requests the directory entry for the top directory only.
 
 void PowerManagementGui::refreshDirectory()
 {
-    socket->write("fD/\n\r");
+    model->clear();
+    socket->write("fd/\n\r");
 }
 
 //-----------------------------------------------------------------------------
