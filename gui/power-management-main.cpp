@@ -1899,6 +1899,10 @@ void PowerManagementGui::on_connectButton_clicked()
         {
             connect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
             PowerManagementMainUi.connectButton->setText("Disconnect");
+/* Turn on microcontroller communications */
+            socket->write("pc+\n\r");
+/* This should cause the microcontroller to respond with all data */
+            socket->write("dS\n\r");
         }
         else
         {
@@ -1943,6 +1947,10 @@ void PowerManagementGui::on_connectButton_clicked()
         }
         msgBox.close();
         PowerManagementMainUi.connectButton->setText("Disconnect");
+/* Turn on microcontroller communications */
+        socket->write("pc+\n\r");
+/* This should cause the microcontroller to respond with all data */
+        socket->write("dS\n\r");
     }
     else
     {
