@@ -400,7 +400,7 @@ void checkChargerWatchdog(void)
         vTaskDelete(prvChargerTask);
         xTaskCreate(prvChargerTask, (signed portCHAR * ) "Charger", \
                     configMINIMAL_STACK_SIZE, NULL, CHARGER_TASK_PRIORITY, NULL);
-        sendStringLowPriority("D","Charger Restarted");
+        sendDebugString("D","Charger Restarted");
         recordString("D","Charger Restarted");
     }
 }

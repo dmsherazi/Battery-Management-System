@@ -356,7 +356,7 @@ void checkMeasurementWatchdog(void)
         vTaskDelete(prvMeasurementTask);
         xTaskCreate(prvMeasurementTask, (signed portCHAR * ) "Measurement", \
                 configMINIMAL_STACK_SIZE, NULL, MEASUREMENT_TASK_PRIORITY, NULL);
-        sendStringLowPriority("D","Measurement Restarted");
+        sendDebugString("D","Measurement Restarted");
         recordString("D","Measurement Restarted");
     }
 }

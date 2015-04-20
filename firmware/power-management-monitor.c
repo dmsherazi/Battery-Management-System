@@ -162,7 +162,7 @@ some currents. */
                 monitorWatchdogCount = 0;
                 for (i=0; i<NUM_IFS; i++) results[test][i] = getCurrent(i);
 /* Send a progress update */
-                dataMessageSend("pQ",0,test);
+                dataMessageSendLowPriority("pQ",0,test);
             }
 
 /* Estimate the offsets only when they are less than a threshold. Find the lowest
@@ -209,11 +209,11 @@ quiescent current */
                     }
                 }
             }
-            dataMessageSend("pQ",quiescentCurrent,7);
+            dataMessageSendLowPriority("pQ",quiescentCurrent,7);
 
 /* Restore switches and report back */
             setSwitchControlBits(switchSettings);
-            dataMessageSend("dS",switchSettings,0);
+            dataMessageSendLowPriority("dS",switchSettings,0);
 /* Compute the SoC from the OCV. Note the conditions for which OCV gives an
 accurate estimate of SoC. */
 /* Zero counters, and reset battery states */
@@ -245,7 +245,7 @@ accurate estimate of SoC. */
 /* Send out a time string */
         char timeString[20];
         putTimeToString(timeString);
-        sendString("pH",timeString);
+        sendDebugString("pH",timeString);
         recordString("pH",timeString);
         uint8_t i;
         for (i=0; i<NUM_BATS; i++)
@@ -253,7 +253,7 @@ accurate estimate of SoC. */
             id[2] = '1'+i;
 /* Send out battery terminal measurements. */
             id[1] = 'B';
-            dataMessageSend(id,
+            dataMessageSendLowPriority(id,
                         getBatteryCurrent(i)-currentOffsets.data[i],
                         getBatteryVoltage(i));
             recordDual(id,
@@ -261,7 +261,7 @@ accurate estimate of SoC. */
                         getBatteryVoltage(i));
 /* Send out battery state of charge. */
             id[1] = 'C';
-            sendResponse(id,batterySoC[i]);
+            sendResponseLowPriority(id,batterySoC[i]);
             recordSingle(id,batterySoC[i]);
 /* Send out battery operational, fill, charging and health status indication. */
             uint16_t states = (batteryOpState[i] & 0x03) |
@@ -269,7 +269,7 @@ accurate estimate of SoC. */
                              ((getBatteryChargingPhase(i) & 0x03) << 4) |
                              ((batteryHealthState[i] & 0x03) << 6);
             id[1] = 'O';
-            sendResponse(id,states);
+            sendResponseLowPriority(id,states);
             recordSingle(id,states);
         }
 /* Send out load terminal measurements. */
@@ -277,7 +277,7 @@ accurate estimate of SoC. */
         for (i=0; i<NUM_LOADS; i++)
         {
             id[2] = '1'+i;
-            dataMessageSend(id,
+            dataMessageSendLowPriority(id,
                         getLoadCurrent(i)-currentOffsets.data[NUM_BATS+i],
                         getLoadVoltage(i));
             recordDual(id,
@@ -289,7 +289,7 @@ accurate estimate of SoC. */
         for (i=0; i<NUM_PANELS; i++)
         {
             id[2] = '1'+i;
-            dataMessageSend(id,
+            dataMessageSendLowPriority(id,
                         getPanelCurrent(i)-currentOffsets.data[NUM_BATS+NUM_LOADS+i],
                         getPanelVoltage(i));
             recordDual(id,
@@ -297,21 +297,21 @@ accurate estimate of SoC. */
                         getPanelVoltage(i));
         }
 /* Send out temperature measurement. */
-        sendResponse("dT",getTemperature());
+        sendResponseLowPriority("dT",getTemperature());
         recordSingle("dT",getTemperature());
 /* Send out control variables - isAutoTrack(), recording, calibrate */
-        sendResponse("dD",getControls());
+        sendResponseLowPriority("dD",getControls());
         recordSingle("dD",getControls());
-        sendResponse("ds",(int)getSwitchControlBits());
+        sendResponseLowPriority("ds",(int)getSwitchControlBits());
         recordSingle("ds",(int)getSwitchControlBits());
 /* Send switch and decision settings during tracking */
         if (isAutoTrack())
         {
-            sendResponse("dd",decisionStatus);
+            sendResponseLowPriority("dd",decisionStatus);
             recordSingle("dd",decisionStatus);
         }
 /* Read the interface fault indicators and send out */
-        sendResponse("dI",getIndicators());
+        sendResponseLowPriority("dI",getIndicators());
         recordSingle("dI",getIndicators());
 
 /*------------- COMPUTE BATTERY STATE -----------------------*/
@@ -942,7 +942,7 @@ void checkMonitorWatchdog(void)
         vTaskDelete(prvMonitorTask);
         xTaskCreate(prvMonitorTask, (signed portCHAR * ) "Monitor", \
                     configMINIMAL_STACK_SIZE, NULL, MONITOR_TASK_PRIORITY, NULL);
-        sendStringLowPriority("D","Monitor Restarted");
+        sendDebugString("D","Monitor Restarted");
         recordString("D","Monitor Restarted");
     }
 }

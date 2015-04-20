@@ -284,7 +284,6 @@ is full. */
                 fileStatus = f_write(&file[fileHandle],line+3,length,&numWritten);
                 if (numWritten != length)
                 {
-//dataMessageSend("DF1",fileStatus,numWritten);
                     fileStatus = FR_DENIED;
                 }
                 if (fileStatus == FR_OK) f_sync(&file[fileHandle]);
@@ -448,11 +447,6 @@ Checks the filename and handle for the write and read files, if they are open. *
     }
 /* Return the file status */
     xQueueSendToBack(fileReceiveQueue,&fileStatus,FILE_SEND_TIMEOUT);
-/* Debug*/
-if (fileStatus != FR_OK)
-{
-//dataMessageSend("DFile",line[0],fileStatus);
-}
 }
 
 /*--------------------------------------------------------------------------*/

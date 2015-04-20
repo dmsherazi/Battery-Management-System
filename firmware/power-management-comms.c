@@ -59,6 +59,10 @@ Initial 29 September 2013
 static void initGlobals(void);
 static void parseCommand(uint8_t* line);
 static void resetCallback(xTimerHandle resethandle);
+void commsPrintInt(int32_t value);
+void commsPrintHex(uint32_t value);
+void commsPrintString(char *ch);
+void commsPrintChar(char *ch);
 
 /*--------------------------------------------------------------------------*/
 /* Global Variables */
@@ -203,7 +207,7 @@ released. The command is followed by an interface number 0-5 being batteries
 /* Send an ident response */
         case 'E':
             {
-                sendStringLowPriority("DD", "Battery Management System v0.1");
+                sendDebugString("DD", "Battery Management System v0.1");
                 break;
             }
 /* Set the battery SoC from the OCV */
@@ -634,7 +638,7 @@ sent, the rest remains in the buffer until the next request. */
                             if (sendData[sendPointer] == '\n')
                             {
                                 sendData[sendPointer+1] = 0;
-                                sendStringLowPriority("fG",sendData);
+                                sendDebugString("fG",sendData);
                                 sendPointer = 0;
                                 numberRecords--;
                                 break;
@@ -880,21 +884,23 @@ This blocks indefinitely until the queue is empty of all messages.
 
 void dataMessageSendLowPriority(char* ident, int32_t param1, int32_t param2)
 {
-    if ((ident[0] == 'D') && !configData.config.debugMessageSend) return;
+    if (configData.config.measurementSend)
+    {
 /* If any characters are on the send queue, block on the commsEmptySemaphore
 which is released by the ISR after the last character has been sent. One
 message is then sent. The calling task cannot queue more than one message. */
 /* Hold indefinitely as the message must not be abandoned */
-    while (uxQueueMessagesWaiting(commsSendQueue) > 0)
-        xSemaphoreTake(commsEmptySemaphore,portMAX_DELAY);
-    if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_DELAY)) return;
-    commsPrintString(ident);
-    commsPrintString(",");
-    commsPrintInt(param1);
-    commsPrintString(",");
-    commsPrintInt(param2);
-    commsPrintString("\r\n");
-    xSemaphoreGive(commsSendSemaphore);
+        while (uxQueueMessagesWaiting(commsSendQueue) > 0)
+            xSemaphoreTake(commsEmptySemaphore,portMAX_DELAY);
+        if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_DELAY)) return;
+        commsPrintString(ident);
+        commsPrintString(",");
+        commsPrintInt(param1);
+        commsPrintString(",");
+        commsPrintInt(param2);
+        commsPrintString("\r\n");
+        xSemaphoreGive(commsSendSemaphore);
+    }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -921,9 +927,65 @@ void sendResponse(char* ident, int32_t parameter)
 }
 
 /*--------------------------------------------------------------------------*/
+/** @brief Send a data message with one parameter at low priority.
+
+Use to send a simple response to a command. The calling task will block until
+commsSendSemaphore is available.
+
+@param[in] char* ident. Response identifier string
+@param[in] int32_t parameter. Single integer parameter.
+*/
+
+void sendResponseLowPriority(char* ident, int32_t parameter)
+{
+    if (configData.config.measurementSend)
+    {
+/* If any characters are on the send queue, block on the commsEmptySemaphore
+which is released by the ISR after the last character has been sent. One
+message is then sent. The calling task cannot queue more than one message. */
+/* Hold indefinitely as the message must not be abandoned */
+        while (uxQueueMessagesWaiting(commsSendQueue) > 0)
+            xSemaphoreTake(commsEmptySemaphore,portMAX_DELAY);
+        if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_DELAY)) return;
+        commsPrintString(ident);
+        commsPrintString(",");
+        commsPrintInt(parameter);
+        commsPrintString("\r\n");
+        xSemaphoreGive(commsSendSemaphore);
+    }
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Send a debug message with one parameter at low priority.
+
+Use to send a simple debug response to a command. The calling task will block
+until commsSendSemaphore is available.
+
+@param[in] char* ident. Response identifier string
+@param[in] int32_t parameter. Single integer parameter.
+*/
+
+void sendDebugResponse(char* ident, int32_t parameter)
+{
+    if ((ident[0] == 'D') && !configData.config.debugMessageSend) return;
+/* If any characters are on the send queue, block on the commsEmptySemaphore
+which is released by the ISR after the last character has been sent. One
+message is then sent. The calling task cannot queue more than one message. */
+/* Hold indefinitely as the message must not be abandoned */
+    while (uxQueueMessagesWaiting(commsSendQueue) > 0)
+        xSemaphoreTake(commsEmptySemaphore,portMAX_DELAY);
+    if (! xSemaphoreTake(commsSendSemaphore,COMMS_SEND_DELAY)) return;
+    commsPrintString(ident);
+    commsPrintString(",");
+    commsPrintInt(parameter);
+    commsPrintString("\r\n");
+    xSemaphoreGive(commsSendSemaphore);
+}
+
+/*--------------------------------------------------------------------------*/
 /** @brief Send a string
 
-Use to send a string. This abandons the message if it cannot get the
+Use to send a string. This simply abandons the message if it cannot get the
 commsSendSemaphore.
 
 @param[in] char* ident. Response identifier string
@@ -959,6 +1021,41 @@ This blocks indefinitely until the queue is empty of all messages.
 */
 
 void sendStringLowPriority(char* ident, char* string)
+{
+    if (configData.config.measurementSend)
+    {
+/* If any characters are on the send queue, block on the commsEmptySemaphore
+which is released by the ISR after the last character has been sent. One
+message is then sent. The calling task cannot queue more than one message. */
+/* Hold indefinitely as the message must not be abandoned */
+        if (uxQueueSpacesAvailable(commsSendQueue) >=
+            stringLength(ident)+stringLength(string)+3)
+        {
+            while (uxQueueMessagesWaiting(commsSendQueue) > 0)
+                xSemaphoreTake(commsEmptySemaphore,portMAX_DELAY);
+            xSemaphoreTake(commsSendSemaphore,portMAX_DELAY);
+            commsPrintString(ident);
+            commsPrintString(",");
+            commsPrintString(string);
+            commsPrintString("\r\n");
+            xSemaphoreGive(commsSendSemaphore);
+        }
+    }
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Send a debug string at low priority.
+
+Use to send a debug string. A message is only sent if the commsSendQueue is
+empty and the debug messages are enabled.
+
+This blocks indefinitely until the queue is empty of all messages.
+
+@param[in] char* ident. Response identifier string
+@param[in] int32_t parameter. Single integer parameter.
+*/
+
+void sendDebugString(char* ident, char* string)
 {
     if ((ident[0] == 'D') && !configData.config.debugMessageSend) return;
 /* If any characters are on the send queue, block on the commsEmptySemaphore

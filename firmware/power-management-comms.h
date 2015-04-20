@@ -46,12 +46,11 @@ void initComms(void);
 void dataMessageSend(char* ident, int32_t parm1, int32_t parm2);
 void dataMessageSendLowPriority(char* ident, int32_t param1, int32_t param2);
 void sendResponse(char* ident, int32_t parameter);
+void sendResponseLowPriority(char* ident, int32_t parameter);
+void sendDebugResponse(char* ident, int32_t parameter);
 void sendString(char* ident, char* string);
 void sendStringLowPriority(char* ident, char* string);
-void commsPrintInt(int32_t value);
-void commsPrintHex(uint32_t value);
-void commsPrintString(char *ch);
-void commsPrintChar(char *ch);
+void sendDebugString(char* ident, char* string);
 
 #endif
 

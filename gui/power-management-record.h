@@ -81,6 +81,8 @@ private:
     bool readFileOpen;
     QStandardItemModel *model;
     int row;
+    bool directoryEnded;
+    bool nextDirectoryEntry;
 
 };
 

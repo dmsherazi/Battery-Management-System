@@ -196,6 +196,7 @@ independent of formats.
 
 void PowerManagementRecordGui::onMessageReceived(const QString &response)
 {
+qDebug() << response;
     QStringList breakdown = response.split(",");
     QString command = breakdown[0].right(1);
 // Error Code
@@ -255,7 +256,9 @@ the previous entry has been fully received.
         {
             if (breakdown.size() < 1) break;
 // Empty parameters received indicates the directory listing has ended.
-            if (breakdown.size() == 1) break;
+            directoryEnded = (breakdown.size() == 1);
+            if (directoryEnded) break;
+            nextDirectoryEntry = true;
             for (int i=1; i<breakdown.size(); i++)
             {
                 QChar type = breakdown[i][0];
@@ -415,7 +418,9 @@ void PowerManagementRecordGui::on_registerButton_clicked()
 //-----------------------------------------------------------------------------
 /** @brief Refresh the Directory.
 
-This requests the directory entry for the top directory only.
+This requests the first directory entry for the top directory only.
+Subsequent directory entries are obtained when the response to the previous
+one has been received.
 */
 
 void PowerManagementRecordGui::refreshDirectory()
