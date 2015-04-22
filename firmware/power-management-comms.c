@@ -59,6 +59,7 @@ Initial 29 September 2013
 static void initGlobals(void);
 static void parseCommand(uint8_t* line);
 static void resetCallback(xTimerHandle resethandle);
+static void lapseCommsCallback(xTimerHandle lapseCommsTimer);
 void commsPrintInt(int32_t value);
 void commsPrintHex(uint32_t value);
 void commsPrintString(char *ch);
@@ -88,6 +89,8 @@ static char writeFileName[12];
 static char readFileName[12];
 static uint8_t writeFileHandle;
 static uint8_t readFileHandle;
+static int lapseCommsID;
+static xTimerHandle lapseCommsTimer;
 
 /*--------------------------------------------------------------------------*/
 /* @brief Communications Receive Task
@@ -103,14 +106,19 @@ void prvCommsTask( void *pvParameters )
 
     initGlobals();
 
+/* Timer to cause communications to cease if nothing received for 10 seconds */
+    lapseCommsTimer = xTimerCreate("Lapse Comms",10000,pdTRUE,
+                        (void *)lapseCommsID,lapseCommsCallback);
+
     while(1)
     {
-/* Build a command line string before actioning. the task will block
+/* Build a command line string before actioning. The task will block
 indefinitely waiting for input. */
         char character;
         xQueueReceive(commsReceiveQueue,&character,portMAX_DELAY);
         if ((character == 0x0D) || (character == 0x0A) || (characterPosition > 78))
         {
+            xTimerReset(lapseCommsTimer,0);
             line[characterPosition] = 0;
             characterPosition = 0;
             parseCommand(line);
@@ -638,7 +646,7 @@ sent, the rest remains in the buffer until the next request. */
                             if (sendData[sendPointer] == '\n')
                             {
                                 sendData[sendPointer+1] = 0;
-                                sendDebugString("fG",sendData);
+                                sendString("fG",sendData);
                                 sendPointer = 0;
                                 numberRecords--;
                                 break;
@@ -1181,5 +1189,19 @@ void commsPrintChar(char *ch)
         }
         commsEnableTxInterrupt(true);
     }
+}
+
+/*--------------------------------------------------------------------------*/
+/** @brief Callback function to lapse communications
+
+This is called if the lapse communications timer is not reset by a received
+message within the timeout period. The GUI is expected to regularly send a
+message of some sort to keep communications alive. This feature allows
+power hungry communications circuits to be used only when the GUI is open.
+*/
+
+void lapseCommsCallback(xTimerHandle lapseCommsTimer)
+{
+    configData.config.enableSend = false;    
 }
 

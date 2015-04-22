@@ -196,7 +196,6 @@ independent of formats.
 
 void PowerManagementRecordGui::onMessageReceived(const QString &response)
 {
-qDebug() << response;
     QStringList breakdown = response.split(",");
     QString command = breakdown[0].right(1);
 // Error Code
