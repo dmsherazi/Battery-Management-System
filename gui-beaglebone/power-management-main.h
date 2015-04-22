@@ -85,12 +85,12 @@ private slots:
     void on_panelBattery1_pressed();
     void on_panelBattery2_pressed();
     void on_panelBattery3_pressed();
-    void on_load1CheckBox_clicked();
-    void on_load2CheckBox_clicked();
-    void on_panelCheckBox_clicked();
-    void on_battery1CheckBox_clicked();
-    void on_battery2CheckBox_clicked();
-    void on_battery3CheckBox_clicked();
+    void on_load1PushButton_clicked();
+    void on_load2PushButton_clicked();
+    void on_panelPushButton_clicked();
+    void on_battery1PushButton_clicked();
+    void on_battery2PushButton_clicked();
+    void on_battery3PushButton_clicked();
     void on_battery1OverCurrent_clicked();
     void on_battery2OverCurrent_clicked();
     void on_battery3OverCurrent_clicked();
@@ -101,7 +101,7 @@ private slots:
     void on_battery2SoCReset_clicked();
     void on_battery3SoCReset_clicked();
     bool testIndicator(const IndicatorType indicator);
-    void on_autoTrackCheckBox_clicked();
+    void on_autoTrackPushButton_clicked();
     void disableRadioButtons(bool enable);
 // Configuration
     void on_timeSetButton_clicked();
@@ -118,12 +118,15 @@ private slots:
     void on_absorptionMuteCheckbox_clicked();
     void configureMessageReceived(const QString text);
 // Recording
+    void on_newFileButton_clicked();
+    void onListItemClicked(const QModelIndex & index);
+    void on_recordFileButton_clicked();
     void on_startRecordingButton_clicked();
     void on_stopRecordingButton_clicked();
     void on_closeRecordingFileButton_clicked();
-    void on_recordFileButton_clicked();
     void on_registerButton_clicked();
     void recordMessageReceived(const QString text);
+    void on_refreshListButton_clicked();
 private:
 // User Interface object instance
     Ui::PowerManagementDialog PowerManagementMainUi;
@@ -157,7 +160,7 @@ private:
     bool recordingInitialised;
     bool configInitialised;
     QStandardItemModel *model;
-    int row;
+    int rowCount;
     QLineEdit* lineEditObject;
 };
 

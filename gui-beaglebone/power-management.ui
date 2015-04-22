@@ -83,7 +83,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QCheckBox" name="battery1CheckBox">
+    <widget class="QPushButton" name="battery1PushButton">
      <property name="geometry">
       <rect>
        <x>149</x>
@@ -97,6 +97,9 @@
      </property>
      <property name="text">
       <string>Batt 1</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <property name="checked">
       <bool>false</bool>
@@ -213,7 +216,7 @@
       <enum>Qt::Vertical</enum>
      </property>
     </widget>
-    <widget class="QCheckBox" name="load1CheckBox">
+    <widget class="QPushButton" name="load1PushButton">
      <property name="geometry">
       <rect>
        <x>382</x>
@@ -227,6 +230,9 @@
      </property>
      <property name="text">
       <string>Load 1</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <property name="checked">
       <bool>false</bool>
@@ -299,7 +305,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QCheckBox" name="battery2CheckBox">
+    <widget class="QPushButton" name="battery2PushButton">
      <property name="geometry">
       <rect>
        <x>230</x>
@@ -313,6 +319,9 @@
      </property>
      <property name="text">
       <string>Batt 2</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="Line" name="battery3line3">
@@ -685,7 +694,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QCheckBox" name="load2CheckBox">
+    <widget class="QPushButton" name="load2PushButton">
      <property name="geometry">
       <rect>
        <x>466</x>
@@ -699,6 +708,9 @@
      </property>
      <property name="text">
       <string>Load 2</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <property name="checked">
       <bool>false</bool>
@@ -930,7 +942,7 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QCheckBox" name="autoTrackCheckBox">
+    <widget class="QPushButton" name="autoTrackPushButton">
      <property name="geometry">
       <rect>
        <x>28</x>
@@ -947,6 +959,9 @@
      </property>
      <property name="text">
       <string>Auto Track</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <property name="checked">
       <bool>false</bool>
@@ -1051,7 +1066,7 @@
       <pixmap resource="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc">:/main/battery2.png</pixmap>
      </property>
     </widget>
-    <widget class="QCheckBox" name="panelCheckBox">
+    <widget class="QPushButton" name="panelPushButton">
      <property name="geometry">
       <rect>
        <x>550</x>
@@ -1065,6 +1080,9 @@
      </property>
      <property name="text">
       <string>Panel</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <property name="checked">
       <bool>false</bool>
@@ -1407,7 +1425,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QCheckBox" name="battery3CheckBox">
+    <widget class="QPushButton" name="battery3PushButton">
      <property name="geometry">
       <rect>
        <x>310</x>
@@ -1421,6 +1439,9 @@
      </property>
      <property name="text">
       <string>Batt 3</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="Line" name="battery1line2">
@@ -1896,17 +1917,17 @@
     </widget>
     <zorder>battery1Charge</zorder>
     <zorder>load2OverCurrent</zorder>
-    <zorder>battery1CheckBox</zorder>
+    <zorder>battery1PushButton</zorder>
     <zorder>battery1Fill</zorder>
     <zorder>battery1line1</zorder>
     <zorder>battery2line1</zorder>
     <zorder>battery2Fill</zorder>
     <zorder>line</zorder>
-    <zorder>load1CheckBox</zorder>
+    <zorder>load1PushButton</zorder>
     <zorder>battery1Op</zorder>
     <zorder>battery2line3</zorder>
     <zorder>battery3OverCurrent</zorder>
-    <zorder>battery2CheckBox</zorder>
+    <zorder>battery2PushButton</zorder>
     <zorder>battery3line3</zorder>
     <zorder>battery3Fill</zorder>
     <zorder>load1Image</zorder>
@@ -1914,7 +1935,7 @@
     <zorder>layoutWidget</zorder>
     <zorder>battery2line2</zorder>
     <zorder>battery2OverCurrent</zorder>
-    <zorder>load2CheckBox</zorder>
+    <zorder>load2PushButton</zorder>
     <zorder>battery1Charging</zorder>
     <zorder>battery2UnderVoltage</zorder>
     <zorder>battery3Charging</zorder>
@@ -1924,12 +1945,12 @@
     <zorder>panelImage</zorder>
     <zorder>battery1Health</zorder>
     <zorder>battery3Charge</zorder>
-    <zorder>autoTrackCheckBox</zorder>
+    <zorder>autoTrackPushButton</zorder>
     <zorder>battery1line3</zorder>
     <zorder>load2Image</zorder>
     <zorder>load1UnderVoltage</zorder>
     <zorder>battery3Image</zorder>
-    <zorder>panelCheckBox</zorder>
+    <zorder>panelPushButton</zorder>
     <zorder>battery2Health</zorder>
     <zorder>battery2Charge</zorder>
     <zorder>battery3Health</zorder>
@@ -1944,7 +1965,7 @@
     <zorder>battery3line2</zorder>
     <zorder>load2UnderVoltage</zorder>
     <zorder>battery1OverCurrent</zorder>
-    <zorder>battery3CheckBox</zorder>
+    <zorder>battery3PushButton</zorder>
     <zorder>battery1line2</zorder>
     <zorder>load1OverCurrent</zorder>
     <zorder>battery1UnderVoltage</zorder>
@@ -1989,22 +2010,6 @@
      </property>
      <property name="text">
       <string>Size (MB)</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="stopRecordingButton">
-     <property name="geometry">
-      <rect>
-       <x>198</x>
-       <y>145</y>
-       <width>93</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Pause recording but do not close the file.</string>
-     </property>
-     <property name="text">
-      <string>Stop Record</string>
      </property>
     </widget>
     <widget class="QTableView" name="fileTableView">
@@ -2103,10 +2108,20 @@
        <x>76</x>
        <y>45</y>
        <width>99</width>
-       <height>141</height>
+       <height>226</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="recordingLayout">
+      <item>
+       <widget class="QPushButton" name="newFileButton">
+        <property name="toolTip">
+         <string>Open the specified remote file for recording.</string>
+        </property>
+        <property name="text">
+         <string>New File</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QPushButton" name="recordFileButton">
         <property name="toolTip">
@@ -2134,6 +2149,26 @@
         </property>
         <property name="text">
          <string>Start Record</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="stopRecordingButton">
+        <property name="toolTip">
+         <string>Pause recording but do not close the file.</string>
+        </property>
+        <property name="text">
+         <string>Stop Record</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="refreshListButton">
+        <property name="toolTip">
+         <string>Open the specified remote file for recording.</string>
+        </property>
+        <property name="text">
+         <string>Refresh List</string>
         </property>
        </widget>
       </item>
@@ -2727,46 +2762,14 @@
     <widget class="QPushButton" name="resetMissing1Button">
      <property name="geometry">
       <rect>
-       <x>236</x>
+       <x>212</x>
        <y>365</y>
-       <width>31</width>
-       <height>21</height>
+       <width>79</width>
+       <height>26</height>
       </rect>
      </property>
      <property name="toolTip">
       <string>Reset Battery 1 Missing Status to Good.</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="resetMissing2Button">
-     <property name="geometry">
-      <rect>
-       <x>344</x>
-       <y>365</y>
-       <width>31</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Reset Battery 2 Missing Status to Good.</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="resetMissing3Button">
-     <property name="geometry">
-      <rect>
-       <x>456</x>
-       <y>365</y>
-       <width>31</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Reset Battery 3 Missing Status to Good.</string>
      </property>
      <property name="text">
       <string/>
@@ -2893,6 +2896,38 @@
      </property>
      <property name="frameShape">
       <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="resetMissing3Button">
+     <property name="geometry">
+      <rect>
+       <x>432</x>
+       <y>365</y>
+       <width>79</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Reset Battery 1 Missing Status to Good.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="resetMissing2Button">
+     <property name="geometry">
+      <rect>
+       <x>322</x>
+       <y>365</y>
+       <width>79</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Reset Battery 1 Missing Status to Good.</string>
      </property>
      <property name="text">
       <string/>

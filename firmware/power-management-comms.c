@@ -107,8 +107,8 @@ void prvCommsTask( void *pvParameters )
     initGlobals();
 
 /* Timer to cause communications to cease if nothing received for 10 seconds */
-    lapseCommsTimer = xTimerCreate("Lapse Comms",10000,pdTRUE,
-                        (void *)lapseCommsID,lapseCommsCallback);
+    lapseCommsTimer = xTimerCreate("Lapse Comms",10000,pdTRUE,0,lapseCommsCallback);
+    if (lapseCommsTimer != NULL) xTimerStart(lapseCommsTimer,0);
 
     while(1)
     {
@@ -118,7 +118,7 @@ indefinitely waiting for input. */
         xQueueReceive(commsReceiveQueue,&character,portMAX_DELAY);
         if ((character == 0x0D) || (character == 0x0A) || (characterPosition > 78))
         {
-            xTimerReset(lapseCommsTimer,0);
+            if (lapseCommsTimer != NULL) xTimerReset(lapseCommsTimer,0);
             line[characterPosition] = 0;
             characterPosition = 0;
             parseCommand(line);

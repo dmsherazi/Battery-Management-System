@@ -46,6 +46,7 @@ detailed monitoring and for configuration.
 #include <QFileDialog>
 #include <QStandardItemModel>
 #include <QDateTime>
+#include <QDate>
 #include <QDir>
 #include <QFile>
 #include <QDebug>
@@ -157,12 +158,12 @@ void PowerManagementGui::initGui()
     PowerManagementMainUi.load2Voltage->clear();
     PowerManagementMainUi.panelCurrent->clear();
     PowerManagementMainUi.panelVoltage->clear();
-    PowerManagementMainUi.battery1CheckBox->setChecked(true);
-    PowerManagementMainUi.battery2CheckBox->setChecked(true);
-    PowerManagementMainUi.battery3CheckBox->setChecked(true);
-    PowerManagementMainUi.load1CheckBox->setChecked(true);
-    PowerManagementMainUi.load2CheckBox->setChecked(true);
-    PowerManagementMainUi.panelCheckBox->setChecked(true);
+    PowerManagementMainUi.battery1PushButton->setChecked(true);
+    PowerManagementMainUi.battery2PushButton->setChecked(true);
+    PowerManagementMainUi.battery3PushButton->setChecked(true);
+    PowerManagementMainUi.load1PushButton->setChecked(true);
+    PowerManagementMainUi.load2PushButton->setChecked(true);
+    PowerManagementMainUi.panelPushButton->setChecked(true);
 
     PowerManagementMainUi.battery1SoCReset->
         setStyleSheet("background-color:lightpink;");
@@ -251,7 +252,7 @@ void PowerManagementGui::processResponse(const QString response)
     if (size > 1) secondField = breakdown[1].simplified();
     QString current, voltage;
 /* When the time field is received, send back a short message to keep comms
-alive. Also check for calibration as time emssages stop during this process. */
+alive. Also check for calibration as time messages stop during this process. */
     if ((size > 0) && ((firstField == "pH") || (firstField == "pQ")))
     {
         socket->write("pc+\n\r");
@@ -260,7 +261,7 @@ alive. Also check for calibration as time emssages stop during this process. */
     if ((size > 0) && (firstField == "dL1"))
     {
         getCurrentVoltage(breakdown,&current,&voltage);
-        if (PowerManagementMainUi.load1CheckBox->isChecked())
+        if (PowerManagementMainUi.load1PushButton->isChecked())
         {
             if (testIndicator(load1UnderVoltage) || testIndicator(load1OverCurrent))
             {
@@ -285,7 +286,7 @@ alive. Also check for calibration as time emssages stop during this process. */
     if ((size > 0) && (firstField == "dL2"))
     {
         getCurrentVoltage(breakdown,&current,&voltage);
-        if (PowerManagementMainUi.load2CheckBox->isChecked())
+        if (PowerManagementMainUi.load2PushButton->isChecked())
         {
             if (testIndicator(load2UnderVoltage) || testIndicator(load2OverCurrent))
             {
@@ -310,7 +311,7 @@ alive. Also check for calibration as time emssages stop during this process. */
     if ((size > 0) && (firstField == "dM1"))
     {
         getCurrentVoltage(breakdown,&current,&voltage);
-        if (PowerManagementMainUi.panelCheckBox->isChecked())
+        if (PowerManagementMainUi.panelPushButton->isChecked())
         {
             if (testIndicator(panelUnderVoltage) || testIndicator(panelOverCurrent))
             {
@@ -335,7 +336,7 @@ alive. Also check for calibration as time emssages stop during this process. */
     if ((size > 0) && (firstField == "dB1"))
     {
         getCurrentVoltage(breakdown,&current,&voltage);
-        if (PowerManagementMainUi.battery1CheckBox->isChecked())
+        if (PowerManagementMainUi.battery1PushButton->isChecked())
         {
             if (testIndicator(battery1UnderVoltage) || testIndicator(battery1OverCurrent))
             {
@@ -360,7 +361,7 @@ alive. Also check for calibration as time emssages stop during this process. */
     if ((size > 0) && (firstField == "dB2"))
     {
         getCurrentVoltage(breakdown,&current,&voltage);
-        if (PowerManagementMainUi.battery2CheckBox->isChecked())
+        if (PowerManagementMainUi.battery2PushButton->isChecked())
         {
             if (testIndicator(battery2UnderVoltage) || testIndicator(battery2OverCurrent))
             {
@@ -385,7 +386,7 @@ alive. Also check for calibration as time emssages stop during this process. */
     if ((size > 0) && (firstField == "dB3"))
     {
         getCurrentVoltage(breakdown,&current,&voltage);
-        if (PowerManagementMainUi.battery3CheckBox->isChecked())
+        if (PowerManagementMainUi.battery3PushButton->isChecked())
         {
             if (testIndicator(battery3UnderVoltage) || testIndicator(battery3OverCurrent))
             {
@@ -411,7 +412,7 @@ alive. Also check for calibration as time emssages stop during this process. */
     if ((size > 0) && (firstField == "dD"))
     {
         bool autoTrackOn = ((secondField.toInt() & 0x01) > 0);
-        PowerManagementMainUi.autoTrackCheckBox->setChecked(autoTrackOn);
+        PowerManagementMainUi.autoTrackPushButton->setChecked(autoTrackOn);
         disableRadioButtons(autoTrackOn);
     }
 // Read all the microcontroller's switch settings and set display accordingly
@@ -434,9 +435,9 @@ alive. Also check for calibration as time emssages stop during this process. */
 // Disable a battery if none of the load/panels are selected for it
         if (firstField == "dS")
         {
-            PowerManagementMainUi.battery1CheckBox->setChecked(battery1Enabled);
-            PowerManagementMainUi.battery2CheckBox->setChecked(battery2Enabled);
-            PowerManagementMainUi.battery3CheckBox->setChecked(battery3Enabled);
+            PowerManagementMainUi.battery1PushButton->setChecked(battery1Enabled);
+            PowerManagementMainUi.battery2PushButton->setChecked(battery2Enabled);
+            PowerManagementMainUi.battery3PushButton->setChecked(battery3Enabled);
             PowerManagementMainUi.load1Battery1->setEnabled(battery1Enabled);
             PowerManagementMainUi.load1Battery2->setEnabled(battery2Enabled);
             PowerManagementMainUi.load1Battery3->setEnabled(battery3Enabled);
@@ -449,7 +450,7 @@ alive. Also check for calibration as time emssages stop during this process. */
         }
 // Set each of the switch settings
         if (firstField == "dS")
-            PowerManagementMainUi.load1CheckBox->setChecked(true);
+            PowerManagementMainUi.load1PushButton->setChecked(true);
         bool load1Battery1enabled = PowerManagementMainUi.load1Battery1->isEnabled();
         bool load1Battery2enabled = PowerManagementMainUi.load1Battery2->isEnabled();
         bool load1Battery3enabled = PowerManagementMainUi.load1Battery3->isEnabled();
@@ -488,7 +489,7 @@ alive. Also check for calibration as time emssages stop during this process. */
         if (! load1Battery3enabled) PowerManagementMainUi.load1Battery3->setEnabled(false);
 
         if (firstField == "dS")
-            PowerManagementMainUi.load2CheckBox->setChecked(true);
+            PowerManagementMainUi.load2PushButton->setChecked(true);
         bool load2Battery1enabled = PowerManagementMainUi.load2Battery1->isEnabled();
         bool load2Battery2enabled = PowerManagementMainUi.load2Battery2->isEnabled();
         bool load2Battery3enabled = PowerManagementMainUi.load2Battery3->isEnabled();
@@ -773,7 +774,7 @@ alive. Also check for calibration as time emssages stop during this process. */
             PowerManagementMainUi.battery1Fill->
                 setStyleSheet("background-color:white;");
         }
-        if (PowerManagementMainUi.autoTrackCheckBox->isChecked())
+        if (PowerManagementMainUi.autoTrackPushButton->isChecked())
         {
             if (opState == 0)
             {
@@ -908,7 +909,7 @@ alive. Also check for calibration as time emssages stop during this process. */
             PowerManagementMainUi.battery2Fill->
                 setStyleSheet("background-color:white;");
         }
-        if (PowerManagementMainUi.autoTrackCheckBox->isChecked())
+        if (PowerManagementMainUi.autoTrackPushButton->isChecked())
         {
             if (opState == 0)
             {
@@ -1043,7 +1044,7 @@ alive. Also check for calibration as time emssages stop during this process. */
             PowerManagementMainUi.battery3Fill->
                 setStyleSheet("background-color:white;");
         }
-        if (PowerManagementMainUi.autoTrackCheckBox->isChecked())
+        if (PowerManagementMainUi.autoTrackPushButton->isChecked())
         {
             if (opState == 0)
             {
@@ -1149,7 +1150,7 @@ alive. Also check for calibration as time emssages stop during this process. */
 /* SoC estimates */
     if ((size > 0) && (firstField == "dC1"))
     {
-        if (PowerManagementMainUi.battery1CheckBox->isChecked())
+        if (PowerManagementMainUi.battery1PushButton->isChecked())
         {
             if (size > 1) PowerManagementMainUi.battery1Charge
                 ->setText(QString("%1").arg(secondField
@@ -1162,7 +1163,7 @@ alive. Also check for calibration as time emssages stop during this process. */
     }
     if ((size > 0) && (firstField == "dC2"))
     {
-        if (PowerManagementMainUi.battery2CheckBox->isChecked())
+        if (PowerManagementMainUi.battery2PushButton->isChecked())
         {
             if (size > 1) PowerManagementMainUi.battery2Charge
                 ->setText(QString("%1").arg(secondField
@@ -1175,7 +1176,7 @@ alive. Also check for calibration as time emssages stop during this process. */
     }
     if ((size > 0) && (firstField == "dC3"))
     {
-        if (PowerManagementMainUi.battery3CheckBox->isChecked())
+        if (PowerManagementMainUi.battery3PushButton->isChecked())
         {
             if (size > 1) PowerManagementMainUi.battery3Charge
                 ->setText(QString("%1").arg(secondField
@@ -1296,82 +1297,82 @@ the radio button should have been disabled anyway.
 
 void PowerManagementGui::on_load1Battery1_pressed()
 {
-    if (PowerManagementMainUi.battery1CheckBox->isChecked())
+    if (PowerManagementMainUi.battery1PushButton->isChecked())
     {
         socket->write("aS11\n\r");
-        PowerManagementMainUi.load1CheckBox->setChecked(true);
+        PowerManagementMainUi.load1PushButton->setChecked(true);
     }
 }
 
 void PowerManagementGui::on_load1Battery2_pressed()
 {
-    if (PowerManagementMainUi.battery2CheckBox->isChecked())
+    if (PowerManagementMainUi.battery2PushButton->isChecked())
     {
         socket->write("aS21\n\r");
-        PowerManagementMainUi.load1CheckBox->setChecked(true);
+        PowerManagementMainUi.load1PushButton->setChecked(true);
     }
 }
 
 void PowerManagementGui::on_load1Battery3_pressed()
 {
-    if (PowerManagementMainUi.battery3CheckBox->isChecked())
+    if (PowerManagementMainUi.battery3PushButton->isChecked())
     {
         socket->write("aS31\n\r");
-        PowerManagementMainUi.load1CheckBox->setChecked(true);
+        PowerManagementMainUi.load1PushButton->setChecked(true);
     }
 }
 
 void PowerManagementGui::on_load2Battery1_pressed()
 {
-    if (PowerManagementMainUi.battery1CheckBox->isChecked())
+    if (PowerManagementMainUi.battery1PushButton->isChecked())
     {
         socket->write("aS12\n\r");
-        PowerManagementMainUi.load2CheckBox->setChecked(true);
+        PowerManagementMainUi.load2PushButton->setChecked(true);
     }
 }
 
 void PowerManagementGui::on_load2Battery2_pressed()
 {
-    if (PowerManagementMainUi.battery2CheckBox->isChecked())
+    if (PowerManagementMainUi.battery2PushButton->isChecked())
     {
         socket->write("aS22\n\r");
-        PowerManagementMainUi.load2CheckBox->setChecked(true);
+        PowerManagementMainUi.load2PushButton->setChecked(true);
     }
 }
 
 void PowerManagementGui::on_load2Battery3_pressed()
 {
-    if (PowerManagementMainUi.battery3CheckBox->isChecked())
+    if (PowerManagementMainUi.battery3PushButton->isChecked())
     {
         socket->write("aS32\n\r");
-        PowerManagementMainUi.load2CheckBox->setChecked(true);
+        PowerManagementMainUi.load2PushButton->setChecked(true);
     }
 }
 
 void PowerManagementGui::on_panelBattery1_pressed()
 {
-    if (PowerManagementMainUi.battery1CheckBox->isChecked())
+    if (PowerManagementMainUi.battery1PushButton->isChecked())
     {
         socket->write("aS13\n\r");
-        PowerManagementMainUi.panelCheckBox->setChecked(true);
+        PowerManagementMainUi.panelPushButton->setChecked(true);
     }
 }
 
 void PowerManagementGui::on_panelBattery2_pressed()
 {
-    if (PowerManagementMainUi.battery2CheckBox->isChecked())
+    if (PowerManagementMainUi.battery2PushButton->isChecked())
     {
         socket->write("aS23\n\r");
-        PowerManagementMainUi.panelCheckBox->setChecked(true);
+        PowerManagementMainUi.panelPushButton->setChecked(true);
     }
 }
 
 void PowerManagementGui::on_panelBattery3_pressed()
 {
-    if (PowerManagementMainUi.battery3CheckBox->isChecked())
+    if (PowerManagementMainUi.battery3PushButton->isChecked())
     {
         socket->write("aS33\n\r");
-        PowerManagementMainUi.panelCheckBox->setChecked(true);
+        PowerManagementMainUi.panelPushButton->setChecked(true);
     }
 }
 
@@ -1387,9 +1388,9 @@ If it is checked, then do nothing as some radio buttons may be disabled
 due to disabled battery settings.
 */
 
-void PowerManagementGui::on_load1CheckBox_clicked()
+void PowerManagementGui::on_load1PushButton_clicked()
 {
-    if (! PowerManagementMainUi.load1CheckBox->isChecked())
+    if (! PowerManagementMainUi.load1PushButton->isChecked())
     {
         socket->write("aS01\n\r");
         PowerManagementMainUi.load1Battery1->setAutoExclusive(false);
@@ -1406,9 +1407,9 @@ void PowerManagementGui::on_load1CheckBox_clicked()
     }
 }
 
-void PowerManagementGui::on_load2CheckBox_clicked()
+void PowerManagementGui::on_load2PushButton_clicked()
 {
-    if (! PowerManagementMainUi.load2CheckBox->isChecked())
+    if (! PowerManagementMainUi.load2PushButton->isChecked())
     {
         socket->write("aS02\n\r");
         PowerManagementMainUi.load2Battery1->setAutoExclusive(false);
@@ -1423,9 +1424,9 @@ void PowerManagementGui::on_load2CheckBox_clicked()
     }
 }
 
-void PowerManagementGui::on_panelCheckBox_clicked()
+void PowerManagementGui::on_panelPushButton_clicked()
 {
-    if (! PowerManagementMainUi.panelCheckBox->isChecked())
+    if (! PowerManagementMainUi.panelPushButton->isChecked())
     {
         socket->write("aS03\n\r");
         PowerManagementMainUi.panelBattery1->setAutoExclusive(false);
@@ -1490,9 +1491,9 @@ if they are checked. Also disable them and send a command to turn off the
 relevant switch in the microcontroller.
 */
 
-void PowerManagementGui::on_battery1CheckBox_clicked()
+void PowerManagementGui::on_battery1PushButton_clicked()
 {
-    if (PowerManagementMainUi.battery1CheckBox->isChecked())
+    if (PowerManagementMainUi.battery1PushButton->isChecked())
     {
         PowerManagementMainUi.load1Battery1->setEnabled(true);
         PowerManagementMainUi.load2Battery1->setEnabled(true);
@@ -1527,9 +1528,9 @@ void PowerManagementGui::on_battery1CheckBox_clicked()
     }
 }
 
-void PowerManagementGui::on_battery2CheckBox_clicked()
+void PowerManagementGui::on_battery2PushButton_clicked()
 {
-    if (PowerManagementMainUi.battery2CheckBox->isChecked())
+    if (PowerManagementMainUi.battery2PushButton->isChecked())
     {
         PowerManagementMainUi.load1Battery2->setEnabled(true);
         PowerManagementMainUi.load2Battery2->setEnabled(true);
@@ -1564,9 +1565,9 @@ void PowerManagementGui::on_battery2CheckBox_clicked()
     }
 }
 
-void PowerManagementGui::on_battery3CheckBox_clicked()
+void PowerManagementGui::on_battery3PushButton_clicked()
 {
-    if (PowerManagementMainUi.battery3CheckBox->isChecked())
+    if (PowerManagementMainUi.battery3PushButton->isChecked())
     {
         PowerManagementMainUi.load1Battery3->setEnabled(true);
         PowerManagementMainUi.load2Battery3->setEnabled(true);
@@ -1628,9 +1629,9 @@ void PowerManagementGui::on_battery3SoCReset_clicked()
 
 */
 
-void PowerManagementGui::on_autoTrackCheckBox_clicked()
+void PowerManagementGui::on_autoTrackPushButton_clicked()
 {
-    if (PowerManagementMainUi.autoTrackCheckBox->isChecked())
+    if (PowerManagementMainUi.autoTrackPushButton->isChecked())
     {
         disableRadioButtons(true);
         socket->write("pa+\n\r");
@@ -2298,29 +2299,88 @@ void PowerManagementGui::initRecording()
 // Ask for the microcontroller SD card free space (process response later)
     getFreeSpace();
     model = new QStandardItemModel(0, 2, this);
+    rowCount = 0;
     PowerManagementMainUi.fileTableView->setModel(model);
     PowerManagementMainUi.fileTableView->setGridStyle(Qt::NoPen);
     PowerManagementMainUi.fileTableView->setShowGrid(false);
     QHeaderView *verticalHeader = PowerManagementMainUi.fileTableView->verticalHeader();
     verticalHeader->setResizeMode(QHeaderView::Fixed);
     verticalHeader->setDefaultSectionSize(18);
-    row = 0;
+// Signal to process a click on a directory item
+    connect(PowerManagementMainUi.fileTableView,
+                     SIGNAL(clicked(const QModelIndex)),
+                     this,SLOT(onListItemClicked(const QModelIndex)));
 // Send a command to refresh the directory
     refreshDirectory();
     writeFileHandle = 0xFF;
 }
+
+//-----------------------------------------------------------------------------
+/** @brief Create a new Recording File.
+
+A filename is created based on the day and month, plus a postfix character if
+this name already exists.
+*/
+
+void PowerManagementGui::on_newFileButton_clicked()
+{
+    PowerManagementMainUi.recordFileName->clear();
+    QString fileName = "D" + QDate::currentDate().toString("MMdd");
+/* Check listing to see if the filename exists, and if so, increment
+the character at the filename end to make it unique.
+Relies on the names being 5 characters at base with a possible postfix
+character, followed by .TXT */
+    QChar postfix;
+    for (int indx = 0; indx < rowCount; indx++)
+    {
+        QStandardItem *item = model->item(indx);
+        QString itemName = item->text();
+        QChar type = item->data().toChar();
+        if (type == 'f')
+        {
+            if (itemName.left(5) == fileName)
+            {
+                if (itemName[5] == '.') postfix = 'A';
+                else postfix = QChar(itemName[5].toAscii()+1);
+            }
+        }
+    }
+    fileName += QString(postfix) + ".TXT";
+    PowerManagementMainUi.recordFileName->setText(fileName);
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Slot to process Directory Entry Clicks.
+
+Display filename in edit box, or enter a directory and redisplay.
+*/
+
+void PowerManagementGui::onListItemClicked(const QModelIndex & index)
+{
+    PowerManagementMainUi.recordFileName->clear();
+    QStandardItem *item = model->itemFromIndex(index);
+    QString fileName = item->text();
+    QChar type = item->data().toChar();
+    if (type == 'f')
+    {
+        PowerManagementMainUi.recordFileName->setText(fileName);
+    }
+    if (type == 'd')
+        socket->write(QString("fD%1\n\r").arg(fileName).toLocal8Bit().data());
+}
+
 //-----------------------------------------------------------------------------
 /** @brief Open Recording File.
 
-If a write file is not open the specified file is opened for writing. Response
-is a status that indicates if the file was opened/created and the recording
-started. This is processed later.
+If a write file is not already open the specified file is opened for writing.
+Response is a status that indicates if the file was opened/created and the
+recording started. This is processed later.
 */
 
 void PowerManagementGui::on_recordFileButton_clicked()
 {
     QString fileName = PowerManagementMainUi.recordFileName->text();
-    if (fileName.length() > 0)
+    if (fileName.right(4) == ".TXT")
     {
         socket->write("fW");
         socket->write(fileName.toLocal8Bit().data());
@@ -2436,6 +2496,7 @@ The response will be a comma separated list of items preceded by a type
                     nameItem->setData(QVariant(type));
 //                    item->setIcon(...);
                     model->appendRow(row);
+                    rowCount++;
                 }
             }
             break;
@@ -2475,6 +2536,7 @@ the previous entry has been fully received.
                     nameItem->setData(QVariant(type));
 //                    item->setIcon(...);
                     model->appendRow(row);
+                    rowCount++;
                 }
 /* Request the next entry by sending another incremental directory command with
 no directory name. */
@@ -2573,6 +2635,16 @@ int PowerManagementGui::extractValue(const QString &response)
 void PowerManagementGui::on_registerButton_clicked()
 {
     socket->write("fM/\n\r");
+    refreshDirectory();
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Refresh the directory listing
+
+*/
+
+void PowerManagementGui::on_refreshListButton_clicked()
+{
     refreshDirectory();
 }
 
