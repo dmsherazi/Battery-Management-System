@@ -69,6 +69,9 @@ private slots:
     void on_resetMissing1Button_clicked();
     void on_resetMissing2Button_clicked();
     void on_resetMissing3Button_clicked();
+    void on_forceZeroCurrent1_clicked();
+    void on_forceZeroCurrent2_clicked();
+    void on_forceZeroCurrent3_clicked();
     void on_calibrateButton_clicked();
     void on_setTrackOptionButton_clicked();
     void on_setChargeOptionButton_clicked();

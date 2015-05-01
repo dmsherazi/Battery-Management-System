@@ -1689,6 +1689,16 @@ void PowerManagementGui::ssleep(int centiseconds)
 }
 
 //-----------------------------------------------------------------------------
+/** @brief Cause the machine to shutdown
+
+*/
+
+void PowerManagementGui::on_shutdownButton_clicked()
+{
+    accept();
+}
+
+//-----------------------------------------------------------------------------
 //                  CONFIGURE
 //-----------------------------------------------------------------------------
 /** @brief Initialise Configurations
@@ -1923,6 +1933,45 @@ void PowerManagementGui::on_resetMissing3Button_clicked()
         PowerManagementMainUi.resetMissing3Button->setText("X");
         socket->write("pm3+\n\r");
     }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Force Set the Battery 1 Current Calibration
+
+These buttons should be used sparingly, only when calibration fails and it is
+known that the current is zero. Watch out for a battery carrying about 200mA of
+quiescent current.
+*/
+
+void PowerManagementGui::on_forceZeroCurrent1_clicked()
+{
+    socket->write("pz1\n\r");
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Force Set the Battery 2 Current Calibration
+
+These buttons should be used sparingly, only when calibration fails and it is
+known that the current is zero. Watch out for a battery carrying about 200mA of
+quiescent current.
+*/
+
+void PowerManagementGui::on_forceZeroCurrent2_clicked()
+{
+    socket->write("pz2\n\r");
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Force Set the Battery 3 Current Calibration
+
+These buttons should be used sparingly, only when calibration fails and it is
+known that the current is zero. Watch out for a battery carrying about 200mA of
+quiescent current.
+*/
+
+void PowerManagementGui::on_forceZeroCurrent3_clicked()
+{
+    socket->write("pz3\n\r");
 }
 
 //-----------------------------------------------------------------------------

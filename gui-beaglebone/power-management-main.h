@@ -103,6 +103,7 @@ private slots:
     bool testIndicator(const IndicatorType indicator);
     void on_autoTrackPushButton_clicked();
     void disableRadioButtons(bool enable);
+    void on_shutdownButton_clicked();
 // Configuration
     void on_timeSetButton_clicked();
     void on_debugMessageCheckbox_clicked();
@@ -112,6 +113,9 @@ private slots:
     void on_resetMissing1Button_clicked();
     void on_resetMissing2Button_clicked();
     void on_resetMissing3Button_clicked();
+    void on_forceZeroCurrent1_clicked();
+    void on_forceZeroCurrent2_clicked();
+    void on_forceZeroCurrent3_clicked();
     void initCalibration();
     void on_calibrateButton_clicked();
     void on_setTrackOptionButton_clicked();

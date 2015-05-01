@@ -646,6 +646,45 @@ void PowerManagementConfigGui::on_resetMissing3Button_clicked()
 }
 
 //-----------------------------------------------------------------------------
+/** @brief Force Set the Battery 1 Current Calibration
+
+These buttons should be used sparingly, only when calibration fails and it is
+known that the current is zero. Watch out for a battery carrying about 200mA of
+quiescent current.
+*/
+
+void PowerManagementConfigGui::on_forceZeroCurrent1_clicked()
+{
+    socket->write("pz1\n\r");
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Force Set the Battery 2 Current Calibration
+
+These buttons should be used sparingly, only when calibration fails and it is
+known that the current is zero. Watch out for a battery carrying about 200mA of
+quiescent current.
+*/
+
+void PowerManagementConfigGui::on_forceZeroCurrent2_clicked()
+{
+    socket->write("pz2\n\r");
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Force Set the Battery 3 Current Calibration
+
+These buttons should be used sparingly, only when calibration fails and it is
+known that the current is zero. Watch out for a battery carrying about 200mA of
+quiescent current.
+*/
+
+void PowerManagementConfigGui::on_forceZeroCurrent3_clicked()
+{
+    socket->write("pz3\n\r");
+}
+
+//-----------------------------------------------------------------------------
 /** @brief Close Window
 
 */

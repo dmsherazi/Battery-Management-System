@@ -107,8 +107,7 @@ void prvCommsTask( void *pvParameters )
     initGlobals();
 
 /* Timer to cause communications to cease if nothing received for 10 seconds */
-    lapseCommsTimer = xTimerCreate("Lapse Comms",10000,pdTRUE,0,lapseCommsCallback);
-    if (lapseCommsTimer != NULL) xTimerStart(lapseCommsTimer,0);
+    lapseCommsTimer = xTimerCreate("Lapse Comms",10000,pdFALSE,0,lapseCommsCallback);
 
     while(1)
     {
@@ -403,6 +402,13 @@ released. The command is followed by an interface number 0-5 being batteries
                 if (battery < 3)
                     configData.config.floatVoltage[battery] =
                         asciiToInt((char*)line+3);
+                break;
+            }
+/* z zero current calibration by forcing current offset. */
+        case 'z':
+            {
+                if (battery < 3)
+                    setCurrentOffset(battery,getCurrent(battery));
                 break;
             }
 /*--------------------*/
