@@ -1299,7 +1299,7 @@ void PowerManagementGui::on_load1Battery1_pressed()
 {
     if (PowerManagementMainUi.battery1PushButton->isChecked())
     {
-        socket->write("aS11\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS11\n\r");
         PowerManagementMainUi.load1PushButton->setChecked(true);
     }
 }
@@ -1308,7 +1308,7 @@ void PowerManagementGui::on_load1Battery2_pressed()
 {
     if (PowerManagementMainUi.battery2PushButton->isChecked())
     {
-        socket->write("aS21\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS21\n\r");
         PowerManagementMainUi.load1PushButton->setChecked(true);
     }
 }
@@ -1317,7 +1317,7 @@ void PowerManagementGui::on_load1Battery3_pressed()
 {
     if (PowerManagementMainUi.battery3PushButton->isChecked())
     {
-        socket->write("aS31\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS31\n\r");
         PowerManagementMainUi.load1PushButton->setChecked(true);
     }
 }
@@ -1326,7 +1326,7 @@ void PowerManagementGui::on_load2Battery1_pressed()
 {
     if (PowerManagementMainUi.battery1PushButton->isChecked())
     {
-        socket->write("aS12\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS12\n\r");
         PowerManagementMainUi.load2PushButton->setChecked(true);
     }
 }
@@ -1335,7 +1335,7 @@ void PowerManagementGui::on_load2Battery2_pressed()
 {
     if (PowerManagementMainUi.battery2PushButton->isChecked())
     {
-        socket->write("aS22\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS22\n\r");
         PowerManagementMainUi.load2PushButton->setChecked(true);
     }
 }
@@ -1344,7 +1344,7 @@ void PowerManagementGui::on_load2Battery3_pressed()
 {
     if (PowerManagementMainUi.battery3PushButton->isChecked())
     {
-        socket->write("aS32\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS32\n\r");
         PowerManagementMainUi.load2PushButton->setChecked(true);
     }
 }
@@ -1353,7 +1353,7 @@ void PowerManagementGui::on_panelBattery1_pressed()
 {
     if (PowerManagementMainUi.battery1PushButton->isChecked())
     {
-        socket->write("aS13\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS13\n\r");
         PowerManagementMainUi.panelPushButton->setChecked(true);
     }
 }
@@ -1362,7 +1362,7 @@ void PowerManagementGui::on_panelBattery2_pressed()
 {
     if (PowerManagementMainUi.battery2PushButton->isChecked())
     {
-        socket->write("aS23\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS23\n\r");
         PowerManagementMainUi.panelPushButton->setChecked(true);
     }
 }
@@ -1371,7 +1371,7 @@ void PowerManagementGui::on_panelBattery3_pressed()
 {
     if (PowerManagementMainUi.battery3PushButton->isChecked())
     {
-        socket->write("aS33\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS33\n\r");
         PowerManagementMainUi.panelPushButton->setChecked(true);
     }
 }
@@ -1392,7 +1392,7 @@ void PowerManagementGui::on_load1PushButton_clicked()
 {
     if (! PowerManagementMainUi.load1PushButton->isChecked())
     {
-        socket->write("aS01\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS01\n\r");
         PowerManagementMainUi.load1Battery1->setAutoExclusive(false);
         PowerManagementMainUi.load1Battery1->setChecked(false);
         PowerManagementMainUi.load1Battery1->setAutoExclusive(true);
@@ -1411,7 +1411,7 @@ void PowerManagementGui::on_load2PushButton_clicked()
 {
     if (! PowerManagementMainUi.load2PushButton->isChecked())
     {
-        socket->write("aS02\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS02\n\r");
         PowerManagementMainUi.load2Battery1->setAutoExclusive(false);
         PowerManagementMainUi.load2Battery1->setChecked(false);
         PowerManagementMainUi.load2Battery1->setAutoExclusive(true);
@@ -1428,7 +1428,7 @@ void PowerManagementGui::on_panelPushButton_clicked()
 {
     if (! PowerManagementMainUi.panelPushButton->isChecked())
     {
-        socket->write("aS03\n\r");
+        if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS03\n\r");
         PowerManagementMainUi.panelBattery1->setAutoExclusive(false);
         PowerManagementMainUi.panelBattery1->setChecked(false);
         PowerManagementMainUi.panelBattery1->setAutoExclusive(true);
@@ -1503,21 +1503,21 @@ void PowerManagementGui::on_battery1PushButton_clicked()
     {
         if (PowerManagementMainUi.load1Battery1->isChecked())
         {
-            socket->write("aS01\n\r");
+            if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS01\n\r");
             PowerManagementMainUi.load1Battery1->setAutoExclusive(false);
             PowerManagementMainUi.load1Battery1->setChecked(false);
             PowerManagementMainUi.load1Battery1->setAutoExclusive(true);
         }
         if (PowerManagementMainUi.load2Battery1->isChecked())
         {
-            socket->write("aS02\n\r");
+            if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS02\n\r");
             PowerManagementMainUi.load2Battery1->setAutoExclusive(false);
             PowerManagementMainUi.load2Battery1->setChecked(false);
             PowerManagementMainUi.load2Battery1->setAutoExclusive(true);
         }
         if (PowerManagementMainUi.panelBattery1->isChecked())
         {
-            socket->write("aS03\n\r");
+            if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS03\n\r");
             PowerManagementMainUi.panelBattery1->setAutoExclusive(false);
             PowerManagementMainUi.panelBattery1->setChecked(false);
             PowerManagementMainUi.panelBattery1->setAutoExclusive(true);
@@ -1540,21 +1540,21 @@ void PowerManagementGui::on_battery2PushButton_clicked()
     {
         if (PowerManagementMainUi.load1Battery2->isChecked())
         {
-            socket->write("aS01\n\r");
+            if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS01\n\r");
             PowerManagementMainUi.load1Battery2->setAutoExclusive(false);
             PowerManagementMainUi.load1Battery2->setChecked(false);
             PowerManagementMainUi.load1Battery2->setAutoExclusive(true);
         }
         if (PowerManagementMainUi.load2Battery2->isChecked())
         {
-            socket->write("aS02\n\r");
+            if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS02\n\r");
             PowerManagementMainUi.load2Battery2->setAutoExclusive(false);
             PowerManagementMainUi.load2Battery2->setChecked(false);
             PowerManagementMainUi.load2Battery2->setAutoExclusive(true);
         }
         if (PowerManagementMainUi.panelBattery2->isChecked())
         {
-            socket->write("aS03\n\r");
+            if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS03\n\r");
             PowerManagementMainUi.panelBattery2->setAutoExclusive(false);
             PowerManagementMainUi.panelBattery2->setChecked(false);
             PowerManagementMainUi.panelBattery2->setAutoExclusive(true);
@@ -1577,21 +1577,21 @@ void PowerManagementGui::on_battery3PushButton_clicked()
     {
         if (PowerManagementMainUi.load1Battery3->isChecked())
         {
-            socket->write("aS01\n\r");
+            if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS01\n\r");
             PowerManagementMainUi.load1Battery3->setAutoExclusive(false);
             PowerManagementMainUi.load1Battery3->setChecked(false);
             PowerManagementMainUi.load1Battery3->setAutoExclusive(true);
         }
         if (PowerManagementMainUi.load2Battery3->isChecked())
         {
-            socket->write("aS02\n\r");
+            if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS02\n\r");
             PowerManagementMainUi.load2Battery3->setAutoExclusive(false);
             PowerManagementMainUi.load2Battery3->setChecked(false);
             PowerManagementMainUi.load2Battery3->setAutoExclusive(true);
         }
         if (PowerManagementMainUi.panelBattery3->isChecked())
         {
-            socket->write("aS03\n\r");
+            if (! PowerManagementMainUi.autoTrackPushButton->isChecked()) socket->write("aS03\n\r");
             PowerManagementMainUi.panelBattery3->setAutoExclusive(false);
             PowerManagementMainUi.panelBattery3->setChecked(false);
             PowerManagementMainUi.panelBattery3->setAutoExclusive(true);
