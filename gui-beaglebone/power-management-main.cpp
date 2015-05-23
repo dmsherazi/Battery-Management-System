@@ -80,7 +80,7 @@ PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
 // Initialize the Main GUI
     initGui();
 
-// Setup to allow first seelction of a tab to initialise the contents.
+// Setup to allow first selection of a tab to initialise the contents.
     recordingInitialised = false;
     configInitialised = false;
     connect(PowerManagementMainUi.tabWidget,SIGNAL(currentChanged(int)),
@@ -158,12 +158,12 @@ void PowerManagementGui::initGui()
     PowerManagementMainUi.load2Voltage->clear();
     PowerManagementMainUi.panelCurrent->clear();
     PowerManagementMainUi.panelVoltage->clear();
-    PowerManagementMainUi.battery1PushButton->setChecked(true);
-    PowerManagementMainUi.battery2PushButton->setChecked(true);
-    PowerManagementMainUi.battery3PushButton->setChecked(true);
-    PowerManagementMainUi.load1PushButton->setChecked(true);
-    PowerManagementMainUi.load2PushButton->setChecked(true);
-    PowerManagementMainUi.panelPushButton->setChecked(true);
+    PowerManagementMainUi.battery1PushButton->setChecked(false);
+    PowerManagementMainUi.battery2PushButton->setChecked(false);
+    PowerManagementMainUi.battery3PushButton->setChecked(false);
+    PowerManagementMainUi.load1PushButton->setChecked(false);
+    PowerManagementMainUi.load2PushButton->setChecked(false);
+    PowerManagementMainUi.panelPushButton->setChecked(false);
 
     PowerManagementMainUi.battery1SoCReset->
         setStyleSheet("background-color:lightpink;");
@@ -2347,6 +2347,7 @@ void PowerManagementGui::initRecording()
     requestRecordingStatus();
 // Ask for the microcontroller SD card free space (process response later)
     getFreeSpace();
+    PowerManagementMainUi.recordFileName->clear();
     model = new QStandardItemModel(0, 2, this);
     rowCount = 0;
     PowerManagementMainUi.fileTableView->setModel(model);
@@ -2387,14 +2388,16 @@ character, followed by .TXT */
         QChar type = item->data().toChar();
         if (type == 'f')
         {
-            if (itemName.left(5) == fileName)
+            if (itemName.left(5) == fileName.left(5))
             {
+                fileName = fileName.left(5);
                 if (itemName[5] == '.') postfix = 'A';
                 else postfix = QChar(itemName[5].toAscii()+1);
+                fileName.append(QString(postfix));
             }
         }
     }
-    fileName += QString(postfix) + ".TXT";
+    fileName.append(".TXT");
     PowerManagementMainUi.recordFileName->setText(fileName);
 }
 
