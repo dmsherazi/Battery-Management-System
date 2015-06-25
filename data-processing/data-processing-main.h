@@ -70,10 +70,11 @@ public:
     bool success();
 private slots:
     void on_openReadFileButton_clicked();
-    void on_extractButton_clicked();
     void on_dumpAllButton_clicked();
-    void on_energyButton_clicked();
     void on_splitButton_clicked();
+    void on_energyButton_clicked();
+    void on_energySaveButton_clicked();
+    void on_extractButton_clicked();
 private:
 // User Interface object instance
     Ui::DataProcessingMainWindow DataProcessingMainUi;
@@ -87,11 +88,14 @@ private:
     QStringList recordText;
     QFile* inFile;
     QFile* outFile;
+    QFile* energyOutFile;
     QString saveFile;
+    QString energySaveFile;
     QDir saveDirectory;
     QFileInfo fileInfo;
 // Record information
     QString timeRecord;
+    int tableRow;
 };
 
 #endif

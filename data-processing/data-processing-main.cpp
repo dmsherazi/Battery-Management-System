@@ -90,6 +90,9 @@ DataProcessingGui::DataProcessingGui()
     energyViewHeader << "Battery 1" << "Battery 2" << "Battery 3";
     energyViewHeader << "Load 1" << "Load 1" << "Panel" << "Total";
     DataProcessingMainUi.energyView->setHorizontalHeaderLabels(energyViewHeader);
+
+    energyOutFile = NULL;
+    outFile = NULL;
 }
 
 DataProcessingGui::~DataProcessingGui()
@@ -107,8 +110,9 @@ bool DataProcessingGui::success()
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Open a data file for Reading.
+/** @brief Open a raw data file for Reading.
 
+This button only opens the file for reading.
 */
 
 void DataProcessingGui::on_openReadFileButton_clicked()
@@ -137,8 +141,14 @@ void DataProcessingGui::on_openReadFileButton_clicked()
 //-----------------------------------------------------------------------------
 /** @brief Extract All to CSV.
 
-All data is extracted to a csv file with one record per time interval. Format
-suitable for spreadsheet analysis.
+The data files are expected to have the format of the BMS transmissions and
+will be text files. 
+
+All data is extracted to a csv file with one record per time interval. The
+records subsequent to the time record are analysed and data is extracted
+to the appropriate fields. The code expects the records to have a particular
+order as sent by the BMS and the output has the same order without any
+identification. The output format is suitable for spreadsheet analysis.
 */
 
 void DataProcessingGui::on_dumpAllButton_clicked()
@@ -166,12 +176,11 @@ void DataProcessingGui::on_dumpAllButton_clicked()
 All data is extracted to a csv file with one record per time interval with
 time starting at midnight and ending at midnight on the same day.
 
-An input file must already be opened using the Open button.
-Start time is taken from the first record of the input file and the
-end time is midnight.
+An input file must already be opened using the Open button. Start time is taken
+from the first record of the input file and the end time is midnight.
 The save file is created from the input file name and the date on the first
 record of the input file. This is updated each time the record date changes.
-If the save file exists, abort, create a parallel save file or append data.
+If the save file exists, abort and create a parallel save file or append data.
 */
 
 void DataProcessingGui::on_splitButton_clicked()
@@ -201,12 +210,18 @@ void DataProcessingGui::on_splitButton_clicked()
         if (QFile::exists(saveFile))
         {
             QMessageBox msgBox;
-            msgBox.setText(QString("A previous save file ").append(filename).append(" exists."));
-            QPushButton *overwriteButton = msgBox.addButton(tr("Overwrite"), QMessageBox::AcceptRole);
-            QPushButton *appendButton = msgBox.addButton(tr("Append"), QMessageBox::AcceptRole);
-            QPushButton *parallelButton = msgBox.addButton(tr("New File"), QMessageBox::AcceptRole);
-            QPushButton *skipButton = msgBox.addButton(tr("Skip"), QMessageBox::AcceptRole);
-            QPushButton *abortButton = msgBox.addButton(tr("Abort"), QMessageBox::AcceptRole);
+            msgBox.setText(QString("A previous save file ").append(filename).
+                            append(" exists."));
+            QPushButton *overwriteButton = msgBox.addButton(tr("Overwrite"),
+                             QMessageBox::AcceptRole);
+            QPushButton *appendButton = msgBox.addButton(tr("Append"),
+                             QMessageBox::AcceptRole);
+            QPushButton *parallelButton = msgBox.addButton(tr("New File"),
+                             QMessageBox::AcceptRole);
+            QPushButton *skipButton = msgBox.addButton(tr("Skip"),
+                            QMessageBox::AcceptRole);
+            QPushButton *abortButton = msgBox.addButton(tr("Abort"),
+                             QMessageBox::AcceptRole);
             msgBox.exec();
             if (msgBox.clickedButton() == overwriteButton)
             {
@@ -231,7 +246,8 @@ void DataProcessingGui::on_splitButton_clicked()
         if (! skip)
         {
             QFile* outFile = new QFile(saveFile);   // Open file for output
-            if (! outFile->open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+            if (! outFile->open(QIODevice::WriteOnly | QIODevice::Append
+                                                     | QIODevice::Text))
             {
                 displayErrorMessage("Could not open the output file");
                 return;
@@ -266,11 +282,12 @@ void DataProcessingGui::on_energyButton_clicked()
     if (inFile == NULL) return;
     if (! inFile->isOpen()) return;
     inFile->seek(0);      // rewind file
+    tableRow = 0;
     int interval = DataProcessingMainUi.intervalSpinBox->value();
     int intervaltype = DataProcessingMainUi.intervalType->currentIndex();
     QTextStream inStream(inFile);
     QDateTime startTime = DataProcessingMainUi.startTime->dateTime();
-    QDateTime endTime = DataProcessingMainUi.endTime->dateTime();
+    QDateTime finalTime = DataProcessingMainUi.endTime->dateTime();
     QDateTime time = startTime;
     QDateTime previousTime = startTime;
 // Cumulative energy measures
@@ -288,6 +305,9 @@ void DataProcessingGui::on_energyButton_clicked()
     long panelSeconds = 0;
     long elapsedSeconds = 0;
     int indicators = 0;
+    DataProcessingMainUi.energyView->clear();
+// Set the end time to the record before midnight
+    QDateTime endTime(startTime.date(),QTime(23,59,59));
     while (! inStream.atEnd())
     {
       	QString lineIn = inStream.readLine();
@@ -297,9 +317,12 @@ void DataProcessingGui::on_energyButton_clicked()
         QString firstText = breakdown[0].simplified();
         int secondField = 0;
         int thirdField = 0;
-// Extract the time record for time range comparison
         if (size > 1)
         {
+// Extract the time record for time range comparison.
+// records are nominally 0.5 seconds apart but QT doesn't have fractions of
+// a second. Therefore some intervals will be zero. This method however accounts
+// for gaps in the records.
             if (firstText == "pH")
             {
                 previousTime = time;
@@ -312,8 +335,8 @@ void DataProcessingGui::on_energyButton_clicked()
             }
         }
         if (size > 2) thirdField = breakdown[2].simplified().toInt();
-        if  (time > endTime) break;
-// Extract records of measured currents
+// Extract records of measured currents and add up. The second field is the
+// current times 256 and the third is the voltage times 256.
         if (time >= startTime)
         {
             if (firstText == "dB1")
@@ -343,6 +366,7 @@ void DataProcessingGui::on_energyButton_clicked()
                 load2Energy += secondField*elapsedSeconds;
                 load2Seconds += elapsedSeconds;
             }
+// Sum only positive currents. Negatives are phantoms due to electronics.
             if (firstText == "dM1")
             {
                 if (secondField < 0) secondField = 0;
@@ -355,32 +379,102 @@ void DataProcessingGui::on_energyButton_clicked()
                 indicators = secondField;
             }
         }
+// Completion of a day. Print out and get ready for next.
+        if  (time > endTime)
+        {
+// Add a row if necessary
+            if (tableRow >= DataProcessingMainUi.energyView->rowCount())
+                DataProcessingMainUi.energyView->setRowCount(tableRow+1);
+
+            QTableWidgetItem *battery1Item = new QTableWidgetItem(tr("%1")
+                 .arg((float)battery1Energy/921600,0,'g',3));
+            DataProcessingMainUi.energyView->setItem(tableRow, 0, battery1Item);
+            QTableWidgetItem *battery2Item = new QTableWidgetItem(tr("%1")
+                 .arg((float)battery2Energy/921600,0,'g',3));
+            DataProcessingMainUi.energyView->setItem(tableRow, 1, battery2Item);
+            QTableWidgetItem *battery3Item = new QTableWidgetItem(tr("%1")
+                 .arg((float)battery3Energy/921600,0,'g',3));
+            DataProcessingMainUi.energyView->setItem(tableRow, 2, battery3Item);
+            QTableWidgetItem *load1Item = new QTableWidgetItem(tr("%1")
+                 .arg((float)load1Energy/921600,0,'g',3));
+            DataProcessingMainUi.energyView->setItem(tableRow, 3, load1Item);
+            QTableWidgetItem *load2Item = new QTableWidgetItem(tr("%1")
+                 .arg((float)load2Energy/921600,0,'g',3));
+            DataProcessingMainUi.energyView->setItem(tableRow, 4, load2Item);
+            QTableWidgetItem *panelItem = new QTableWidgetItem(tr("%1")
+                 .arg((float)panelEnergy/921600,0,'g',3));
+            DataProcessingMainUi.energyView->setItem(tableRow, 5, panelItem);
+// Display total energy used (negative if charging) in last column
+            long long totalEnergy = battery1Energy+battery2Energy+battery3Energy;
+            QTableWidgetItem *energyTotal = new QTableWidgetItem(tr("%1")
+                 .arg((float)totalEnergy/921600,0,'g',3));
+            QFont tableFont = QApplication::font();
+            tableFont.setBold(true);
+            energyTotal->setFont(tableFont);
+            DataProcessingMainUi.energyView->setItem(tableRow, 6, energyTotal);
+
+// Reset energy measures
+            battery1Energy = 0;
+            battery2Energy = 0;
+            battery3Energy = 0;
+            load1Energy = 0;
+            load2Energy = 0;
+            panelEnergy = 0;
+            battery1Seconds = 0;
+            battery2Seconds = 0;
+            battery3Seconds = 0;
+            load1Seconds = 0;
+            load2Seconds = 0;
+            panelSeconds = 0;
+            elapsedSeconds = 0;
+
+            tableRow++;
+// New start and end times
+            startTime = QDateTime(startTime.date().addDays(1),QTime(0,0,0));
+            if (startTime > DataProcessingMainUi.endTime->dateTime()) return;
+            endTime = QDateTime(startTime.date(),QTime(23,59,59));
+            if (endTime > DataProcessingMainUi.endTime->dateTime())
+                endTime = DataProcessingMainUi.endTime->dateTime();
+        }
     }
-    QTableWidgetItem *battery1Item = new QTableWidgetItem(tr("%1").arg(
-         (float)battery1Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 0, battery1Item);
-    QTableWidgetItem *battery2Item = new QTableWidgetItem(tr("%1").arg(
-         (float)battery2Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 1, battery2Item);
-    QTableWidgetItem *battery3Item = new QTableWidgetItem(tr("%1").arg(
-         (float)battery3Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 2, battery3Item);
-    QTableWidgetItem *load1Item = new QTableWidgetItem(tr("%1").arg(
-         (float)load1Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 3, load1Item);
-    QTableWidgetItem *load2Item = new QTableWidgetItem(tr("%1").arg(
-         (float)load2Energy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 4, load2Item);
-    QTableWidgetItem *panelItem = new QTableWidgetItem(tr("%1").arg(
-         (float)panelEnergy/921600,0,'g',3));
-    DataProcessingMainUi.energyView->setItem(0, 5, panelItem);
-// Display total in last column
-    QTableWidgetItem *energyTotal = new QTableWidgetItem(tr("%1").arg(
-         (float)(battery1Energy+battery2Energy+battery3Energy)/921600,0,'g',3));
-    QFont tableFont = QApplication::font();
-    tableFont.setBold(true);
-    energyTotal->setFont(tableFont);
-    DataProcessingMainUi.energyView->setItem(0, 6, energyTotal);
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Save Energy Computations.
+
+*/
+
+void DataProcessingGui::on_energySaveButton_clicked()
+{
+    QString filename = QFileDialog::getSaveFileName(this,
+                        "Acquisition Save Acquired Data",
+                        QString(),
+                        "Comma Separated Variables (*.csv *.txt)");
+    if (filename.isEmpty()) return;
+    if (! filename.endsWith(".csv")) filename.append(".csv");
+    QFileInfo fileInfo(filename);
+    saveDirectory = fileInfo.absolutePath();
+    energySaveFile = saveDirectory.filePath(filename);
+    energyOutFile = new QFile(energySaveFile);          // Open file for output
+    if (! energyOutFile->open(QIODevice::WriteOnly))
+    {
+        displayErrorMessage("Could not open the output file");
+        return;
+    }
+    QTextStream outStream(energyOutFile);
+    int numberColumns = DataProcessingMainUi.energyView->columnCount();
+    for (int row = 0; row<tableRow; row++)
+    {
+        for (int column = 0; column<numberColumns; column++)
+        {
+            if (column > 0) outStream << ",";
+            QString item = DataProcessingMainUi.energyView->item(row,column)->text();
+            outStream << item;
+        }
+        outStream << "\n\r";
+    }
+    energyOutFile->close();
+    delete energyOutFile;
 }
 
 //-----------------------------------------------------------------------------
