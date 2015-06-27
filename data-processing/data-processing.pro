@@ -3,6 +3,11 @@ TEMPLATE =      app
 TARGET          += 
 DEPENDPATH      += .
 
+QWT_ROOT        = /usr/local/qwt-6.1.0
+include( $${QWT_ROOT}/features/qwt.prf )
+
+QMAKE_RPATHDIR  *= $${QWT_ROOT}/lib
+
 OBJECTS_DIR     = obj
 MOC_DIR         = moc
 UI_HEADERS_DIR  = ui

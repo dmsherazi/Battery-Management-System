@@ -13,6 +13,9 @@ a specified time interval:
 - extracted measures with average, peak or sample within a subinterval, to a csv
   file for plotting.
 - Split a large file into day files and merge with previous set of day files.
+- Show some basic plots of battery and module currents and battery voltages.
+
+QWT must be installed and the .pro file modified if necessary to point to it.
 
 (c) K. Sarkies 31/08/2014
 

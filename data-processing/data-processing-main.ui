@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>749</width>
     <height>626</height>
    </rect>
   </property>
@@ -296,7 +296,7 @@
       </rect>
      </property>
      <property name="toolTip">
-      <string>Save energy balance as a csv file</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open a file to save energy balance in csv format.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Save File</string>
@@ -324,11 +324,17 @@
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>5</x>
        <y>10</y>
-       <width>111</width>
+       <width>121</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>Energy Analysis</string>
@@ -439,13 +445,144 @@
      <string>Interval</string>
     </property>
    </widget>
+   <widget class="QFrame" name="frame_2">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>350</y>
+      <width>131</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>45</x>
+       <y>5</y>
+       <width>31</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Plot</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="moduleCheckbox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>160</y>
+       <width>93</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Module</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="voltagePlotCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>25</y>
+       <width>93</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tick to plot voltage, untick to plot current&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Voltage</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="plotFileSelectButton">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>55</y>
+       <width>91</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the csv file to be plotted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>CSV File</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="battery1Checkbox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>85</y>
+       <width>93</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Battery 1</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="battery3Checkbox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>135</y>
+       <width>93</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Battery 3</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="battery2Checkbox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>93</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Battery 2</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>749</width>
      <height>27</height>
     </rect>
    </property>
@@ -454,6 +591,8 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen_Datafile"/>
+    <addaction name="actionEnergy_Analysis"/>
+    <addaction name="actionPlot"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -461,6 +600,16 @@
   <action name="actionOpen_Datafile">
    <property name="text">
     <string>Open Datafile</string>
+   </property>
+  </action>
+  <action name="actionEnergy_Analysis">
+   <property name="text">
+    <string>Energy Analysis</string>
+   </property>
+  </action>
+  <action name="actionPlot">
+   <property name="text">
+    <string>Plot</string>
    </property>
   </action>
  </widget>

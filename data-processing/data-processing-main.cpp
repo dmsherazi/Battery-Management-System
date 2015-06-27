@@ -43,6 +43,13 @@ Utility program to aid in analysis if BMS data files.
 #include <QDir>
 #include <QFile>
 #include <QDebug>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_plot_grid.h>
+#include <qwt_symbol.h>
+#include <qwt_legend.h>
+#include <qwt_date_scale_draw.h>
+#include <qwt_date_scale_engine.h>
 #include <cstdlib>
 #include <iostream>
 #include <unistd.h>
@@ -205,21 +212,27 @@ void DataProcessingGui::on_splitButton_clicked()
         QFileInfo fileInfo(filename);
         QDir saveDirectory = fileInfo.absolutePath();
         QString saveFile = saveDirectory.filePath(filename);
-// If it exists, decide what action to take
+// If it exists, decide what action to take.
+// Build a message box with options
         bool skip = false;
         if (QFile::exists(saveFile))
         {
             QMessageBox msgBox;
             msgBox.setText(QString("A previous save file ").append(filename).
                             append(" exists."));
+// Overwrite the existing file
             QPushButton *overwriteButton = msgBox.addButton(tr("Overwrite"),
                              QMessageBox::AcceptRole);
+// Append to the existing file
             QPushButton *appendButton = msgBox.addButton(tr("Append"),
                              QMessageBox::AcceptRole);
+// Make a different filename by adding a character at the end
             QPushButton *parallelButton = msgBox.addButton(tr("New File"),
                              QMessageBox::AcceptRole);
+// Skip this file and go on to the next
             QPushButton *skipButton = msgBox.addButton(tr("Skip"),
                             QMessageBox::AcceptRole);
+// Quit altogether
             QPushButton *abortButton = msgBox.addButton(tr("Abort"),
                              QMessageBox::AcceptRole);
             msgBox.exec();
@@ -243,6 +256,7 @@ void DataProcessingGui::on_splitButton_clicked()
                 return;
             }
         }
+// This will write to the file as created above, or append to the existing file.
         if (! skip)
         {
             QFile* outFile = new QFile(saveFile);   // Open file for output
@@ -587,6 +601,207 @@ void DataProcessingGui::on_extractButton_clicked()
 //! Null the name to prevent the same file being used.
         saveFile = QString();
     }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Select Voltages to be plotted
+*/
+
+void DataProcessingGui::on_voltagePlotCheckBox_clicked()
+{
+    if (DataProcessingMainUi.voltagePlotCheckBox->isChecked())
+    {
+        DataProcessingMainUi.moduleCheckbox->setEnabled(false);
+        DataProcessingMainUi.moduleCheckbox->setVisible(false);
+    }
+    else
+    {
+        DataProcessingMainUi.moduleCheckbox->setEnabled(true);
+        DataProcessingMainUi.moduleCheckbox->setVisible(true);
+    }
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Select File to be plotted and execute the plot
+*/
+
+void DataProcessingGui::on_plotFileSelectButton_clicked()
+{
+    bool showCurrent = ! DataProcessingMainUi.voltagePlotCheckBox->isChecked();
+    float xScaleLow,xScaleHigh,yScaleLow,yScaleHigh;
+    bool showPlot1,showPlot2,showPlot3,showPlot4;
+    int i1,i2,i3,i4;        // Column for data series
+    if (showCurrent)        // Current
+    {
+        showPlot1 = DataProcessingMainUi.battery1Checkbox->isChecked();
+        showPlot2 = DataProcessingMainUi.battery2Checkbox->isChecked();
+        showPlot3 = DataProcessingMainUi.battery3Checkbox->isChecked();
+        showPlot4 = DataProcessingMainUi.moduleCheckbox->isChecked();
+        i1 = 1;
+        i2 = 7;
+        i3 = 13;
+        i4 = 23;
+        yScaleLow = -20;
+        yScaleHigh = 20;
+    }
+    else                    // Voltage
+    {
+        showPlot1 = DataProcessingMainUi.battery1Checkbox->isChecked();
+        showPlot2 = DataProcessingMainUi.battery2Checkbox->isChecked();
+        showPlot3 = DataProcessingMainUi.battery3Checkbox->isChecked();
+        showPlot4 = false;
+        i1 = 2;
+        i2 = 8;
+        i3 = 14;
+        yScaleLow = 10;
+        yScaleHigh = 18;
+    }
+
+// Get data file
+    QString fileName = QFileDialog::getOpenFileName(0,
+                                "Data File","./","CSV Files (*.csv)");
+    if (fileName.isEmpty()) return;
+    QFileInfo fileInfo;
+    QFile* inFile = new QFile(fileName);
+    fileInfo.setFile(fileName);
+    if (! inFile->open(QIODevice::ReadOnly)) return;
+    QTextStream inStream(inFile);
+
+    QwtPlotCurve *curve1;
+    if (showPlot1)
+    {
+        curve1 = new QwtPlotCurve();
+        curve1->setTitle("Battery 1");
+        curve1->setPen(Qt::blue, 2),
+        curve1->setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    }
+    QwtPlotCurve *curve2;
+    if (showPlot2)
+    {
+        curve2 = new QwtPlotCurve();
+        curve2->setTitle("Battery 2");
+        curve2->setPen(Qt::red, 2),
+        curve2->setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    }
+    QwtPlotCurve *curve3;
+    if (showPlot3)
+    {
+        curve3 = new QwtPlotCurve();
+        curve3->setTitle("Battery 3");
+        curve3->setPen(Qt::yellow, 2),
+        curve3->setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    }
+    QwtPlotCurve *curve4;
+    if (showPlot4)
+    {
+        curve4 = new QwtPlotCurve();
+        curve4->setTitle("Module");
+        curve4->setPen(Qt::green, 2),
+        curve4->setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    }
+
+    bool ok;
+    QPolygonF points1;
+    QPolygonF points2;
+    QPolygonF points3;
+    QPolygonF points4;
+// Read in data from input file
+// Skip first line as it may be a header
+  	QString lineIn;
+    lineIn = inStream.readLine();
+    bool startRun = true;
+// Index increments by about 0.5 seconds
+// To have x-axis in date-time index must be "double" type, ie ms since epoch.
+    double index = 0;
+    QDateTime startTime;
+    QDateTime previousTime;
+    while (! inStream.atEnd())
+    {
+      	lineIn = inStream.readLine();
+        QStringList breakdown = lineIn.split(",");
+        int size = breakdown.size();
+        if (size == 36)
+        {
+            QDateTime time = QDateTime::fromString(breakdown[0].simplified(),Qt::ISODate);
+            if (time.isValid())
+            {
+// On the first run get the start time
+                if (startRun)
+                {
+                    startRun = false;
+                    startTime = time;
+                    previousTime = startTime;
+                    index = startTime.toMSecsSinceEpoch();
+                }
+// Try to keep index and time in sync to account for jumps in time.
+// Index is counting half seconds and time from records is integer seconds only
+                if (previousTime == time) index += 500;
+                else index = time.toMSecsSinceEpoch();
+// Create points to plot
+                if (showPlot1)
+                {
+                    float currentBattery1 = breakdown[i1].simplified().toFloat(&ok);
+                    points1 << QPointF(index,currentBattery1);
+                }
+                if (showPlot2)
+                {
+                    float currentBattery2 = breakdown[i2].simplified().toFloat(&ok);
+                    points2 << QPointF(index,currentBattery2);
+                }
+                if (showPlot3)
+                {
+                    float currentBattery3 = breakdown[i3].simplified().toFloat(&ok);
+                    points3 << QPointF(index,currentBattery3);
+                }
+                if (showPlot4)
+                {
+                    float currentModule = breakdown[i4].simplified().toFloat(&ok);
+                    points4 << QPointF(index,currentModule);
+                }
+            }
+        }
+    }
+// Build plot
+    QwtPlot *plot = new QwtPlot(0);
+    if (showCurrent) plot->setTitle("BMS Currents");
+    else plot->setTitle("BMS Voltages");
+    plot->setCanvasBackground(Qt::white);
+    plot->setAxisScale(QwtPlot::yLeft, yScaleLow, yScaleHigh);
+    //Set x-axis scaling.
+    QwtDateScaleDraw *qwtDateScaleDraw = new QwtDateScaleDraw(Qt::LocalTime);
+    QwtDateScaleEngine *qwtDateScaleEngine = new QwtDateScaleEngine(Qt::LocalTime);
+    qwtDateScaleDraw->setDateFormat(QwtDate::Hour, "hh");
+ 
+    plot->setAxisScaleDraw(QwtPlot::xBottom, qwtDateScaleDraw);
+    plot->setAxisScaleEngine(QwtPlot::xBottom, qwtDateScaleEngine);
+//    plot->setAxisScale(QwtPlot::xBottom, xScaleLow, xScaleHigh);
+    plot->insertLegend(new QwtLegend());
+    QwtPlotGrid *grid = new QwtPlotGrid();
+    grid->attach(plot);
+
+    if (showPlot1)
+    {
+        curve1->setSamples(points1);
+        curve1->attach(plot);
+    }
+    if (showPlot2)
+    {
+        curve2->setSamples(points2);
+        curve2->attach(plot);
+    }
+    if (showPlot3)
+    {
+        curve3->setSamples(points3);
+        curve3->attach(plot);
+    }
+    if (showPlot4)
+    {
+        curve4->setSamples(points4);
+        curve4->attach(plot);
+    }
+
+    plot->resize(1000,600);
+    plot->show();
 }
 
 //-----------------------------------------------------------------------------

@@ -75,6 +75,8 @@ private slots:
     void on_energyButton_clicked();
     void on_energySaveButton_clicked();
     void on_extractButton_clicked();
+    void on_voltagePlotCheckBox_clicked();
+    void on_plotFileSelectButton_clicked();
 private:
 // User Interface object instance
     Ui::DataProcessingMainWindow DataProcessingMainUi;
