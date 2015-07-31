@@ -129,6 +129,9 @@
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
    <widget class="QRadioButton" name="load1Battery2">
     <property name="geometry">
      <rect>
@@ -247,6 +250,9 @@
    <property name="title">
     <string/>
    </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
    <widget class="QRadioButton" name="load2Battery2">
     <property name="geometry">
      <rect>
@@ -364,6 +370,9 @@
    </property>
    <property name="title">
     <string/>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
    </property>
    <widget class="QRadioButton" name="panelBattery2">
     <property name="geometry">

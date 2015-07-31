@@ -10,7 +10,7 @@ TCP/IP when connected through an intermediate machine that maps the serial
 interface to a TCP/IP interface. This makes it possible to monitor the system
 remotely over Internet.
 
-To compile this program, ensure that QT4 is installed and also that
+To compile this program, ensure that QT4.8 is installed and also that
 qextserialport has been downloaded and unzipped into a suitable directory. It
 doesn't need to be compiled or installed, as the GUI will incorporate it
 directly into the compile and link procedure.
