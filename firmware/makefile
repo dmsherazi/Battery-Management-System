@@ -11,6 +11,7 @@ GDB		    = $(PREFIX)-gdb
 NM 		    = $(PREFIX)-nm
 
 MCU             = cortex-m3
+PROC            = STM32F1
 CHIP            = STM32F10x_128k_20k
 BOARD           = ET_STAMP_STM32
 F_XTAL          = 8000000
@@ -37,9 +38,10 @@ CDEFS      += -D$(SYSCLOCK_CL)
 CDEFS      += -DUSE_$(BOARD)
 CDEFS      += -DVERSION=$(VERSION)
 
-CFLAGS	   += -Os -g -Wall -Wextra -Wno-unused-variable -I. $(INCLUDES) -fno-common -mthumb -MD
+CFLAGS	   += -Os -g -Wall -Wextra -Wno-unused-variable -I. $(INCLUDES)
+              -fno-common -mthumb -MD
 CFLAGS	   += -DGCC_ARMCM3 -ffunction-sections -fdata-sections
-CFLAGS	   += -mcpu=cortex-m3 -DSTM32F1 -msoft-float
+CFLAGS	   += -mcpu=$(MCU) -D$(PROC) -msoft-float
 CFLAGS	   += $(CDEFS)
 
 LDSCRIPT    = stm32-h103RET6.ld
@@ -58,7 +60,8 @@ CFILES     += $(PROJECT)-charger.c
 
 OBJS		= $(CFILES:.c=.o)
 
-all: $(PROJECT).elf $(PROJECT).bin $(PROJECT).hex $(PROJECT).lss $(PROJECT).list $(PROJECT).sym
+all: $(PROJECT).elf $(PROJECT).bin $(PROJECT).hex $(PROJECT).lss \
+     $(PROJECT).list $(PROJECT).sym
 
 $(PROJECT).elf: $(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
