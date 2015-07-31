@@ -95,6 +95,9 @@ private:
     QString energySaveFile;
     QDir saveDirectory;
     QFileInfo fileInfo;
+    long long battery1CurrentZero;
+    long long battery2CurrentZero;
+    long long battery3CurrentZero;
 // Record information
     QString timeRecord;
     int tableRow;

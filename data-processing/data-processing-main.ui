@@ -11,23 +11,23 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>BMS Data Processing</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="openReadFileButton">
     <property name="geometry">
      <rect>
-      <x>26</x>
-      <y>75</y>
+      <x>25</x>
+      <y>60</y>
       <width>91</width>
       <height>27</height>
      </rect>
     </property>
     <property name="toolTip">
-     <string>Open a txt file for processing</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open a raw txt data file for processing&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="text">
-     <string>Open</string>
+     <string>Open Raw</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -51,8 +51,8 @@
    <widget class="QDateTimeEdit" name="startTime">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>75</y>
+      <x>139</x>
+      <y>60</y>
       <width>194</width>
       <height>25</height>
      </rect>
@@ -61,8 +61,8 @@
    <widget class="QDateTimeEdit" name="endTime">
     <property name="geometry">
      <rect>
-      <x>412</x>
-      <y>75</y>
+      <x>411</x>
+      <y>60</y>
       <width>194</width>
       <height>25</height>
      </rect>
@@ -110,7 +110,7 @@
    <widget class="QPushButton" name="extractButton">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>25</x>
       <y>155</y>
       <width>91</width>
       <height>27</height>
@@ -120,7 +120,7 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Extracts and interprets data between the given times in csv form suitable for spreadsheet.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="text">
-     <string>Extract</string>
+     <string>Field Extract</string>
     </property>
    </widget>
    <widget class="QSpinBox" name="intervalSpinBox">
@@ -152,8 +152,8 @@
    <widget class="QPushButton" name="dumpAllButton">
     <property name="geometry">
      <rect>
-      <x>626</x>
-      <y>75</y>
+      <x>625</x>
+      <y>60</y>
       <width>91</width>
       <height>27</height>
      </rect>
@@ -170,9 +170,15 @@
      <rect>
       <x>150</x>
       <y>210</y>
-      <width>563</width>
-      <height>331</height>
+      <width>561</width>
+      <height>336</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>561</width>
+      <height>16777215</height>
+     </size>
     </property>
     <property name="verticalScrollBarPolicy">
      <enum>Qt::ScrollBarAsNeeded</enum>
@@ -184,13 +190,16 @@
      <bool>false</bool>
     </property>
     <property name="rowCount">
-     <number>10</number>
+     <number>11</number>
     </property>
     <property name="columnCount">
-     <number>7</number>
+     <number>8</number>
     </property>
+    <attribute name="horizontalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
     <attribute name="horizontalHeaderDefaultSectionSize">
-     <number>80</number>
+     <number>70</number>
     </attribute>
     <attribute name="verticalHeaderVisible">
      <bool>false</bool>
@@ -205,6 +214,8 @@
     <row/>
     <row/>
     <row/>
+    <row/>
+    <column/>
     <column/>
     <column/>
     <column/>
@@ -249,10 +260,10 @@
      </rect>
     </property>
     <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Extracts and interprets all data between given times in csv form and splits into individual day records.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Extracts and interprets all data between given times in csv form and splits into individual day files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="text">
-     <string>Split</string>
+     <string>Day Split</string>
     </property>
    </widget>
    <widget class="QFrame" name="frame">
@@ -344,7 +355,7 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>245</x>
       <y>190</y>
       <width>26</width>
       <height>20</height>
@@ -357,7 +368,7 @@
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>265</x>
+      <x>315</x>
       <y>190</y>
       <width>26</width>
       <height>20</height>
@@ -370,7 +381,7 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>345</x>
+      <x>385</x>
       <y>190</y>
       <width>26</width>
       <height>20</height>
@@ -383,7 +394,7 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>640</x>
+      <x>645</x>
       <y>190</y>
       <width>71</width>
       <height>20</height>
@@ -396,20 +407,20 @@
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>575</x>
       <y>190</y>
-      <width>56</width>
+      <width>66</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Module</string>
+     <string>Module In</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>425</x>
+      <x>455</x>
       <y>190</y>
       <width>26</width>
       <height>20</height>
@@ -422,7 +433,7 @@
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>500</x>
+      <x>525</x>
       <y>190</y>
       <width>26</width>
       <height>20</height>
@@ -575,6 +586,58 @@
       <bool>true</bool>
      </property>
     </widget>
+   </widget>
+   <widget class="QLabel" name="label_12">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>95</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Fields to be extracted</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>32</x>
+      <y>105</y>
+      <width>261</width>
+      <height>10</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>105</y>
+      <width>261</width>
+      <height>10</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_13">
+    <property name="geometry">
+     <rect>
+      <x>175</x>
+      <y>190</y>
+      <width>36</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Date</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

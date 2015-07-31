@@ -135,6 +135,7 @@ void DataProcessingGui::on_openReadFileButton_clicked()
     }
     inFile = new QFile(filename);
     fileInfo.setFile(filename);
+/* Look for start and end times, and determine current zero calibration */
     if (inFile->open(QIODevice::ReadOnly))
     {
         scanFile(inFile);
@@ -255,6 +256,11 @@ void DataProcessingGui::on_splitButton_clicked()
             {
                 return;
             }
+// Don't write the heade into the appended file
+            else if (msgBox.clickedButton() == appendButton)
+            {
+                header = false;
+            }
         }
 // This will write to the file as created above, or append to the existing file.
         if (! skip)
@@ -268,7 +274,7 @@ void DataProcessingGui::on_splitButton_clicked()
             }
             inFile->seek(0);      // rewind input file
             eof = combineRecords(startTime, endTime, inFile, outFile, header);
-            header = false;
+            header = true;
             outFile->close();
             delete outFile;
         }
@@ -279,6 +285,8 @@ void DataProcessingGui::on_splitButton_clicked()
 
 //-----------------------------------------------------------------------------
 /** @brief Find Energy Balance.
+
+This is taken from the RAW file.
 
 Add up the ampere hour energy taken from batteries and supplied by the source
 over the specified time interval. Display these in a table form. The battery
@@ -322,102 +330,114 @@ void DataProcessingGui::on_energyButton_clicked()
     DataProcessingMainUi.energyView->clear();
 // Set the end time to the record before midnight
     QDateTime endTime(startTime.date(),QTime(23,59,59));
-    while (! inStream.atEnd())
+    while (true)
     {
-      	QString lineIn = inStream.readLine();
-        QStringList breakdown = lineIn.split(",");
-        int size = breakdown.size();
-        if (size <= 0) break;
-        QString firstText = breakdown[0].simplified();
-        int secondField = 0;
-        int thirdField = 0;
-        if (size > 1)
+        if (! inStream.atEnd())
         {
+          	QString lineIn = inStream.readLine();
+            QStringList breakdown = lineIn.split(",");
+            int size = breakdown.size();
+            if (size <= 0) break;
+            QString firstText = breakdown[0].simplified();
+            int secondField = 0;
+            int thirdField = 0;
+            if (size > 1)
+            {
 // Extract the time record for time range comparison.
 // records are nominally 0.5 seconds apart but QT doesn't have fractions of
 // a second. Therefore some intervals will be zero. This method however accounts
 // for gaps in the records.
-            if (firstText == "pH")
-            {
-                previousTime = time;
-                time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
-                elapsedSeconds = previousTime.secsTo(time);
+                if (firstText == "pH")
+                {
+                    previousTime = time;
+                    time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
+                    elapsedSeconds = previousTime.secsTo(time);
+                }
+                else
+                {
+                    secondField = breakdown[1].simplified().toInt();
+                }
             }
-            else
-            {
-                secondField = breakdown[1].simplified().toInt();
-            }
-        }
-        if (size > 2) thirdField = breakdown[2].simplified().toInt();
+            if (size > 2) thirdField = breakdown[2].simplified().toInt();
 // Extract records of measured currents and add up. The second field is the
 // current times 256 and the third is the voltage times 256.
-        if (time >= startTime)
-        {
-            if (firstText == "dB1")
+            if (time >= startTime)
             {
-                battery1Energy += secondField*elapsedSeconds;
-                battery1Seconds += elapsedSeconds;
-            }
-            if (firstText == "dB2")
-            {
-                battery2Energy += secondField*elapsedSeconds;
-                battery2Seconds += elapsedSeconds;
-            }
-            if (firstText == "dB3")
-            {
-                battery3Energy += secondField*elapsedSeconds;
-                battery3Seconds += elapsedSeconds;
-            }
-            if (firstText == "dL1")
-            {
-                if (secondField < 0) secondField = 0;
-                load1Energy += secondField*elapsedSeconds;
-                load1Seconds += elapsedSeconds;
-            }
-            if (firstText == "dL2")
-            {
-                if (secondField < 0) secondField = 0;
-                load2Energy += secondField*elapsedSeconds;
-                load2Seconds += elapsedSeconds;
-            }
+                if (firstText == "dB1")
+                {
+                    int battery1Current = secondField-battery1CurrentZero;
+                    battery1Energy += battery1Current*elapsedSeconds;
+                    battery1Seconds += elapsedSeconds;
+                }
+                if (firstText == "dB2")
+                {
+                    int battery2Current = secondField-battery2CurrentZero;
+                    battery2Energy += battery2Current*elapsedSeconds;
+                    battery2Seconds += elapsedSeconds;
+                }
+                if (firstText == "dB3")
+                {
+                    int battery3Current = secondField-battery3CurrentZero;
+                    battery3Energy += battery3Current*elapsedSeconds;
+                    battery3Seconds += elapsedSeconds;
+                }
 // Sum only positive currents. Negatives are phantoms due to electronics.
-            if (firstText == "dM1")
-            {
-                if (secondField < 0) secondField = 0;
-                panelEnergy += secondField*elapsedSeconds;
-                panelSeconds += elapsedSeconds;
-            }
+                if (firstText == "dL1")
+                {
+                    int load1Current = secondField;
+                    if (load1Current < 0) load1Current = 0;
+                    load1Energy += load1Current*elapsedSeconds;
+                    load1Seconds += elapsedSeconds;
+                }
+                if (firstText == "dL2")
+                {
+                    int load2Current = secondField;
+                    if (load2Current < 0) load2Current = 0;
+                    load2Energy += load2Current*elapsedSeconds;
+                    load2Seconds += elapsedSeconds;
+                }
+                if (firstText == "dM1")
+                {
+                    int panelCurrent = secondField;
+                    if (panelCurrent < 0) panelCurrent = 0;
+                    panelEnergy += panelCurrent*elapsedSeconds;
+                    panelSeconds += elapsedSeconds;
+                }
 // Get record of indicators
-            if (firstText == "dI")
-            {
-                indicators = secondField;
+                if (firstText == "dI")
+                {
+                    indicators = secondField;
+                }
             }
         }
-// Completion of a day. Print out and get ready for next.
-        if  (time > endTime)
+// Completion of a day or file. Print out and get ready for next.
+        if  ((time > endTime) || inStream.atEnd())
         {
 // Add a row if necessary
             if (tableRow >= DataProcessingMainUi.energyView->rowCount())
                 DataProcessingMainUi.energyView->setRowCount(tableRow+1);
 
+            QDate date = startTime.date();
+            QTableWidgetItem *day = new QTableWidgetItem(date.toString("dd/MM/yy"));
+            DataProcessingMainUi.energyView->setItem(tableRow, 0, day);
             QTableWidgetItem *battery1Item = new QTableWidgetItem(tr("%1")
                  .arg((float)battery1Energy/921600,0,'g',3));
-            DataProcessingMainUi.energyView->setItem(tableRow, 0, battery1Item);
+            DataProcessingMainUi.energyView->setItem(tableRow, 1, battery1Item);
             QTableWidgetItem *battery2Item = new QTableWidgetItem(tr("%1")
                  .arg((float)battery2Energy/921600,0,'g',3));
-            DataProcessingMainUi.energyView->setItem(tableRow, 1, battery2Item);
+            DataProcessingMainUi.energyView->setItem(tableRow, 2, battery2Item);
             QTableWidgetItem *battery3Item = new QTableWidgetItem(tr("%1")
                  .arg((float)battery3Energy/921600,0,'g',3));
-            DataProcessingMainUi.energyView->setItem(tableRow, 2, battery3Item);
+            DataProcessingMainUi.energyView->setItem(tableRow, 3, battery3Item);
             QTableWidgetItem *load1Item = new QTableWidgetItem(tr("%1")
                  .arg((float)load1Energy/921600,0,'g',3));
-            DataProcessingMainUi.energyView->setItem(tableRow, 3, load1Item);
+            DataProcessingMainUi.energyView->setItem(tableRow, 4, load1Item);
             QTableWidgetItem *load2Item = new QTableWidgetItem(tr("%1")
                  .arg((float)load2Energy/921600,0,'g',3));
-            DataProcessingMainUi.energyView->setItem(tableRow, 4, load2Item);
+            DataProcessingMainUi.energyView->setItem(tableRow, 5, load2Item);
             QTableWidgetItem *panelItem = new QTableWidgetItem(tr("%1")
                  .arg((float)panelEnergy/921600,0,'g',3));
-            DataProcessingMainUi.energyView->setItem(tableRow, 5, panelItem);
+            DataProcessingMainUi.energyView->setItem(tableRow, 6, panelItem);
 // Display total energy used (negative if charging) in last column
             long long totalEnergy = battery1Energy+battery2Energy+battery3Energy;
             QTableWidgetItem *energyTotal = new QTableWidgetItem(tr("%1")
@@ -425,7 +445,9 @@ void DataProcessingGui::on_energyButton_clicked()
             QFont tableFont = QApplication::font();
             tableFont.setBold(true);
             energyTotal->setFont(tableFont);
-            DataProcessingMainUi.energyView->setItem(tableRow, 6, energyTotal);
+            DataProcessingMainUi.energyView->setItem(tableRow, 7, energyTotal);
+
+            if (inStream.atEnd()) break;
 
 // Reset energy measures
             battery1Energy = 0;
@@ -494,8 +516,7 @@ void DataProcessingGui::on_energySaveButton_clicked()
 //-----------------------------------------------------------------------------
 /** @brief Extract Data.
 
-Up to three data sets specified are extracted and written to a file for
-plotting.
+Up to three data sets specified are extracted and written to a file.
 
 An interval is specified over which data may be taken as the first sample, the
 maximum or the average. The time over which the extraction occurs can be
@@ -900,20 +921,20 @@ bool DataProcessingGui::combineRecords(QDateTime startTime, QDateTime endTime,
                 if ((blockStart) && (time > startTime))
                 {
                     outStream << timeRecord << ",";
-                    outStream << (float)battery1Voltage/256 << ",";
                     outStream << (float)battery1Current/256 << ",";
+                    outStream << (float)battery1Voltage/256 << ",";
                     outStream << (float)battery1SoC/256 << ",";
                     outStream << battery1StateText << ",";
                     outStream << battery1FillText << ",";
                     outStream << battery1ChargeText << ",";
-                    outStream << (float)battery2Voltage/256 << ",";
                     outStream << (float)battery2Current/256 << ",";
+                    outStream << (float)battery2Voltage/256 << ",";
                     outStream << (float)battery2SoC/256 << ",";
                     outStream << battery2StateText << ",";
                     outStream << battery2FillText << ",";
                     outStream << battery2ChargeText << ",";
-                    outStream << (float)battery3Voltage/256 << ",";
                     outStream << (float)battery3Current/256 << ",";
+                    outStream << (float)battery3Voltage/256 << ",";
                     outStream << (float)battery3SoC/256 << ",";
                     outStream << battery3StateText << ",";
                     outStream << battery3FillText << ",";
@@ -942,18 +963,18 @@ bool DataProcessingGui::combineRecords(QDateTime startTime, QDateTime endTime,
             }
             if (firstText == "dB1")
             {
-                battery1Voltage = secondField;
-                battery1Current = thirdField;
+                battery1Current = secondField-battery1CurrentZero;
+                battery1Voltage = thirdField;
             }
             if (firstText == "dB2")
             {
-                battery2Voltage = secondField;
-                battery2Current = thirdField;
+                battery2Current = secondField-battery2CurrentZero;
+                battery2Voltage = thirdField;
             }
             if (firstText == "dB3")
             {
-                battery3Voltage = secondField;
-                battery3Current = thirdField;
+                battery3Current = secondField-battery3CurrentZero;
+                battery3Voltage = thirdField;
             }
             if (firstText == "dC1")
             {
@@ -1188,7 +1209,10 @@ bool DataProcessingGui::openSaveFile()
 }
 
 //-----------------------------------------------------------------------------
-/** @brief Scan the data file for start and end times and record types.
+/** @brief Scan the data file
+
+Look for start and end times and record types. Obtain the current zeros from
+records that have isolated operational status.
 
 */
 
@@ -1197,6 +1221,15 @@ void DataProcessingGui::scanFile(QFile* inFile)
     if (! inFile->isOpen()) return;
     QTextStream inStream(inFile);
     QDateTime startTime, endTime;
+    uint calibration1Count = 0;
+    uint calibration2Count = 0;
+    uint calibration3Count = 0;
+    int battery1Current;
+    int battery2Current;
+    int battery3Current;
+    battery1CurrentZero = 0;
+    battery2CurrentZero = 0;
+    battery3CurrentZero = 0;
     while (! inStream.atEnd())
     {
       	QString lineIn = inStream.readLine();
@@ -1204,13 +1237,57 @@ void DataProcessingGui::scanFile(QFile* inFile)
         int length = breakdown.size();
         if (length <= 0) break;
         QString firstText = breakdown[0].simplified();
+        QString secondText = breakdown[1].simplified();
         if ((firstText == "pH") && (length > 1))
         {
-            QDateTime time = QDateTime::fromString(breakdown[1].simplified(),Qt::ISODate);
+            QDateTime time = QDateTime::fromString(secondText,Qt::ISODate);
             if (startTime.isNull()) startTime = time;
             endTime = time;
         }
+        int secondField = secondText.toInt();
+        if ((firstText == "dB1") && (length > 1))
+        {
+            battery1Current = secondField;
+        }
+        if ((firstText == "dB2") && (length > 1))
+        {
+            battery2Current = secondField;
+        }
+        if ((firstText == "dB3") && (length > 1))
+        {
+            battery3Current = secondField;
+        }
+        if ((firstText == "dO1") && (length > 1))
+        {
+            int operationalStatus = secondField&0x03;
+            if (operationalStatus == 2)
+            {
+                calibration1Count++;
+                battery1CurrentZero += battery1Current;
+            }
+        }
+        if ((firstText == "dO2") && (length > 1))
+        {
+            int operationalStatus = secondField&0x03;
+            if (operationalStatus == 2)
+            {
+                calibration2Count++;
+                battery2CurrentZero += battery2Current;
+            }
+        }
+        if ((firstText == "dO3") && (length > 1))
+        {
+            int operationalStatus = secondField&0x03;
+            if (operationalStatus == 2)
+            {
+                calibration3Count++;
+                battery3CurrentZero += battery3Current;
+            }
+        }
     }
+    battery1CurrentZero /= calibration1Count;
+    battery2CurrentZero /= calibration2Count;
+    battery3CurrentZero /= calibration3Count;
     if (! startTime.isNull()) DataProcessingMainUi.startTime->setDateTime(startTime);
     if (! endTime.isNull()) DataProcessingMainUi.endTime->setDateTime(endTime);
 }
