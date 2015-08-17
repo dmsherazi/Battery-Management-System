@@ -1285,9 +1285,19 @@ void DataProcessingGui::scanFile(QFile* inFile)
             }
         }
     }
-    battery1CurrentZero /= calibration1Count;
-    battery2CurrentZero /= calibration2Count;
-    battery3CurrentZero /= calibration3Count;
+// Remove the zero point of current if required
+    if (DataProcessingMainUi.zeroCurrentCheckBox->isChecked())  
+    {
+        battery1CurrentZero /= calibration1Count;
+        battery2CurrentZero /= calibration2Count;
+        battery3CurrentZero /= calibration3Count;
+    }
+    else
+    {
+        battery1CurrentZero = 0;
+        battery2CurrentZero = 0;
+        battery3CurrentZero = 0;
+    }
     if (! startTime.isNull()) DataProcessingMainUi.startTime->setDateTime(startTime);
     if (! endTime.isNull()) DataProcessingMainUi.endTime->setDateTime(endTime);
 }

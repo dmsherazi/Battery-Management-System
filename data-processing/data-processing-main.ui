@@ -639,6 +639,25 @@
      <string>Date</string>
     </property>
    </widget>
+   <widget class="QCheckBox" name="zeroCurrentCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>504</x>
+      <y>160</y>
+      <width>103</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Determine the zero point of the currents and subtract them. Use this only if the results come from a system that was not or could not be calibrated.</string>
+    </property>
+    <property name="text">
+     <string>Zero Current</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -646,7 +665,7 @@
      <x>0</x>
      <y>0</y>
      <width>749</width>
-     <height>27</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
