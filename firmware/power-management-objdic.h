@@ -29,6 +29,8 @@ tasks running on the same microcontroller.
 #ifndef POWER_MANAGEMENT_OBJDIC_H_
 #define POWER_MANAGEMENT_OBJDIC_H_
 
+#define FIRMWARE_VERSION    "3.00"
+
 #define NUM_BATS    3
 #define NUM_LOADS   2
 #define NUM_PANELS  1

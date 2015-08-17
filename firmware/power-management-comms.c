@@ -214,7 +214,13 @@ released. The command is followed by an interface number 0-5 being batteries
 /* Send an ident response */
         case 'E':
             {
-                sendDebugString("DD", "Battery Management System v0.1");
+                char ident[35] = "Battery Management System,";
+                stringAppend(ident,FIRMWARE_VERSION);
+                stringAppend(ident,",");
+                char version[3];
+                intToAscii(VERSION,version);
+                stringAppend(ident,version);
+                sendStringLowPriority("dE",ident);
                 break;
             }
 /* Set the battery SoC from the OCV */
@@ -1031,7 +1037,7 @@ Use to send a string. A message is only sent if the commsSendQueue is empty.
 This blocks indefinitely until the queue is empty of all messages.
 
 @param[in] char* ident. Response identifier string
-@param[in] int32_t parameter. Single integer parameter.
+@param[in] char* string. Arbitrary length string.
 */
 
 void sendStringLowPriority(char* ident, char* string)

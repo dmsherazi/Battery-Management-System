@@ -1228,12 +1228,10 @@ alive. Also check for calibration as time emssages stop during this process. */
     {
         emit this->recordMessageReceived(response);
     }
-/* Messages for the Configure Task start with p or dS */
-    if ((size > 0) && ((firstField.left(1) == "p") || (firstField.left(2) == "dO")))
-    {
-        emit this->configureMessageReceived(response);
-    }
-    if ((size > 0) && (firstField.left(2) == "dD"))
+/* Messages for the Configure Task start with p or certain of the data responses */
+    if ((size > 0) && ((firstField.left(1) == "p") || (firstField.left(2) == "dO")
+                                                   || (firstField.left(2) == "dE")
+                                                   || (firstField.left(2) == "dD")))
     {
         emit this->configureMessageReceived(response);
     }

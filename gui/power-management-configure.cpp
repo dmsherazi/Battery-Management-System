@@ -100,6 +100,8 @@ PowerManagementConfigGui::PowerManagementConfigGui(QTcpSocket* tcpSocket, QWidge
             ->setText(QString("0 m").append(QChar(0x03A9)));
     PowerManagementConfigUi.battery3Resistance
             ->setText(QString("0 m").append(QChar(0x03A9)));
+/* Ask for identification */
+    socket->write("aE\n\r");
 /* Ask for battery parameters to fill display */
     on_queryBatteryButton_clicked();
 /* Ask for switch control settings */
@@ -700,6 +702,9 @@ void PowerManagementConfigGui::on_closeButton_clicked()
 After a command is sent, response messages from the remote are passed here for
 processing. Appropriate fields on the form are updated.
 
+The message type can be p (parameter) or one of three cases d (data message).
+The function doesn't check the type, only the command.
+
 @todo This interprets response as done in main. See if this can be made
 independent of formats.
 */
@@ -710,6 +715,14 @@ void PowerManagementConfigGui::onMessageReceived(const QString &response)
     int size = breakdown.size();
     if (size <= 0) return;
     QChar command = breakdown[0].at(1);
+// Check for ident response
+    if (command == 'E')
+    {
+        if (size != 4) return;
+        PowerManagementConfigUi.firmwareVersion->setText("Firmware version : " + breakdown[2]);
+        PowerManagementConfigUi.boardVersion->setText("Interface Board Version: " + breakdown[3]);
+        return;
+    }
     QChar battery = breakdown[0].at(2);
     QChar parameter = breakdown[0].at(2);
     int controlByte = 0;

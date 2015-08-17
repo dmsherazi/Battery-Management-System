@@ -38,7 +38,7 @@ CDEFS      += -D$(SYSCLOCK_CL)
 CDEFS      += -DUSE_$(BOARD)
 CDEFS      += -DVERSION=$(VERSION)
 
-CFLAGS	   += -Os -g -Wall -Wextra -Wno-unused-variable -I. $(INCLUDES)
+CFLAGS	   += -Os -g -Wall -Wextra -Wno-unused-variable -I. $(INCLUDES) \
               -fno-common -mthumb -MD
 CFLAGS	   += -DGCC_ARMCM3 -ffunction-sections -fdata-sections
 CFLAGS	   += -mcpu=$(MCU) -D$(PROC) -msoft-float
@@ -46,7 +46,8 @@ CFLAGS	   += $(CDEFS)
 
 LDSCRIPT    = stm32-h103RET6.ld
 
-LDFLAGS	   += -I . -lc -T$(LDSCRIPT) -L$(DRIVERS_DIR)/lib -nostartfiles -Wl,--gc-sections
+LDFLAGS	   += -I . -lc -T$(LDSCRIPT) -L$(DRIVERS_DIR)/lib -nostartfiles \
+              -Wl,--gc-sections
 LDFLAGS	   += -lopencm3_stm32f1
 LDFLAGS	   += -specs=nosys.specs
 
@@ -84,8 +85,9 @@ $(PROJECT).sym: $(PROJECT).elf
 clean:
 	rm *.elf *.o *.d *.hex *.list *.sym *.bin *.lss
 
-# Using CC and CFLAGS will cause any object files to be built implicitely if they are missing.
-# We are searching an archive library opencm3_stm32f1.a which has been precompiled, so we don't need
-# to recompile the DRIVERS source.
-# The libopencm3 source has been added in case the archive doesn't have them, VPATH finds them.
+# Using CC and CFLAGS will cause any object files to be built implicitely if
+# they are missing. We are searching an archive library opencm3_stm32f1.a which
+# has been precompiled, so we don't need to recompile the DRIVERS source.
+# The libopencm3 source has been added in case the archive doesn't have them,
+# VPATH finds them.
 

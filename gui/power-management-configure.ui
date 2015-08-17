@@ -216,6 +216,32 @@
       <string>Echo Test</string>
      </property>
     </widget>
+    <widget class="QLabel" name="firmwareVersion">
+     <property name="geometry">
+      <rect>
+       <x>162</x>
+       <y>280</y>
+       <width>316</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Firmware Version:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="boardVersion">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>305</y>
+       <width>316</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Interface Board Version: </string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="batteriesTab">
     <property name="toolTip">
