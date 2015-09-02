@@ -26,7 +26,8 @@ The hardware component values set the various scaling factors for voltages and
 currents, and these may change for different hardware versions.
 
 Three versions are here represented. Each refers to slightly different
-voltage and current scales in the measurement header for the PCB version.
+voltage and current scales in the measurement header for the interface PCB
+version. Currently version 3 is being used and is the default.
 It is compiled with 'make VERSION=x' where x = 2 or 3. Version 1 is obsolete.
 
 The charger algorithm is referred to as "Pulse Charge". This aims to avoid the

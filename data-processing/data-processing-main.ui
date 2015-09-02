@@ -642,14 +642,14 @@
    <widget class="QCheckBox" name="zeroCurrentCheckBox">
     <property name="geometry">
      <rect>
-      <x>504</x>
+      <x>455</x>
       <y>160</y>
-      <width>103</width>
+      <width>111</width>
       <height>22</height>
      </rect>
     </property>
     <property name="toolTip">
-     <string>Determine the zero point of the currents and subtract them. Use this only if the results come from a system that was not or could not be calibrated.</string>
+     <string>Determine the zero point of the currents and subtract them. Use this only if the results come from a system that was not or could not be calibrated. Set this BEFORE opening the raw file.</string>
     </property>
     <property name="text">
      <string>Zero Current</string>
@@ -665,7 +665,7 @@
      <x>0</x>
      <y>0</y>
      <width>749</width>
-     <height>20</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
