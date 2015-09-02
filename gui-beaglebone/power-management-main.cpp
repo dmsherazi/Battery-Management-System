@@ -90,13 +90,12 @@ PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
     if (socket != NULL)
     {
 /* Turn on microcontroller communications */
-        socket->write("pc+\n\r");
-/* This should cause the microcontroller to respond with all data */
-        socket->write("dS\n\r");
+        on_connectButton_clicked();
     }
 }
 
-// In the embedded application we probably will never get here.
+// In the embedded application we probably will never get here, but you
+// never know.
 PowerManagementGui::~PowerManagementGui()
 {
 /* Turn off microcontroller communications */
@@ -1695,6 +1694,13 @@ void PowerManagementGui::ssleep(int centiseconds)
 
 void PowerManagementGui::on_shutdownButton_clicked()
 {
+/* Turn off microcontroller communications */
+    if (socket != NULL)
+    {
+        socket->write("pc-\n\r");
+        if (socket != NULL) socket->close();
+        if (socket != NULL) delete socket;
+    }
     accept();
 }
 
@@ -1738,6 +1744,24 @@ void PowerManagementGui::initCalibration()
     socket->write("dT\n\r");
 /* Ask for charge parameter settings */
     socket->write("dC\n\r");
+}
+
+//-----------------------------------------------------------------------------
+/** @brief Attempt to connect to the BMS
+
+This attempts to establish connection woith the remote system in case it failed
+on startup.
+*/
+
+void PowerManagementGui::on_connectButton_clicked()
+{
+    if (socket != NULL)
+    {
+/* Turn on microcontroller communications */
+        socket->write("pc+\n\r");
+/* This should cause the microcontroller to respond with all data */
+        socket->write("dS\n\r");
+    }
 }
 
 //-----------------------------------------------------------------------------

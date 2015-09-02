@@ -19,7 +19,7 @@
      <x>4</x>
      <y>10</y>
      <width>777</width>
-     <height>436</height>
+     <height>447</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -86,9 +86,9 @@
     <widget class="QPushButton" name="battery1PushButton">
      <property name="geometry">
       <rect>
-       <x>149</x>
+       <x>143</x>
        <y>269</y>
-       <width>71</width>
+       <width>79</width>
        <height>22</height>
       </rect>
      </property>
@@ -308,9 +308,9 @@
     <widget class="QPushButton" name="battery2PushButton">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>226</x>
        <y>269</y>
-       <width>71</width>
+       <width>75</width>
        <height>22</height>
       </rect>
      </property>
@@ -946,7 +946,7 @@
      <property name="geometry">
       <rect>
        <x>28</x>
-       <y>270</y>
+       <y>268</y>
        <width>99</width>
        <height>22</height>
       </rect>
@@ -1070,7 +1070,7 @@
      <property name="geometry">
       <rect>
        <x>550</x>
-       <y>270</y>
+       <y>268</y>
        <width>71</width>
        <height>22</height>
       </rect>
@@ -1428,9 +1428,9 @@
     <widget class="QPushButton" name="battery3PushButton">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>304</x>
        <y>269</y>
-       <width>71</width>
+       <width>75</width>
        <height>22</height>
       </rect>
      </property>
@@ -1918,8 +1918,8 @@
     <widget class="QPushButton" name="shutdownButton">
      <property name="geometry">
       <rect>
-       <x>644</x>
-       <y>270</y>
+       <x>636</x>
+       <y>268</y>
        <width>99</width>
        <height>22</height>
       </rect>
@@ -1938,6 +1938,22 @@
      </property>
      <property name="checked">
       <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="connectButton">
+     <property name="geometry">
+      <rect>
+       <x>354</x>
+       <y>390</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Attempt to reconnect to the remote in case of communications failure.</string>
+     </property>
+     <property name="text">
+      <string>Connect</string>
      </property>
     </widget>
     <zorder>battery1Charge</zorder>
@@ -2007,6 +2023,7 @@
     <zorder>frame_3</zorder>
     <zorder>frame_2</zorder>
     <zorder>shutdownButton</zorder>
+    <zorder>connectButton</zorder>
    </widget>
    <widget class="QWidget" name="recordingTab">
     <attribute name="title">
@@ -3904,7 +3921,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>450</y>
+     <y>458</y>
      <width>685</width>
      <height>20</height>
     </rect>
@@ -3918,4 +3935,21 @@
   <include location="../../../../../data/home/ksarkies/Projects/Battery-Management-System/gui/power-management-gui.qrc"/>
  </resources>
  <connections/>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>2</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>2</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
 </ui>

@@ -117,6 +117,7 @@ private slots:
     void on_forceZeroCurrent2_clicked();
     void on_forceZeroCurrent3_clicked();
     void initCalibration();
+    void on_connectButton_clicked();
     void on_calibrateButton_clicked();
     void on_setTrackOptionButton_clicked();
     void on_absorptionMuteCheckbox_clicked();
