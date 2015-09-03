@@ -47,6 +47,7 @@ detailed monitoring and for configuration.
 #include <QStandardItemModel>
 #include <QDateTime>
 #include <QDate>
+#include <QTimer>
 #include <QDir>
 #include <QFile>
 #include <QDebug>
@@ -91,6 +92,11 @@ PowerManagementGui::PowerManagementGui(QWidget* parent) : QDialog(parent)
     {
 /* Turn on microcontroller communications */
         on_connectButton_clicked();
+// Setup a 1 second timer to check for active communications
+        timer = new QTimer(this);
+        connect(timer, SIGNAL(timeout()), this, SLOT(checkCommunications()));
+        timer->start(1000);
+        responseReceived = false;
     }
 }
 
@@ -179,6 +185,29 @@ void PowerManagementGui::initGui()
 }
 
 //-----------------------------------------------------------------------------
+/** @brief Check if communications is active
+
+This is called when a previously established timer has timed out. The timer is
+set at the start of the GUI after a message is sent to the remote. This checks
+to see if a response had been received. If not, then the message is sent again.
+*/
+
+void PowerManagementGui::checkCommunications()
+{
+    if (! responseReceived)
+    {
+/* Try again to turn on microcontroller communications */
+        on_connectButton_clicked();
+    }
+    else
+    {
+// Stop the timer
+        timer->stop();
+        delete timer;
+    }
+}
+
+//-----------------------------------------------------------------------------
 /** @brief Selection of New Tab
 
 This is called when the displayed tab is changed. It initializes the tab
@@ -243,6 +272,7 @@ Parse the line and take action on the command received.
 
 void PowerManagementGui::processResponse(const QString response)
 {
+    responseReceived = true;        // indicate that comms is happening
     QStringList breakdown = response.split(",");
     int size = breakdown.size();
     QString firstField;

@@ -76,6 +76,7 @@ protected:
 private slots:
     void tabChanged(int index);
     void onDataAvailable();
+    void checkCommunications();
     void on_load1Battery1_pressed();
     void on_load1Battery2_pressed();
     void on_load1Battery3_pressed();
@@ -135,6 +136,8 @@ private slots:
 private:
 // User Interface object instance
     Ui::PowerManagementDialog PowerManagementMainUi;
+    bool responseReceived;
+    QTimer *timer;
     uint baudrate;
     bool synchronized;
     QString errorMessage;
