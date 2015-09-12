@@ -717,8 +717,10 @@ later. */
             {
                 setSwitch(batteryUnderLoad,LOAD_1);
             }
-/* Connect the battery under charge to the charger */
-            setSwitch(batteryUnderCharge,PANEL);
+/* Connect the battery under charge to the charger if the temperature is below
+the temperature limit. */
+            if (getTemperature() < TEMPERATURE_LIMIT*256)
+                setSwitch(batteryUnderCharge,PANEL);
 /* Set the battery selected for charge as the preferred battery so that it is
 used if autotrack is turned off. This is passed to the charger task. */
             setPanelSwitchSetting(batteryUnderCharge);

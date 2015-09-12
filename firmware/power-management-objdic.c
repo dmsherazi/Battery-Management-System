@@ -119,6 +119,8 @@ uint32_t writeConfigBlock(void)
 /*--------------------------------------------------------------------------*/
 /** @brief Set the Battery Charge Parameters given the Type
 
+The voltage parameters are set for recommended values at 25C.
+
 @param[in] battery: 0..NUM_BATS-1
 */
 

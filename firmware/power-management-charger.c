@@ -408,12 +408,17 @@ void checkChargerWatchdog(void)
 /*--------------------------------------------------------------------------*/
 /** @brief Correct the Voltage Limit for Temperature
 
-Based on an heuristic measure from battery data.
+Based on an heuristic measure from battery data, which is about 5mV per cell
+per degree C.
+Recommendation is to reduce by 3mV per cell per degree C above 25C.
 */
 
 int16_t voltageLimit(uint16_t limitV)
 {
-    int32_t voltageOffset = (1984*(6835-getTemperature())) >> 16;
+/* Original heuristic (unknown source) */
+//    int32_t voltageOffset = (1984*(6835-getTemperature())) >> 16;
+/* Based on recommended 3mV per cell per degree C */
+    int32_t voltageOffset = (1180*(6835-getTemperature())) >> 16;
     return limitV + voltageOffset;
 }
 
