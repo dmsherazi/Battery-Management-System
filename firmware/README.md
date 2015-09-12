@@ -1,5 +1,5 @@
 Battery Management System Firmware
-Version: First Prototype
+Version: 1.00
 ----------------------------------
 
 The firmware is written for an STM32F103 ARM Cortex M3 microcontroller and uses
@@ -43,9 +43,15 @@ More information is available on:
 
 http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-software.html
 
-(c) K. Sarkies 8/12/2014
+(c) K. Sarkies 12/09/2015
 
 BUGS
+
+1. The file directory list command results in very slow transmission, about one
+   entry per second.
+2. File dates are sometimes wrong.
+3. Auto tracker often makes odd decisions, such as placing load on a low battery
+   or charging a higher battery.
 
 TODO
 

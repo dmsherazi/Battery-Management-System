@@ -43,7 +43,10 @@ A wide range of state information is stored on a removable memory, and also
 transmitted over a serial link to allow a GUI to display the state accurately
 and in detail.
 
-A GUI is provided to allow control and observation of operations.
+A GUI is provided to allow control and observation of operations. The GUI has
+been provided also on a BeagleBone Black card with a LCD touchscreen. This
+is suitable for wall installation and draws very low power. For wireless
+communications, XBees placed in point-point AT serial mode were successful.
 
 Each of the six interfaces has a hardware overcurrent circuit breaker and low
 voltage detector, as well as providing current and voltage measurements.
@@ -59,20 +62,10 @@ More information is available on:
 
 http://www.jiggerjuice.info/electronics/projects/solarbms/solarbms-overview.html
 
-(c) K. Sarkies 30/08/2014
+(c) K. Sarkies 12/09/2015
 
 TODO
 
-1. Development of a 433MHz transponder set to convert serial transmissions (3.3V
-   and RS232 levels) to RF signalling.
-2. Improvement of MOSFET switch drivers to reduce EMI at higher rates.
-3. Shunt regulator across panel terminals to reduce voltage in high voltage
-   panels which might stress the MOSFETs. This will put an additional load
-   across the panels to divert current and reduce the voltage.
-4. MPPT regulator for the panel.
-5. Development of a 50W linear regulator to add to the solar panel side. This
-   will allow avoidance of switching while limiting the battery charge voltage.
-   Ideally this would be controlled through the processor DAC but that would
-   need major hardware changes.
-
+1. Improvement of MOSFET switch drivers to reduce EMI at higher rates.
+2. MPPT regulator for the panel.
 
