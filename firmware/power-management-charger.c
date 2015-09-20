@@ -176,7 +176,10 @@ absorption phase, to test if the current is falling. */
                 {
 /* If no other battery is in bulk phase, change this battery to absorption
 phase, otherwise change to rest phase. */
-                    setBatteryChargingPhase(index,absorptionC);
+                    if ((configData.config.chargerStrategy & 1) > 0)
+                        setBatteryChargingPhase(index,restC);
+                    else
+                        setBatteryChargingPhase(index,absorptionC);
                     for (i=0; i<NUM_BATS; i++)
                     {
                         if (getBatteryChargingPhase(i) == bulkC)
