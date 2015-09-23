@@ -1896,6 +1896,7 @@ delete the socket.
 void PowerManagementGui::on_connectButton_clicked()
 {
 #ifdef SERIAL
+    setSourceComboBox();
     if (socket == NULL)
     {
         socket = new SerialPort(serialDevice);
@@ -1922,7 +1923,6 @@ void PowerManagementGui::on_connectButton_clicked()
         socket = NULL;
         PowerManagementMainUi.connectButton->setText("Connect");
     }
-    setSourceComboBox();
 #else
     if (socket == NULL)
     {

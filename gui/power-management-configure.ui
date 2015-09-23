@@ -891,8 +891,8 @@
     <widget class="QPushButton" name="calibrateButton">
      <property name="geometry">
       <rect>
-       <x>256</x>
-       <y>130</y>
+       <x>254</x>
+       <y>195</y>
        <width>91</width>
        <height>27</height>
       </rect>
@@ -904,14 +904,18 @@
     <widget class="QLabel" name="socLabel">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>40</y>
-       <width>461</width>
-       <height>91</height>
+       <x>50</x>
+       <y>50</y>
+       <width>521</width>
+       <height>136</height>
       </rect>
      </property>
      <property name="text">
-      <string>Before starting calibration disconnect all loads and panel from the batteries and ensure that the panel is producing an output so that the interface has power. Calibration takes about 35 seconds to complete. For accurate SoC, leave disconnected for several hours.</string>
+      <string>  - Before starting calibration disconnect all loads and panel from the batteries using the GUI, and also disconnect the loads physically.
+  - Ensure that the panel is producing an output so that its interface has power.
+  - Calibration takes about 35 seconds to complete.
+  - For accurate SoC, leave disconnected for several hours before starting calibration.
+  - The quiescent current should be about 200mA or less. If it is much larger than this, it may be due to the batteries having terminal voltages significantly different between them. This can cause currents to flow between the batteries. Wait until the voltages even out by allowing them to be charged for a time.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -949,8 +953,8 @@
     <widget class="QLabel" name="qcLabel">
      <property name="geometry">
       <rect>
-       <x>236</x>
-       <y>190</y>
+       <x>234</x>
+       <y>255</y>
        <width>131</width>
        <height>17</height>
       </rect>
@@ -962,8 +966,8 @@
     <widget class="QLabel" name="quiescentCurrent">
      <property name="geometry">
       <rect>
-       <x>246</x>
-       <y>210</y>
+       <x>244</x>
+       <y>275</y>
        <width>111</width>
        <height>31</height>
       </rect>
@@ -986,9 +990,9 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>246</x>
-       <y>160</y>
-       <width>118</width>
+       <x>244</x>
+       <y>225</y>
+       <width>151</width>
        <height>23</height>
       </rect>
      </property>
@@ -1002,8 +1006,8 @@
     <widget class="QPushButton" name="forceZeroCurrent1">
      <property name="geometry">
       <rect>
-       <x>172</x>
-       <y>305</y>
+       <x>174</x>
+       <y>355</y>
        <width>31</width>
        <height>21</height>
       </rect>
@@ -1018,8 +1022,8 @@
     <widget class="QPushButton" name="forceZeroCurrent3">
      <property name="geometry">
       <rect>
-       <x>392</x>
-       <y>305</y>
+       <x>394</x>
+       <y>355</y>
        <width>31</width>
        <height>21</height>
       </rect>
@@ -1034,8 +1038,8 @@
     <widget class="QPushButton" name="forceZeroCurrent2">
      <property name="geometry">
       <rect>
-       <x>280</x>
-       <y>305</y>
+       <x>282</x>
+       <y>355</y>
        <width>31</width>
        <height>21</height>
       </rect>
@@ -1050,8 +1054,8 @@
     <widget class="QLabel" name="fcLabel">
      <property name="geometry">
       <rect>
-       <x>238</x>
-       <y>265</y>
+       <x>240</x>
+       <y>315</y>
        <width>131</width>
        <height>17</height>
       </rect>
@@ -1063,8 +1067,8 @@
     <widget class="QLabel" name="fcBatt1Label">
      <property name="geometry">
       <rect>
-       <x>154</x>
-       <y>285</y>
+       <x>164</x>
+       <y>335</y>
        <width>69</width>
        <height>17</height>
       </rect>
@@ -1076,8 +1080,8 @@
     <widget class="QLabel" name="fcBatt2Label">
      <property name="geometry">
       <rect>
-       <x>262</x>
-       <y>285</y>
+       <x>272</x>
+       <y>335</y>
        <width>69</width>
        <height>17</height>
       </rect>
@@ -1089,8 +1093,8 @@
     <widget class="QLabel" name="fcBatt3Label">
      <property name="geometry">
       <rect>
-       <x>372</x>
-       <y>285</y>
+       <x>382</x>
+       <y>335</y>
        <width>69</width>
        <height>17</height>
       </rect>
@@ -1103,13 +1107,16 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>340</y>
+       <y>370</y>
        <width>327</width>
        <height>71</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>About 200mA of quiescent current is carried, but not necessarily allocated to one battery.</string>
+     </property>
      <property name="text">
-      <string>Use these only if the current is known to be zero. One battery will carry about 200mA of quiescent current. After clicking these, also click on the &quot;Set&quot; button in the batteries tab.</string>
+      <string>Use these only if the current is known to be zero. After clicking these, also click on the &quot;Set&quot; button in the batteries tab.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
