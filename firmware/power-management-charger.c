@@ -421,7 +421,7 @@ int16_t voltageLimit(uint16_t limitV)
 /* Original heuristic (unknown source) */
 //    int32_t voltageOffset = (1984*(6835-getTemperature())) >> 16;
 /* Based on recommended 3mV per cell per degree C */
-    int32_t voltageOffset = (1180*(6835-getTemperature())) >> 16;
+    int32_t voltageOffset = (1180*(6400-getTemperature()))/65536;
     return limitV + voltageOffset;
 }
 

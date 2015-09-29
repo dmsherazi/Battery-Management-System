@@ -128,7 +128,7 @@ void setBatteryChargeParameters(int battery)
 {
     if (configData.config.batteryType[battery] == wetT)
     {
-        configData.config.absorptionVoltage[battery] = 3712;        /* 14.5V */
+        configData.config.absorptionVoltage[battery] = 3686;        /* 14.4V */
         configData.config.floatVoltage[battery] = 3379;             /* 13.2V */
     }
     else if (configData.config.batteryType[battery] == agmT)
@@ -138,7 +138,7 @@ void setBatteryChargeParameters(int battery)
     }
     else if (configData.config.batteryType[battery] == gelT)
     {
-        configData.config.absorptionVoltage[battery] = 3610;        /* 14.1V */
+        configData.config.absorptionVoltage[battery] = 3584;        /* 14.0V */
         configData.config.floatVoltage[battery] = 3532;             /* 13.8V */
     }
     configData.config.floatStageCurrentScale[battery] = 50;
